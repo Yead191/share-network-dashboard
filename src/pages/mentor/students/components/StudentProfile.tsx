@@ -23,7 +23,7 @@ const StudentProfile = ({ student }: { student: any }) => {
             {
                 loading: 'Creating chat room...',
                 success: (res) => {
-                    console.log(res);
+                    // console.log(res);
                     navigate(`/mentor/chat`);
                     return res?.data?.message || 'Chat room created successfully';
                 },

@@ -5,7 +5,7 @@ import { useGetMentorOverviewQuery } from '../../../../redux/apiSlices/mentor/me
 const MentorStatsCards = () => {
     const { data } = useGetMentorOverviewQuery(undefined);
     const mentorData = data?.data || [];
-    console.log(mentorData);
+    // console.log(mentorData);
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Assigned Students */}

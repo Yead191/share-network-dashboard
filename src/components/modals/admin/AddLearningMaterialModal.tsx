@@ -40,7 +40,7 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
                 ...values,
                 markAsAssigned: !!values.markAsAssigned,
             };
-            console.log('finalData', finalData);
+            // console.log('finalData', finalData);
             const mutation = selectedMaterial?._id
                 ? editMaterial({ id: selectedMaterial._id, data: finalData }).unwrap()
                 : addMaterial(finalData).unwrap();

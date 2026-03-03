@@ -9,7 +9,7 @@ interface MentorDetailsModalProps {
 }
 
 const MentorDetailsModal: React.FC<MentorDetailsModalProps> = ({ open, onCancel, mentor }) => {
-    console.log(mentor, 'selected mentor');
+    // console.log(mentor, 'selected mentor');
     if (!mentor) return null;
 
     const details = [

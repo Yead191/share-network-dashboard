@@ -48,7 +48,7 @@ const StudentGoalsSnapshot = ({ snapshots }: { snapshots: StudentSnapshot[] }) =
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
-                {snapshots.map((student, index) => (
+                {snapshots?.map((student, index) => (
                     <div key={student._id} className="relative">
                         {/* Student Profile Header */}
                         <div className="flex items-center gap-4 mb-6">
