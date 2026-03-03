@@ -11,9 +11,10 @@ const { TextArea } = Input;
 interface EditProfileProps {
     user: any;
     onCancel: () => void;
+    refetch: () => void;
 }
 
-const EditProfile: React.FC<EditProfileProps> = ({ user, onCancel }) => {
+const EditProfile: React.FC<EditProfileProps> = ({ user, onCancel, refetch }) => {
     const [profileForm] = Form.useForm();
     const [imgURL, setImgURL] = useState('');
     const [imgFile, setImageFile] = useState<File | null>(null);
@@ -30,7 +31,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, onCancel }) => {
                 preferredGroup: user?.preferedGroup,
                 availableHours: user?.aviliableHours,
                 about: user?.about || user?.about,
-                linkedinProfile: user?.linkedInProfile,
+                linkedInProfile: user?.linkedInProfile,
                 githubProfile: user?.githubProfile,
                 portfolioWebsite: user?.PortfolioWebsite,
                 city: user?.address?.city,
@@ -55,8 +56,8 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, onCancel }) => {
                 timer: 1500,
                 showConfirmButton: false,
             }).then(() => {
+                refetch();
                 onCancel();
-                window.location.reload();
             });
         }
 
@@ -205,10 +206,10 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, onCancel }) => {
 
                 {/* Links */}
                 {sectionTitle('Links')}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-2 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 mb-8">
                     <Form.Item
                         label={<span className="font-semibold text-gray-700">Linkedin Profile</span>}
-                        name="linkedinProfile"
+                        name="linkedInProfile"
                     >
                         <Input className="h-12 rounded-lg" placeholder="https://linkedin.com/..." />
                     </Form.Item>
@@ -217,12 +218,6 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, onCancel }) => {
                         name="githubProfile"
                     >
                         <Input className="h-12 rounded-lg" placeholder="https://github.com/..." />
-                    </Form.Item>
-                    <Form.Item
-                        label={<span className="font-semibold text-gray-700">Personal Website</span>}
-                        name="portfolioWebsite"
-                    >
-                        <Input className="h-12 rounded-lg" placeholder="https://..." />
                     </Form.Item>
                 </div>
 

@@ -35,7 +35,7 @@ const MentorOverviewResources = () => {
                     <div className="p-2 bg-indigo-500 rounded-lg text-white">
                         <BookOpen size={20} />
                     </div>
-                    Learning Resources
+                    Resources
                 </h3>
             </div>
 

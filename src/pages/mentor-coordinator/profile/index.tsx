@@ -4,20 +4,17 @@ import { EditOutlined } from '@ant-design/icons';
 import EditProfile from './components/EditProfile';
 import { imageUrl } from '../../../redux/api/baseApi';
 import { useProfileQuery as useGetProfileQuery } from '../../../redux/apiSlices/authSlice';
+import Spinner from '../../../components/shared/Spinner';
 
 export default function MentorCoordinatorProfile() {
-    const { data, isLoading } = useGetProfileQuery({});
+    const { data, isLoading, refetch } = useGetProfileQuery({});
 
     const user = data?.data?.data ?? data?.data ?? data;
-    // console.log(user);
+    console.log(user);
     const [isEditing, setIsEditing] = useState(false);
 
     if (isLoading) {
-        return (
-            <div className="flex justify-center mt-10">
-                <Spin size="large" />
-            </div>
-        );
+        return <Spinner />;
     }
 
     if (isEditing) {
@@ -30,7 +27,7 @@ export default function MentorCoordinatorProfile() {
                     </div>
                     <Button onClick={() => setIsEditing(false)}>Back to Profile</Button>
                 </div>
-                <EditProfile user={user} onCancel={() => setIsEditing(false)} />
+                <EditProfile user={user} onCancel={() => setIsEditing(false)} refetch={refetch} />
             </div>
         );
     }
@@ -85,7 +82,7 @@ export default function MentorCoordinatorProfile() {
             {/* About Me */}
             <div className="mb-10">
                 <h3 className="text-lg font-bold text-[#333333] mb-4">About Me</h3>
-                <div className="bg-white p-8 rounded-xl border border-gray-200 min-h-[140px] shadow-sm">
+                <div className="bg-white p-4 rounded-xl border border-gray-200 min-h-[100px] shadow-sm">
                     {user?.aboutMe || user?.about ? (
                         <p className="text-gray-700 leading-relaxed">{user?.aboutMe || user?.about}</p>
                     ) : (
@@ -101,10 +98,13 @@ export default function MentorCoordinatorProfile() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-2">
                         {infoItem('Full Name', displayName)}
                         {infoItem('Email', user?.email)}
+                        {infoItem('Gender', user?.gender)}
                         {infoItem('Professional Title', user?.professionalTitle)}
                         {infoItem('Preferred Group', user?.preferredGroup || user?.preferedGroup)}
-                        {infoItem('Phone', user?.mobileNumber || user?.mobileNumber)}
+                        {infoItem('Phone', user?.contactNumber || user?.mobileNumber)}
                         {infoItem('Available Hours', user?.availableHours || user?.aviliableHours)}
+                        {infoItem('LinkedIn', user?.linkedInProfile)}
+                        {infoItem('GitHub', user?.githubProfile)}
                     </div>
                 </div>
             </div>
