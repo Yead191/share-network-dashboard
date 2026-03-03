@@ -1,4 +1,5 @@
 import { Modal, Button } from 'antd';
+import { imageUrl } from '../../../../redux/api/baseApi';
 
 const ResourceDetailsModal = ({ open, onCancel, resource }: any) => {
     // console.log(resource);
@@ -58,6 +59,24 @@ const ResourceDetailsModal = ({ open, onCancel, resource }: any) => {
                         )}
                     </div>
                 </div>
+                <div className="grid grid-cols-2">
+                    <div className="bg-gray-50/50 p-4 font-semibold text-gray-500 text-sm">Download</div>
+                    <div className="p-4">
+                        {resource?.pdf ? (
+                            <a
+                                href={`${imageUrl}${resource.pdf}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline text-sm font-medium"
+                            >
+                                Download Resource
+                            </a>
+                        ) : (
+                            <span className="text-gray-400">N/A</span>
+                        )}
+                    </div>
+                </div>
+
             </div>
 
             <div className="flex justify-end mt-6">
