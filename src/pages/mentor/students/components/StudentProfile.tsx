@@ -1,7 +1,6 @@
 import { Card, Button } from 'antd';
 import { MessageSquare, Eye } from 'lucide-react';
-import { useProfileQuery } from '../../../../redux/apiSlices/authSlice';
-import { useGetStudentProfileQuery } from '../../../../redux/apiSlices/mentor/studentApi';
+
 import { imageUrl } from '../../../../redux/api/baseApi';
 import { useState } from 'react';
 import StudentProfileModal from '../../../../components/modals/mentor/StudentProfileModal';
@@ -9,12 +8,9 @@ import { useNavigate } from 'react-router-dom';
 import { useCreateChatRoomMutation } from '../../../../redux/apiSlices/chatSlice';
 import { toast } from 'sonner';
 
-const StudentProfile = () => {
+const StudentProfile = ({ student }: { student: any }) => {
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { data: mentorProfile } = useProfileQuery({});
-    const { data: studentProfile } = useGetStudentProfileQuery(mentorProfile?.data?.assignedStudents[0]?._id);
-    const student = studentProfile?.data || {};
 
     // create chat room
     const [createChatRoom] = useCreateChatRoomMutation();

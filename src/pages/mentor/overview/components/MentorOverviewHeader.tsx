@@ -13,7 +13,7 @@ const MentorOverviewHeader = () => {
                 </h1>
                 <p className="text-gray-600 mb-6 leading-relaxed">
                     Thanks for being a mentor! Your guidance and expertise make a real difference in shaping the next
-                    generation of tech professionals. Together, we're building a stronger, more connected learning
+                    generation of young professionals. Together, we're building a stronger, more connected learning
                     community.
                 </p>
                 <Link to="/mentor/profile">
