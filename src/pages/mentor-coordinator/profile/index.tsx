@@ -104,6 +104,7 @@ export default function MentorCoordinatorProfile() {
                         {infoItem('Phone', user?.contactNumber || user?.mobileNumber)}
                         {infoItem('LinkedIn', user?.linkedInProfile)}
                         {infoItem('GitHub', user?.githubProfile)}
+                        {infoItem('address', user?.address)}
                     </div>
                 </div>
             </div>

@@ -196,11 +196,8 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, onCancel, refetch }) =>
                     <Form.Item label={<span className="font-semibold text-gray-700">Phone</span>} name="mobileNumber">
                         <Input className="h-12 rounded-lg" placeholder="+31 6123456789" />
                     </Form.Item>
-                    <Form.Item
-                        label={<span className="font-semibold text-gray-700">Available Hours</span>}
-                        name="availableHours"
-                    >
-                        <Input className="h-12 rounded-lg" placeholder="39.5 hours" />
+                    <Form.Item label={<span className="font-semibold text-gray-700">Address</span>} name="address">
+                        <Input className="h-12 rounded-lg" placeholder="Rotterdam" />
                     </Form.Item>
                 </div>
 
@@ -218,23 +215,6 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, onCancel, refetch }) =>
                         name="githubProfile"
                     >
                         <Input className="h-12 rounded-lg" placeholder="https://github.com/..." />
-                    </Form.Item>
-                </div>
-
-                {/* Address Information */}
-                {sectionTitle('Address Information')}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-2 mb-8">
-                    <Form.Item label={<span className="font-semibold text-gray-700">City</span>} name="city">
-                        <Input className="h-12 rounded-lg" placeholder="Rotterdam" />
-                    </Form.Item>
-                    <Form.Item label={<span className="font-semibold text-gray-700">Zip Code</span>} name="zipCode">
-                        <Input className="h-12 rounded-lg" placeholder="3225 CD" />
-                    </Form.Item>
-                    <Form.Item
-                        label={<span className="font-semibold text-gray-700">Street Address</span>}
-                        name="streetAddress"
-                    >
-                        <Input className="h-12 rounded-lg" placeholder="Kralingseweg 225" />
                     </Form.Item>
                 </div>
 
