@@ -11,6 +11,7 @@ import {
     Sparkles,
     Users,
     GraduationCap,
+    Target,
 } from 'lucide-react';
 
 interface StudentProfileModalProps {
@@ -43,6 +44,11 @@ const StudentProfileModal = ({ isOpen, onClose, student }: StudentProfileModalPr
             icon: <Users className="w-4 h-4 text-primary" />,
             label: 'Groups',
             value: student.userGroup?.map((group: any) => group.name).join(', ') || 'No groups joined',
+        },
+        {
+            icon: <Target className="w-4 h-4 text-primary" />,
+            label: 'Track',
+            value: student?.userGroupTrack?.name || 'Not assigned',
         },
         {
             icon: <GraduationCap className="w-4 h-4 text-primary" />,

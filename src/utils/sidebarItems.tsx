@@ -211,7 +211,7 @@ export const mentorSidebarItems: TSidebarItem[] = [
     },
     {
         key: 'students',
-        label: 'Students',
+        label: 'Student',
         path: 'mentor/students',
         icon: <PiStudent size={24} />,
     },
@@ -229,7 +229,7 @@ export const mentorSidebarItems: TSidebarItem[] = [
     },
     {
         key: 'learning-materials',
-        label: 'Learning Materials',
+        label: 'Resources',
         path: 'mentor/learning-materials',
         icon: <LuBookOpen size={24} />,
     },

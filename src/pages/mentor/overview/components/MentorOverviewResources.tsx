@@ -17,7 +17,7 @@ interface Resource {
 }
 
 const MentorOverviewResources = () => {
-    const { data, isLoading } = useGetMentorOverviewResourcesQuery(undefined);
+    const { data, isLoading } = useGetMentorOverviewResourcesQuery({ targetedAudience: 'MENTOR' });
     const resources: Resource[] = data?.data?.resources || [];
     // console.log(resources);
     if (isLoading) {
