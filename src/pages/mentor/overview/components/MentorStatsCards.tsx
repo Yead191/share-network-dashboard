@@ -1,13 +1,13 @@
 import { Card, Progress } from 'antd';
-import { Users, Target, Calendar } from 'lucide-react';
+import { Users, Target } from 'lucide-react';
 import { useGetMentorOverviewQuery } from '../../../../redux/apiSlices/mentor/mentorOverviewApi';
 
 const MentorStatsCards = () => {
     const { data } = useGetMentorOverviewQuery(undefined);
     const mentorData = data?.data || [];
-    console.log(mentorData);
+    // console.log(mentorData);
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Assigned Students */}
             <Card className="rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex justify-between items-start">
@@ -44,7 +44,7 @@ const MentorStatsCards = () => {
             </Card>
 
             {/* Next Session */}
-            <Card className="rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            {/* <Card className="rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex justify-between items-start">
                     <div>
                         <p className="text-gray-400 text-sm font-medium mb-1">Next Session</p>
@@ -54,7 +54,7 @@ const MentorStatsCards = () => {
                         <Calendar size={24} />
                     </div>
                 </div>
-            </Card>
+            </Card> */}
         </div>
     );
 };

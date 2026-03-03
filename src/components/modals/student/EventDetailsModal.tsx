@@ -25,15 +25,15 @@ export const EventDetailsModal = ({ isOpen, onCancel, event }: EventDetailsModal
             className="event-details-modal overflow-hidden [&>.ant-modal-content]:p-0 [&>.ant-modal-content]:rounded-[24px]"
         >
             <div className="bg-white">
-                {/* Banner Image */}
-                        <div className="h-[300px] w-full relative overflow-hidden rounded-tl-[24px] rounded-tr-[24px]">
+                
+                        {/* <div className="h-[300px] w-full relative overflow-hidden rounded-tl-[24px] rounded-tr-[24px]">
                     <img
                         src={`${imageUrl}${event.image}`}
                         alt={event.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     
-                </div>
+                </div> */}
 
                 {/* Modal Content */}
                 <div className="py-8">

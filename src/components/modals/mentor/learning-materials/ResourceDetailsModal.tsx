@@ -1,7 +1,7 @@
 import { Modal, Button } from 'antd';
 
 const ResourceDetailsModal = ({ open, onCancel, resource }: any) => {
-    console.log(resource);
+    // console.log(resource);
     return (
         <Modal
             title={<span className="text-xl font-bold">Resources Details</span>}

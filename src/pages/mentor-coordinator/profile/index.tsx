@@ -9,7 +9,7 @@ export default function MentorCoordinatorProfile() {
     const { data, isLoading } = useGetProfileQuery({});
 
     const user = data?.data?.data ?? data?.data ?? data;
-    console.log(user);
+    // console.log(user);
     const [isEditing, setIsEditing] = useState(false);
 
     if (isLoading) {

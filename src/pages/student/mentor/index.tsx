@@ -19,7 +19,7 @@ export default function Mentor() {
 
     // Extract mentor from student profile
     const mentorRaw = profileData?.mentorId;
-    console.log(mentorRaw);
+    // console.log(mentorRaw);
     // Format mentor for UI
     const formattedMentor = mentorRaw
         ? {

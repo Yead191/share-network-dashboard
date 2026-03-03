@@ -29,7 +29,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, onCancel }) => {
                 professionalTitle: user?.professionalTitle,
                 preferredGroup: user?.preferedGroup,
                 availableHours: user?.aviliableHours,
-                aboutMe: user?.about || user?.aboutMe,
+                about: user?.about || user?.about,
                 linkedinProfile: user?.linkedInProfile,
                 githubProfile: user?.githubProfile,
                 portfolioWebsite: user?.PortfolioWebsite,
@@ -143,8 +143,8 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, onCancel }) => {
                 </div>
 
                 {/* About Me */}
-                {sectionTitle('About Me')}
-                <Form.Item name="aboutMe" className="mb-8">
+                {sectionTitle('About')}
+                <Form.Item name="about" className="mb-8">
                     <TextArea
                         rows={5}
                         placeholder="Tell us about yourself..."
