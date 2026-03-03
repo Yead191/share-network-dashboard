@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import AuthSidebar from '../../components/ui/AuthSidebar';
 import { useLoginMutation } from '../../redux/apiSlices/authSlice';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 export type errorType = {
     data: {
@@ -23,6 +24,7 @@ const Login = () => {
     // api call
     const [login] = useLoginMutation();
     const [form] = Form.useForm();
+    const [hiddenForget, setHiddenForget] = useState(false);
 
     const onFinish: FormProps<LoginFormValues>['onFinish'] = async (values) => {
         try {
@@ -51,6 +53,11 @@ const Login = () => {
     };
 
     const handleValuesChange = (changedValues: any) => {
+        if (changedValues.role === 'mentor') {
+            setHiddenForget(true);
+        } else {
+            setHiddenForget(false);
+        }
         if (changedValues.role) {
             const roleCredentials: Record<string, { email: string }> = {
                 admin: { email: 'azizulsparktech@gmail.com' },
@@ -151,9 +158,14 @@ const Login = () => {
                                 <Form.Item name="remember" valuePropName="checked" noStyle>
                                     <Checkbox className="text-[#64748B]">Remember Me</Checkbox>
                                 </Form.Item>
-                                <Link to="/forget-password" className="text-[#F43F5E] hover:text-[#E11D48] font-medium">
-                                    Forgot Password?
-                                </Link>
+                                {!hiddenForget && (
+                                    <Link
+                                        to="/forget-password"
+                                        className="text-[#F43F5E] hover:text-[#E11D48] font-medium"
+                                    >
+                                        Forgot Password?
+                                    </Link>
+                                )}
                             </div>
 
                             <Form.Item className="mb-0">
