@@ -102,7 +102,6 @@ export default function MentorCoordinatorProfile() {
                         {infoItem('Professional Title', user?.professionalTitle)}
                         {infoItem('Preferred Group', user?.preferredGroup || user?.preferedGroup)}
                         {infoItem('Phone', user?.contactNumber || user?.mobileNumber)}
-                        {infoItem('Available Hours', user?.availableHours || user?.aviliableHours)}
                         {infoItem('LinkedIn', user?.linkedInProfile)}
                         {infoItem('GitHub', user?.githubProfile)}
                     </div>
