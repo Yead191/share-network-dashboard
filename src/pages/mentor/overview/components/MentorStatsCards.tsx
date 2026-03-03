@@ -1,5 +1,5 @@
 import { Card, Progress } from 'antd';
-import { Users, Target, Calendar } from 'lucide-react';
+import { Users, Target } from 'lucide-react';
 import { useGetMentorOverviewQuery } from '../../../../redux/apiSlices/mentor/mentorOverviewApi';
 
 const MentorStatsCards = () => {

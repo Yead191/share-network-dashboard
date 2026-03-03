@@ -1,13 +1,8 @@
 import { Avatar } from 'antd';
-import { useProfileQuery } from '../../../../redux/apiSlices/authSlice';
 import { imageUrl } from '../../../../redux/api/baseApi';
 import { Link } from 'react-router-dom';
 
-const MentorProfileCard = () => {
-    const { data } = useProfileQuery({});
-
-    const mentor = data?.data?.data ?? data?.data ?? data;
-    console.log(mentor);
+const MentorProfileCard = ({ mentor }: { mentor: any }) => {
     return (
         <Link
             to={'/mentor/students'}
