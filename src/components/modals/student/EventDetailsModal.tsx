@@ -1,18 +1,17 @@
 import { Modal } from 'antd';
-import { LuCalendarDays, LuClock, LuMapPin } from 'react-icons/lu';
-import { Event } from '../../../constants/student/events';
-import { imageUrl } from '../../../redux/api/baseApi';
 
+import dayjs from 'dayjs';
 
 interface EventDetailsModalProps {
     isOpen: boolean;
     onCancel: () => void;
-    event: Event | null;
+    event: any | null;
 }
 
 export const EventDetailsModal = ({ isOpen, onCancel, event }: EventDetailsModalProps) => {
     if (!event) return null;
-  
+
+    const formattedDate = dayjs(event.date).format('MM/DD/YYYY');
 
     return (
         <Modal
@@ -20,64 +19,84 @@ export const EventDetailsModal = ({ isOpen, onCancel, event }: EventDetailsModal
             title={null}
             onCancel={onCancel}
             footer={null}
-            width={700}
+            width={650}
             centered
-            className="event-details-modal overflow-hidden [&>.ant-modal-content]:p-0 [&>.ant-modal-content]:rounded-[24px]"
+            className="event-details-modal overflow-hidden [&>.ant-modal-content]:p-0 [&>.ant-modal-content]:rounded-[12px]"
         >
-            <div className="bg-white">
-                
-                        {/* <div className="h-[300px] w-full relative overflow-hidden rounded-tl-[24px] rounded-tr-[24px]">
-                    <img
-                        src={`${imageUrl}${event.image}`}
-                        alt={event.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    
-                </div> */}
+            <div className="bg-white p-8">
+                <h2 className="text-2xl font-bold text-[#1E293B] mb-2">Event Details</h2>
+                <div className="h-[1px] bg-gray-100 mb-6" />
 
-                {/* Modal Content */}
-                <div className="py-8">
-                    <h2 className="text-[28px] font-bold text-[#1E293B] mb-6">{event.title}</h2>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                        <div className="flex items-center gap-3 text-[#64748B]">
-                            <div className="w-10 h-10 rounded-full bg-[#8B5CF6]/10 flex items-center justify-center text-[#8B5CF6]">
-                                <LuCalendarDays size={20} />
-                            </div>
-                            <span className="font-medium text-base">{event.date}</span>
-                        </div>
-                        <div className="flex items-center gap-3 text-[#64748B]">
-                            <div className="w-10 h-10 rounded-full bg-[#10B981]/10 flex items-center justify-center text-[#10B981]">
-                                <LuClock size={20} />
-                            </div>
-                            <span className="font-medium text-base">
-                                {event.startTime} - {event.endTime}
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-3 text-[#64748B]">
-                            <div className="w-10 h-10 rounded-full bg-[#F43F5E]/10 flex items-center justify-center text-[#F43F5E]">
-                                <LuMapPin size={20} />
-                            </div>
-                            <span className="font-medium text-base">{event.location}</span>
-                        </div>
-                    </div>
-
-                    <p className="text-[#64748B] text-lg leading-relaxed font-normal">{event.description}</p>
+                <div className="mb-6">
+                    <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-1">Title</h3>
+                    <p className="text-lg text-[#334155] font-medium">{event.title}</p>
                 </div>
+
+                <div className="mb-8">
+                    <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-1">Description</h3>
+                    <p className="text-[#64748B] text-base leading-relaxed">
+                        {event.description}
+                    </p>
+                </div>
+
+  <div className="grid grid-cols-2 gap-y-8 gap-x-4">
+    {/* Event Date */}
+    <div>
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Event Date</h3>
+        <div className="text-[#334155] text-base">
+            {event.date ? dayjs(event.date).format('MM/DD/YYYY') : 'N/A'}
+        </div>
+    </div>
+
+    <div>
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Location</h3>
+        <div className="text-[#334155] text-base">
+            {event.location || 'N/A'}
+        </div>
+    </div>
+
+    <div>
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Type</h3>
+        <div className="text-[#334155] capitalize text-base">
+            {event.type}
+        </div>
+    </div>
+
+    <div />
+
+
+    <div>
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Target Group</h3>
+        <div className="text-[#334155] text-base">
+            {event.targetGroup && event.targetGroup.name ? event.targetGroup.name : "All groups"}
+        </div>
+    </div>
+
+
+    <div>
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Target Track</h3>
+        <div className="text-[#334155] text-base">
+            {event.targetTrack && event.targetTrack.name ? event.targetTrack.name : "All tracks"}
+        </div>
+    </div>
+
+    {/* <div>
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Target User (Optional)</h3>
+        <div className="text-[#334155] text-base">
+            {event.studentAssigned && event.studentAssigned.length > 0 ? "Specific assigned users" : "All users"}
+        </div>
+    </div> */}
+</div>
             </div>
 
             <style>{`
                 .event-details-modal .ant-modal-close {
-                    background: white;
-                    border-radius: 50%;
-                    top: 20px;
-                    right: 20px;
-                    width: 40px;
-                    height: 40px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    top: 24px;
+                    right: 24px;
+                }
+                .event-details-modal .ant-modal-content {
+                    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
                 }
             `}</style>
         </Modal>
