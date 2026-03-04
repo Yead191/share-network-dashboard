@@ -11,7 +11,6 @@ interface EventDetailsModalProps {
 export const EventDetailsModal = ({ isOpen, onCancel, event }: EventDetailsModalProps) => {
     if (!event) return null;
 
-    const formattedDate = dayjs(event.date).format('MM/DD/YYYY');
 
     return (
         <Modal

@@ -14,13 +14,20 @@ import {
 } from '../../../redux/apiSlices/students/overview.slice';
 import { imageUrl } from '../../../redux/api/baseApi';
 import Spinner from '../../../components/shared/Spinner';
+import { EventDetailsModal } from '../../../components/modals/student/EventDetailsModal';
+import { useState } from 'react';
 
 const StudentOverview = () => {
     const { data: overviewData, isLoading, error } = useGetstudentOverviewQuery(undefined);
     const { data: profileData } = useGetprofileQuery(undefined);
     const { data: eventsData } = useGetUpcomingSessionsQuery(undefined);
     const { data: assignmentsData } = useGetActiveAssignmentsQuery(undefined);
-
+const [isModalOpen, setIsModalOpen] = useState(false);
+const handleEventClick = (event: any) => {
+        setSelectedEvent(event);
+        setIsModalOpen(true);
+    };
+    const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
     if (isLoading) {
         return <Spinner />;
     }
@@ -58,22 +65,20 @@ const StudentOverview = () => {
         },
     ];
 
-    const formattedEvents =
-        eventsData?.data?.map((event: any) => ({
-            id: event._id,
-            title: event.title,
-            date: event.date,
-            image: event.image ? `${imageUrl}${event.image}` : 'https://via.placeholder.com/150',
+const rawEvents = eventsData?.data?.data || eventsData?.data || [];
 
-            description: event.description,
-            month: new Date(event.date).toLocaleString('en-US', { month: 'short' }),
-            day: new Date(event.date).getDate(),
-            startTime: new Date(event.date).toLocaleTimeString(),
-            endTime: new Date(event.date).toLocaleTimeString(),
-            location: 'Online',
-            color: '#3BB77E',
-        })) || [];
-
+const formattedEvents = Array.isArray(rawEvents) ? rawEvents.map((event: any) => ({
+    ...event,
+    id: event._id,
+    title: event.title,
+    date: event.date,
+    color: '#3BB77E',
+    month: new Date(event.date).toLocaleString('en-US', { month: 'short' }),
+    day: new Date(event.date).getDate(),
+    startTime: new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    endTime: "End Time",
+    location: event.location || 'Online',
+})) : [];
     const formattedAssignments =
         assignmentsData?.data?.map((a: any) => ({
             id: a._id,
@@ -116,15 +121,35 @@ const StudentOverview = () => {
                 ))}
             </div>
 
-            <div>
+            {/* <div>
                 <HeaderTitle title="Upcoming Events" />
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-3">
                     {formattedEvents.map((event: any) => (
                         <EventCard key={event.id} event={event} />
                     ))}
+                    <EventDetailsModal isOpen={isModalOpen} onCancel={() => setIsModalOpen(false)} event={selectedEvent} />
                 </div>
+            </div> */}
+        <div>
+                <HeaderTitle title="Upcoming Events" />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-3">
+                    {formattedEvents.map((event: any) => (
+                        <div 
+                            key={event.id} 
+                            onClick={() => handleEventClick(event)} 
+                            className="cursor-pointer"
+                        >
+                            <EventCard event={event} />
+                        </div>
+                    ))}
+                </div>
+    
+                <EventDetailsModal 
+                    isOpen={isModalOpen} 
+                    onCancel={() => setIsModalOpen(false)} 
+                    event={selectedEvent} 
+                />
             </div>
-
             <div>
                 <HeaderTitle title="Active Assignments" />
                 <div className="space-y-4 pt-3">
