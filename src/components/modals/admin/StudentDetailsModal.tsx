@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Tag } from 'antd';
 import { X } from 'lucide-react';
+import { GoalCard } from './GoalCard';
 
 interface StudentDetailsModalProps {
     open: boolean;
@@ -45,7 +46,7 @@ const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ open, onCance
     const SectionHeader = ({ title }: { title: string }) => (
         <h3 className="text-gray-700 font-bold mb-4 mt-8 px-2">{title}</h3>
     );
-
+    const initialGoals = student?.Goals;
     return (
         <Modal
             title={<span className="text-xl font-semibold">Student Details - {student.name}</span>}
@@ -114,6 +115,17 @@ const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ open, onCance
                         </div>
                     </>
                 )}
+
+                <SectionHeader title="Goals" />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {initialGoals.length > 0 ? (
+                        initialGoals.map((goal: any) => <GoalCard key={goal._id} goal={goal} />)
+                    ) : (
+                        <div className="col-span-full py-20 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                            <p className="text-gray-400 font-medium">No goals found. Create your first goal!</p>
+                        </div>
+                    )}
+                </div>
             </div>
         </Modal>
     );
