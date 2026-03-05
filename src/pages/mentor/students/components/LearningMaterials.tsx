@@ -8,7 +8,7 @@ const LearningMaterials = ({ resources }: any) => {
             className="shadow-sm border-none rounded-2xl overflow-hidden"
             title={<span className="text-xl font-bold">Learning Materials</span>}
         >
-            <div className="flex-1 overflow-y-auto custom-scrollbar max-h-[500px]">
+            <div className="flex-1 overflow-y-auto custom-scrollbar max-h-[280px]">
                 {resources.length > 0 ? (
                     <div className="divide-y divide-gray-50">
                         {resources?.map((resource: any) => (
