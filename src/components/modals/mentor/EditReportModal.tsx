@@ -1,21 +1,46 @@
+import { useEffect } from 'react';
 import { Modal, Form, Select, DatePicker, Checkbox, Input, Slider, Radio } from 'antd';
-import { useAddWeeklyReportMutation } from '../../../redux/apiSlices/mentor/weeklyReportApi';
+import { useUpdateWeeklyReportMutation } from '../../../redux/apiSlices/mentor/weeklyReportApi';
 import { toast } from 'sonner';
+import dayjs from 'dayjs';
 
-interface AddReportModalProps {
+interface EditReportModalProps {
     open: boolean;
     onCancel: () => void;
+    data: any;
     assignedStudent: any;
     refetch: () => void;
 }
 
-const AddReportModal = ({ open, onCancel, assignedStudent, refetch }: AddReportModalProps) => {
-    const [addWeeklyReport] = useAddWeeklyReportMutation();
+const EditReportModal = ({ open, onCancel, data, assignedStudent, refetch }: EditReportModalProps) => {
+    const [updateWeeklyReport] = useUpdateWeeklyReportMutation();
     const [form] = Form.useForm();
+
+    useEffect(() => {
+        if (open && data) {
+            form.setFieldsValue({
+                student: data.studentId?._id || data.studentId,
+                startDate: data.weekStartDate ? dayjs(data.weekStartDate) : undefined,
+                endDate: data.weekEndDate ? dayjs(data.weekEndDate) : undefined,
+                isPresent: data.isPresent ? 'yes' : 'no',
+                achievedHardOutcomes: data.achievedHardOutcomes || [],
+                softSkillImprovements: data.softSkillImprovements || [],
+                whatDidYouWorkOnThisWeek: data.whatDidYouWorkOnThisWeek,
+                whatProgressDidTheStudentMake: data.whatProgressDidTheStudentMake,
+                highLightAchivementsAndImprove: data.highLightAchivementsAndImprove,
+                planForNextWeek: data.planForNextWeek,
+                skillName: data.goalSheet?.skillName,
+                plannedProgress: data.goalSheet?.plannedProgress,
+                actualProgress: data.goalSheet?.actualProgress,
+                comments: data.comments,
+            });
+        }
+    }, [open, data, form]);
 
     const onFinish = async (values: any) => {
         try {
             const formattedValues = {
+                id: data?._id,
                 ...values,
                 weekStartDate: values.startDate?.toISOString(),
                 weekEndDate: values.endDate?.toISOString(),
@@ -25,30 +50,28 @@ const AddReportModal = ({ open, onCancel, assignedStudent, refetch }: AddReportM
                     plannedProgress: values.plannedProgress,
                     actualProgress: values.actualProgress,
                 },
-                studentId: assignedStudent[0]._id,
+                studentId: values.student,
             };
 
-            toast.promise(addWeeklyReport(formattedValues).unwrap(), {
-                loading: 'Adding report...',
+            toast.promise(updateWeeklyReport(formattedValues).unwrap(), {
+                loading: 'Updating report...',
                 success: (res) => {
-                    form.resetFields();
                     refetch();
                     onCancel();
-                    return res.message || 'Report added successfully';
+                    return res.message || 'Report updated successfully';
                 },
                 error: (err) => {
-                    return err.data.message || 'Failed to add report';
+                    return err?.data?.message || 'Failed to update report';
                 },
             });
         } catch (error) {
-            console.error('Failed to add report:', error);
+            console.error('Failed to update report:', error);
         }
     };
 
-    // assigned student
     return (
         <Modal
-            title={<span className="text-xl font-bold">Add Report</span>}
+            title={<span className="text-xl font-bold">Edit Report</span>}
             open={open}
             onCancel={onCancel}
             footer={null}
@@ -60,7 +83,7 @@ const AddReportModal = ({ open, onCancel, assignedStudent, refetch }: AddReportM
                 <Form.Item name="student" label={<span className="font-semibold">Student</span>}>
                     <Select placeholder="Select Student">
                         {assignedStudent?.map((student: any) => (
-                            <Select.Option key={student._id} value={student._id}>
+                            <Select.Option key={student.id || student._id} value={student.id || student._id}>
                                 {student?.firstName + ' ' + student?.lastName}
                             </Select.Option>
                         )) || <Select.Option value="">No student assigned</Select.Option>}
@@ -69,10 +92,10 @@ const AddReportModal = ({ open, onCancel, assignedStudent, refetch }: AddReportM
 
                 <div className="grid grid-cols-2 gap-4">
                     <Form.Item name="startDate" label={<span className="font-semibold">Week Start Date</span>}>
-                        <DatePicker className="w-full" placeholder="mm/dd/yyyy" />
+                        <DatePicker className="w-full" placeholder="mm/dd/yyyy" format="MM/DD/YYYY" />
                     </Form.Item>
                     <Form.Item name="endDate" label={<span className="font-semibold">Week End Date</span>}>
-                        <DatePicker className="w-full" placeholder="mm/dd/yyyy" />
+                        <DatePicker className="w-full" placeholder="mm/dd/yyyy" format="MM/DD/YYYY" />
                     </Form.Item>
                 </div>
 
@@ -98,7 +121,6 @@ const AddReportModal = ({ open, onCancel, assignedStudent, refetch }: AddReportM
                         }
                     >
                         <Checkbox.Group className="grid grid-cols-3 gap-2">
-                            {/* <Checkbox value="HTML/CSS Development">HTML/CSS Development</Checkbox> */}
                             <Checkbox value="Homework">Homework</Checkbox>
                             <Checkbox value="Assignment">Assignment</Checkbox>
                             <Checkbox value="Volunteering">Volunteering</Checkbox>
@@ -212,16 +234,6 @@ const AddReportModal = ({ open, onCancel, assignedStudent, refetch }: AddReportM
                     </div>
                 </div>
 
-                {/* <div className="">
-                    <h3 className="font-semibold text-lg text-gray-800 pb-2">Objectives</h3>
-                    <Form.Item
-                        name="objectives"
-                        label={<span className="text-sm font-medium">Write the objectives</span>}
-                    >
-                        <Input.TextArea rows={4} className="rounded-xl" />
-                    </Form.Item>
-                </div> */}
-
                 <Form.Item name="comments" label={<span className="text-sm font-medium">Comments</span>}>
                     <Input.TextArea rows={2} placeholder="General comments..." className="rounded-xl" />
                 </Form.Item>
@@ -231,7 +243,7 @@ const AddReportModal = ({ open, onCancel, assignedStudent, refetch }: AddReportM
                         type="submit"
                         className="flex-1 h-11 rounded-xl font-semibold bg-primary text-white border-none hover:opacity-90 transition-opacity"
                     >
-                        Submit
+                        Save Changes
                     </button>
                 </div>
             </Form>
@@ -239,4 +251,4 @@ const AddReportModal = ({ open, onCancel, assignedStudent, refetch }: AddReportM
     );
 };
 
-export default AddReportModal;
+export default EditReportModal;

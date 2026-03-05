@@ -22,7 +22,19 @@ const timeTrackingApi = api.injectEndpoints({
             }),
             invalidatesTags: ['TimeTracks'],
         }),
+        deleteTimeTrack: builder.mutation({
+            query: (id: string) => ({
+                url: `/mentor/time-track/${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['TimeTracks'],
+        }),
     }),
 });
 
-export const { useGetTimeTrackingQuery, useCreateTimeTrackingMutation } = timeTrackingApi;
+export const {
+    useGetTimeTrackingQuery,
+    useCreateTimeTrackingMutation,
+    useDeleteTimeTrackMutation,
+    useUpdateTimeTrackingMutation,
+} = timeTrackingApi;

@@ -43,7 +43,9 @@ const ReportDetailsModal = ({ open, onCancel, data }: ReportDetailsModalProps) =
                                     <td className="px-4 py-3 bg-gray-50 font-medium text-gray-600 w-1/3">
                                         Student Name
                                     </td>
-                                    <td className="px-4 py-3 text-gray-800">{data?.studentId?.name || 'N/A'}</td>
+                                    <td className="px-4 py-3 text-gray-800">
+                                        {data?.studentId?.firstName + ' ' + data?.studentId?.lastName || 'N/A'}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td className="px-4 py-3 bg-gray-50 font-medium text-gray-600">Duration</td>

@@ -15,7 +15,25 @@ const weeklyReportsApi = api.injectEndpoints({
                 body: data,
             }),
         }),
+        updateWeeklyReport: build.mutation({
+            query: (data: any) => ({
+                url: `/mentor/report/${data.id}`,
+                method: 'PATCH',
+                body: data,
+            }),
+        }),
+        deleteWeeklyReport: build.mutation({
+            query: (id: string) => ({
+                url: `/mentor/report/${id}`,
+                method: 'DELETE',
+            }),
+        }),
     }),
 });
 
-export const { useGetWeeklyReportsQuery, useAddWeeklyReportMutation } = weeklyReportsApi;
+export const {
+    useGetWeeklyReportsQuery,
+    useAddWeeklyReportMutation,
+    useUpdateWeeklyReportMutation,
+    useDeleteWeeklyReportMutation,
+} = weeklyReportsApi;

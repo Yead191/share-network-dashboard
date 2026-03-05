@@ -13,10 +13,6 @@ export default function MentorCoordinatorProfile() {
     console.log(user);
     const [isEditing, setIsEditing] = useState(false);
 
-    if (isLoading) {
-        return <Spinner />;
-    }
-
     if (isEditing) {
         return (
             <div>
@@ -51,6 +47,9 @@ export default function MentorCoordinatorProfile() {
         : undefined;
     console.log('User Profile Data:', profileSrc);
 
+    if (isLoading) {
+        return <Spinner />;
+    }
     return (
         <div>
             <div className="flex justify-between items-center mb-8">
