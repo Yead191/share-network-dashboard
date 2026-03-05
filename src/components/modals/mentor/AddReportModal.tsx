@@ -98,14 +98,15 @@ const AddReportModal = ({ open, onCancel, assignedStudent, refetch }: AddReportM
                         }
                     >
                         <Checkbox.Group className="grid grid-cols-3 gap-2">
-                            <Checkbox value="HTML/CSS Development">HTML/CSS Development</Checkbox>
-                            <Checkbox value="Assignment1">Assignment1</Checkbox>
-                            <Checkbox value="Homework1">Homework1</Checkbox>
+                            {/* <Checkbox value="HTML/CSS Development">HTML/CSS Development</Checkbox> */}
+                            <Checkbox value="Homework">Homework</Checkbox>
+                            <Checkbox value="Assignment">Assignment</Checkbox>
+                            <Checkbox value="Volunteering">Volunteering</Checkbox>
                             <Checkbox value="Employment">Employment</Checkbox>
                             <Checkbox value="Training">Training</Checkbox>
-                            <Checkbox value="Volunteering">Volunteering</Checkbox>
                         </Checkbox.Group>
                     </Form.Item>
+
 
                     <Form.Item
                         name="softSkillImprovements"
@@ -121,10 +122,6 @@ const AddReportModal = ({ open, onCancel, assignedStudent, refetch }: AddReportM
                             <Checkbox value="Time Management">Time Management</Checkbox>
                             <Checkbox value="Problem Solving">Problem Solving</Checkbox>
                         </Checkbox.Group>
-                    </Form.Item>
-
-                    <Form.Item name="comments" label={<span className="text-sm font-medium">Comments</span>}>
-                        <Input.TextArea rows={2} placeholder="General comments..." className="rounded-xl" />
                     </Form.Item>
 
                     <Form.Item
@@ -216,7 +213,7 @@ const AddReportModal = ({ open, onCancel, assignedStudent, refetch }: AddReportM
                     </div>
                 </div>
 
-                <div className="">
+                {/* <div className="">
                     <h3 className="font-semibold text-lg text-gray-800 pb-2">Objectives</h3>
                     <Form.Item
                         name="objectives"
@@ -224,7 +221,11 @@ const AddReportModal = ({ open, onCancel, assignedStudent, refetch }: AddReportM
                     >
                         <Input.TextArea rows={4} className="rounded-xl" />
                     </Form.Item>
-                </div>
+                </div> */}
+
+                <Form.Item name="comments" label={<span className="text-sm font-medium">Comments</span>}>
+                        <Input.TextArea rows={2} placeholder="General comments..." className="rounded-xl" />
+                    </Form.Item>
 
                 <div className="flex gap-4 pt-4">
                     <button
