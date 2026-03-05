@@ -24,6 +24,7 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
                 title: selectedMaterial?.title,
                 description: selectedMaterial?.description,
                 type: selectedMaterial?.type,
+                pdf: selectedMaterial?.pdf,
                 contentUrl: selectedMaterial?.url,
                 targetAudience: selectedMaterial?.targetAudience,
                 targertGroup: selectedMaterial?.target?._id || selectedMaterial?.target,
@@ -34,38 +35,74 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
         }
     }, [open, selectedMaterial, form]);
 
-    const onFinish = async (values: any) => {
-        try {
-            const finalData = {
-                ...values,
-                markAsAssigned: !!values.markAsAssigned,
-            };
-            // console.log('finalData', finalData);
-            const mutation = selectedMaterial?._id
-                ? editMaterial({ id: selectedMaterial._id, data: finalData }).unwrap()
-                : addMaterial(finalData).unwrap();
+    // const onFinish = async (values: any) => {
+    //     try {
+    //         const finalData = {
+    //             ...values,
+    //             markAsAssigned: !!values.markAsAssigned,
+    //         };
+    //         // console.log('finalData', finalData);
+    //         const mutation = selectedMaterial?._id
+    //             ? editMaterial({ id: selectedMaterial._id, data: finalData }).unwrap()
+    //             : addMaterial(finalData).unwrap();
 
-            toast.promise(mutation, {
-                loading: selectedMaterial?._id ? 'Updating material...' : 'Creating material...',
+    //         toast.promise(mutation, {
+    //             loading: selectedMaterial?._id ? 'Updating material...' : 'Creating material...',
 
-                success: (res: any) => {
-                    if (res?.success) {
-                        refetch();
-                        form.resetFields();
-                        onCancel();
-                    }
-                    return (
-                        res?.message || `Class schedule ${selectedMaterial?._id ? 'updated' : 'created'} successfully`
-                    );
-                },
-                error: (err: any) =>
-                    err?.message || `Failed to ${selectedMaterial?._id ? 'update' : 'create'} class schedule`,
-            });
-        } catch (error: any) {
-            toast.error(error?.data?.message || 'Something went wrong');
+    //             success: (res: any) => {
+    //                 if (res?.success) {
+    //                     refetch();
+    //                     form.resetFields();
+    //                     onCancel();
+    //                 }
+    //                 return (
+    //                     res?.message || `Class schedule ${selectedMaterial?._id ? 'updated' : 'created'} successfully`
+    //                 );
+    //             },
+    //             error: (err: any) =>
+    //                 err?.message || `Failed to ${selectedMaterial?._id ? 'update' : 'create'} class schedule`,
+    //         });
+    //     } catch (error: any) {
+    //         toast.error(error?.data?.message || 'Something went wrong');
+    //     }
+    // };
+const onFinish = async (values: any) => {
+    try {
+        const formData = new FormData();
+
+        formData.append("title", values.title);
+        formData.append("description", values.description || "");
+        formData.append("type", values.type);
+        formData.append("contentUrl", values.contentUrl || "");
+        formData.append("targetAudience", values.targetAudience);
+        formData.append("targertGroup", values.targertGroup || "");
+        formData.append("markAsAssigned", values.markAsAssigned ? "true" : "false");
+
+        if (values.pdf?.[0]?.originFileObj) {
+            formData.append("pdf", values.pdf[0].originFileObj);
         }
-    };
 
+        const mutation = selectedMaterial?._id
+            ? editMaterial({ id: selectedMaterial._id, data: formData }).unwrap()
+            : addMaterial(formData).unwrap();
+
+        toast.promise(mutation, {
+            loading: selectedMaterial?._id ? "Updating material..." : "Creating material...",
+            success: (res: any) => {
+                if (res?.success) {
+                    refetch();
+                    form.resetFields();
+                    onCancel();
+                }
+                return res?.message || "Material saved successfully";
+            },
+            error: (err: any) => err?.message || "Failed to save material",
+        });
+
+    } catch (error: any) {
+        toast.error(error?.data?.message || "Something went wrong");
+    }
+};
     return (
         <Modal
             title={null}
@@ -168,6 +205,18 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
                         />
                     </Form.Item>
                 </div>
+
+                <div className="mb-4">
+                    <Form.Item
+                        name="pdf"
+                        label={<span className="text-sm font-semibold text-gray-700">Upload PDF</span>}
+                        valuePropName="fileList"
+                        getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
+                    >
+                        <Input type="file" accept=".pdf" className="h-11 rounded-lg border-gray-200" />
+                    </Form.Item>
+                </div>
+                
 
                 <Form.Item name="markAsAssigned" valuePropName="checked">
                     <Checkbox className="text-gray-600">Mark as Assigned</Checkbox>

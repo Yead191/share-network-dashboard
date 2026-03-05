@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Table, Button } from 'antd';
-import { Eye, Trash2, Plus } from 'lucide-react';
+import { Eye} from 'lucide-react';
 import AddResourceModal from '../../../components/modals/mentor/learning-materials/AddResourceModal';
 import ResourceDetailsModal from '../../../components/modals/mentor/learning-materials/ResourceDetailsModal';
 import RemoveResourceModal from '../../../components/modals/mentor/learning-materials/RemoveResourceModal';

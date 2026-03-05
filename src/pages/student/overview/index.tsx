@@ -85,7 +85,7 @@ const formattedEvents = Array.isArray(rawEvents) ? rawEvents.map((event: any) =>
             title: a.title,
             dueDate: new Date(a.dueDate).toLocaleDateString(),
             subject: 'COMPUTER',
-            status: 'In Process',
+            status: 'PENDING',
         })) || [];
 
     return (
@@ -121,15 +121,6 @@ const formattedEvents = Array.isArray(rawEvents) ? rawEvents.map((event: any) =>
                 ))}
             </div>
 
-            {/* <div>
-                <HeaderTitle title="Upcoming Events" />
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-3">
-                    {formattedEvents.map((event: any) => (
-                        <EventCard key={event.id} event={event} />
-                    ))}
-                    <EventDetailsModal isOpen={isModalOpen} onCancel={() => setIsModalOpen(false)} event={selectedEvent} />
-                </div>
-            </div> */}
         <div>
                 <HeaderTitle title="Upcoming Events" />
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-3">
