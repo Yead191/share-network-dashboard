@@ -58,7 +58,6 @@ const Student = () => {
     };
 
     const columns = [
-        // ... (columns definitions)
         {
             title: 'STUDENT',
             dataIndex: 'firstName',
@@ -122,12 +121,11 @@ const Student = () => {
         },
         {
             title: 'STATUS',
-            dataIndex: 'verified',
+            dataIndex: 'status',
             key: 'status',
-            render: (verified: boolean) => {
-                const status = verified ? 'Verified' : 'Unverified';
-                const color = verified ? '#f6ffed' : '#fff7e6';
-                const textColor = verified ? '#52c41a' : '#faad14';
+            render: (status: string) => {
+                const color = status === 'ACTIVE' || status === 'Active' ? '#f6ffed' : '#fff7e6';
+                const textColor = status === 'ACTIVE' || status === 'Active' ? '#52c41a' : '#faad14';
                 return (
                     <Tag
                         className="rounded-full px-4 py-0.5 border-none font-medium"

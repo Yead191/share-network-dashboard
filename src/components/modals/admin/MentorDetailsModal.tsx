@@ -8,11 +8,16 @@ interface MentorDetailsModalProps {
     mentor: any;
 }
 
+interface DetailItem {
+    label: string;
+    value: React.ReactNode;
+}
+
 const MentorDetailsModal: React.FC<MentorDetailsModalProps> = ({ open, onCancel, mentor }) => {
     // console.log(mentor, 'selected mentor');
     if (!mentor) return null;
 
-    const details = [
+    const details: DetailItem[] = [
         { label: 'First Name', value: mentor.firstName },
         { label: 'Last Name', value: mentor.lastName },
         { label: 'Email', value: mentor.email },

@@ -49,7 +49,11 @@ const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ open, onCance
     const initialGoals = student?.Goals;
     return (
         <Modal
-            title={<span className="text-xl font-semibold">Student Details - {student.name}</span>}
+            title={
+                <span className="text-xl font-semibold">
+                    Student Details - {student.firstName} {student.lastName}
+                </span>
+            }
             open={open}
             onCancel={onCancel}
             footer={null}

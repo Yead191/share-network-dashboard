@@ -3,15 +3,18 @@ import { api } from '../../api/baseApi';
 const adminMentorsApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getAdminMentors: builder.query({
-            query: ({ page, searchTerm }: { page: number; searchTerm: string }) => ({
-                url: `/admin-mentor`,
-                method: 'GET',
-                params: {
-                    page,
-                    searchTerm,
-                    limit: 10,
-                },
-            }),
+            query: ({ page, searchTerm, userGroup }: { page: number; searchTerm: string; userGroup?: string }) => {
+                const params = new URLSearchParams();
+                if (userGroup) params.append('userGroup', userGroup);
+                if(searchTerm) params.append('searchTerm', searchTerm);
+                params.append('limit', '10');
+                params.append('page', page.toString());
+                return {
+                    url: `/admin-mentor?${params.toString()}`,
+                    method: 'GET',
+                   
+                }
+            }
         }),
         updateAdminMentor: builder.mutation({
             query: ({ id, data }: { id: string; data: any }) => ({
