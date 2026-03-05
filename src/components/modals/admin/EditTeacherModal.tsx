@@ -23,13 +23,16 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({ open, onCancel, tea
                 phone: teacher.mobileNumber || teacher.phone,
                 assignedStudents: teacher.assignedStudents?.map((s: any) => s._id) || [],
                 userGroup: teacher.userGroup?.map((g: any) => g._id) || [],
+                status:teacher?.verified?"active":"inactive"
             });
         }
     }, [teacher, form]);
 
     const onFinish = async (values: any) => {
+        console.log(values);
+        
         try {
-            toast.promise(updateTeacher({ id: teacher._id, data: values }).unwrap(), {
+            toast.promise(updateTeacher({ id: teacher._id, data: {...values,...(values.status?{verified:values.status=="active"?true:false}:{})} }).unwrap(), {
                 loading: 'Updating teacher...',
                 success: (res: any) => {
                     if (res?.success) {
@@ -121,8 +124,17 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({ open, onCancel, tea
                         </Form.Item>
                     </Col>
                     <Col span={12}>
-                        <Form.Item label={<span className="font-semibold text-gray-700">vNumber</span>} name="vNumber">
-                            <Input placeholder="Enter vNumber" className="h-11 rounded-md" />
+                        <Form.Item label={<span className="font-bold text-gray-700">Status</span>} name="status">
+                            <Select
+                                placeholder="Select status"
+                                className="h-11 rounded-md"
+                                variant="filled"
+                                style={{ backgroundColor: '#f9f9f9' }}
+                                options={[
+                                    { label: 'Active', value: 'active' },
+                                    { label: 'Inactive', value: 'inactive' },
+                                ]}
+                            />
                         </Form.Item>
                     </Col>
                 </Row>

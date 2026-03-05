@@ -89,13 +89,13 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({ open, onCancel, mento
                     />
                 </Form.Item>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                <div className="">
                     <Form.Item label={<span className="font-semibold text-gray-700">Phone</span>} name="mobileNumber">
                         <Input placeholder="Enter phone" className="h-11 rounded-md" />
                     </Form.Item>
-                    <Form.Item label={<span className="font-semibold text-gray-700">vNumber</span>} name="vNumber">
+                    {/* <Form.Item label={<span className="font-semibold text-gray-700">vNumber</span>} name="vNumber">
                         <Input placeholder="Enter vNumber" className="h-11 rounded-md" />
-                    </Form.Item>
+                    </Form.Item> */}
                 </div>
 
                 <div className="grid grid-cols-1 gap-x-6">

@@ -81,7 +81,7 @@ const AddMentorModal: React.FC<AddMentorModalProps> = ({ open, onCancel, refetch
                     <Input placeholder="Enter email address" className="h-11 rounded-md" />
                 </Form.Item>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                <div className="">
                     <Form.Item
                         label={<span className="font-semibold text-gray-700">Contact Number</span>}
                         name="contactNumber"
@@ -89,9 +89,9 @@ const AddMentorModal: React.FC<AddMentorModalProps> = ({ open, onCancel, refetch
                     >
                         <Input placeholder="Enter contact number" className="h-11 rounded-md" />
                     </Form.Item>
-                    <Form.Item label={<span className="font-semibold text-gray-700">vNumber</span>} name="vNumber">
+                    {/* <Form.Item label={<span className="font-semibold text-gray-700">vNumber</span>} name="vNumber">
                         <Input placeholder="Enter vNumber (optional)" className="h-11 rounded-md" />
-                    </Form.Item>
+                    </Form.Item> */}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">

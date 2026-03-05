@@ -1,10 +1,11 @@
 import { Modal, Input, Select, Checkbox, Form, Button, Spin } from 'antd';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { useAddMaterialsMutation, useUpdateMaterialsMutation } from '../../../redux/apiSlices/admin/adminMaterialsApi';
 import { toast } from 'sonner';
 import { useGetAllUserGroupTracksQuery } from '../../../redux/apiSlices/userGroupTrackSlice';
-
+import Dragger from 'antd/es/upload/Dragger';
+import { InboxOutlined } from '@ant-design/icons';
 interface AddLearningMaterialModalProps {
     open: boolean;
     onCancel: () => void;
@@ -17,7 +18,7 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
     const [addMaterial, { isLoading }] = useAddMaterialsMutation();
     const [editMaterial, { isLoading: isEditLoading }] = useUpdateMaterialsMutation();
     const { data: userGroupTracks } = useGetAllUserGroupTracksQuery(undefined, { skip: !open });
-
+    const [file, setFile] = useState<any | null>(null);
     useEffect(() => {
         if (open && selectedMaterial) {
             form.setFieldsValue({
@@ -34,16 +35,23 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
         }
     }, [open, selectedMaterial, form]);
 
-    const onFinish = async (values: any) => {
+    const onFinish = async (values: Record<string, any>) => {
         try {
+
             const finalData = {
                 ...values,
                 markAsAssigned: !!values.markAsAssigned,
             };
-            console.log('finalData', finalData);
+            const formdata = new FormData();
+            for(const key in finalData){
+                formdata.append(key, String(finalData[key as keyof typeof finalData]));
+            }
+            if (file) {
+                formdata.append('file', file.file.originFileObj);
+            }
             const mutation = selectedMaterial?._id
-                ? editMaterial({ id: selectedMaterial._id, data: finalData }).unwrap()
-                : addMaterial(finalData).unwrap();
+                ? editMaterial({ id: selectedMaterial._id, data: formdata }).unwrap()
+                : addMaterial(formdata).unwrap();
 
             toast.promise(mutation, {
                 loading: selectedMaterial?._id ? 'Updating material...' : 'Creating material...',
@@ -52,6 +60,7 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
                     if (res?.success) {
                         refetch();
                         form.resetFields();
+                        setFile(null);
                         onCancel();
                     }
                     return (
@@ -139,6 +148,22 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
                         label={<span className="text-sm font-semibold text-gray-700">Content URL</span>}
                     >
                         <Input placeholder="https://..." className="h-11 rounded-lg border-gray-200" />
+                    </Form.Item>
+                </div>
+                <div className="">
+                    <Form.Item name="file" label={<span className="text-sm font-semibold text-gray-700">Upload PDF</span>}>
+                        <Dragger
+                            className="border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:border-indigo-400 transition-colors"
+                            height={180}
+                            accept=".pdf"
+                            onChange={(v)=>setFile(v)}
+                        >
+                            <div className="flex flex-col items-center justify-center py-5 px-4 text-center">
+                                <InboxOutlined className="text-5xl text-indigo-500 mb-4" />
+                                <p className="text-lg font-medium text-gray-700 mb-1">Click or drag PDF file here</p>
+                                <p className="text-sm text-gray-500">Only PDF files are supported • Max 10 MB</p>
+                            </div>
+                        </Dragger>
                     </Form.Item>
                 </div>
 

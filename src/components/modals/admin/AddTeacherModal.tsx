@@ -86,7 +86,7 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onCancel, refet
                 </Form.Item>
 
                 <Row gutter={24}>
-                    <Col span={12}>
+                    <Col span={24}>
                         <Form.Item
                             label={<span className="font-semibold text-gray-700">Contact Number</span>}
                             name="contactNumber"
@@ -95,11 +95,11 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onCancel, refet
                             <Input placeholder="Enter contact number" className="h-11 rounded-md" />
                         </Form.Item>
                     </Col>
-                    <Col span={12}>
+                    {/* <Col span={12}>
                         <Form.Item label={<span className="font-semibold text-gray-700">vNumber</span>} name="vNumber">
                             <Input placeholder="Enter vNumber (optional)" className="h-11 rounded-md" />
                         </Form.Item>
-                    </Col>
+                    </Col> */}
                 </Row>
 
                 <Row gutter={24}>

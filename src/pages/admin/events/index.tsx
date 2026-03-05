@@ -98,10 +98,10 @@ const AdminEvents = () => {
             render: (tags: { name: string; _id: string }) => (
                 <div className="flex gap-2">
                     <span
-                        key={tags._id}
+                        key={tags?._id!||crypto.randomUUID! as any}
                         className="px-3 py-1 bg-gray-50 text-gray-400 text-[11px] rounded-full border border-gray-100 font-medium"
                     >
-                        {tags.name}
+                        {tags?.name}
                     </span>
                 </div>
             ),

@@ -128,7 +128,7 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ open, onCancel, stu
                 </Row>
 
                 <Row gutter={24}>
-                    <Col span={12}>
+                    {/* <Col span={12}>
                         <Form.Item label={<span className="font-bold text-gray-700">V Number</span>} name="vNumber">
                             <Input
                                 className="h-11 rounded-md"
@@ -136,8 +136,8 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ open, onCancel, stu
                                 style={{ backgroundColor: '#f9f9f9' }}
                             />
                         </Form.Item>
-                    </Col>
-                    <Col span={12}>
+                    </Col> */}
+                    <Col span={24}>
                         <Form.Item
                             label={<span className="font-bold text-gray-700">Highest Education</span>}
                             name="highestEducation"
