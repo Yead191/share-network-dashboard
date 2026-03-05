@@ -111,14 +111,21 @@ const AdminTeachers = () => {
             render: (_: any, record: any) => <span className="text-gray-500">{record.address || 'N/A'}</span>,
         },
         {
-            title: 'VERIFIED',
-            dataIndex: 'verified',
-            key: 'verified',
-            render: (verified: boolean) => (
-                <Tag color={verified ? 'success' : 'error'} className="rounded-full">
-                    {verified ? 'Verified' : 'Unverified'}
-                </Tag>
-            ),
+            title: 'STATUS',
+            dataIndex: 'status',
+            key: 'status',
+            render: (status: string) => {
+                const color = status === 'ACTIVE' || status === 'Active' ? '#f6ffed' : '#fff7e6';
+                const textColor = status === 'ACTIVE' || status === 'Active' ? '#52c41a' : '#faad14';
+                return (
+                    <Tag
+                        className="rounded-full px-4 py-0.5 border-none font-medium"
+                        style={{ backgroundColor: color, color: textColor }}
+                    >
+                        {status}
+                    </Tag>
+                );
+            },
         },
         {
             title: 'ACTION',

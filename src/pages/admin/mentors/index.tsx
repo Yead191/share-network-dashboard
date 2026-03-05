@@ -10,6 +10,7 @@ import MentorStudentsModal from '../../../components/modals/admin/MentorStudents
 import { useDeleteAdminMentorMutation, useGetAdminMentorsQuery } from '../../../redux/apiSlices/admin/adminMentorsApi';
 import { useGetAllStudentsQuery } from '../../../redux/apiSlices/admin/adminTeachersApi';
 import AddMentorModal from '../../../components/modals/admin/AddMentorModal';
+import FilterMentorModal from '../../../components/modals/admin/FilterMentorModal';
 import { toast } from 'sonner';
 import { Modal, message } from 'antd';
 
@@ -20,16 +21,23 @@ const AdminMentors = () => {
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [isStudentsModalOpen, setIsStudentsModalOpen] = useState(false);
     const [isAddMentorModalOpen, setIsAddMentorModalOpen] = useState(false);
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [selectedMentor, setSelectedMentor] = useState<any>(null);
+    const [selectedGroup, setSelectedGroup] = useState<string | undefined>(undefined);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
 
     // API CALLS
-    const { data: mentorsApi, isLoading, refetch } = useGetAdminMentorsQuery({ page, searchTerm });
+    const {
+        data: mentorsApi,
+        isLoading,
+        refetch,
+    } = useGetAdminMentorsQuery({ page, searchTerm, userGroup: selectedGroup });
     const { data: studentsApi } = useGetAllStudentsQuery({});
     const [deleteMentor] = useDeleteAdminMentorMutation();
     const mentors = mentorsApi?.data?.mentors || [];
     const pagination = mentorsApi?.data?.pagination;
+    console.log('all mentor data', selectedGroup);
 
     const columns = [
         {
@@ -86,14 +94,21 @@ const AdminMentors = () => {
             render: (address: string) => <span className="text-gray-500 font-medium">{address || 'N/A'}</span>,
         },
         {
-            title: 'VERIFIED',
-            dataIndex: 'verified',
-            key: 'verified',
-            render: (verified: boolean) => (
-                <Tag color={verified ? 'success' : 'error'} className="rounded-full">
-                    {verified ? 'Verified' : 'Unverified'}
-                </Tag>
-            ),
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+            render: (status: string) => {
+                const color = status === 'ACTIVE' || status === 'Active' ? '#f6ffed' : '#fff7e6';
+                const textColor = status === 'ACTIVE' || status === 'Active' ? '#52c41a' : '#faad14';
+                return (
+                    <Tag
+                        className="rounded-full px-4 py-0.5 border-none font-medium"
+                        style={{ backgroundColor: color, color: textColor }}
+                    >
+                        {status}
+                    </Tag>
+                );
+            },
         },
         {
             title: 'ACTION',
@@ -172,7 +187,7 @@ const AdminMentors = () => {
     return (
         <div className="">
             {/* Management Section Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 mt-8 gap-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 mt-0 gap-4">
                 <HeaderTitle title="Mentor Management" />
                 <div className="flex flex-wrap items-center gap-3">
                     <Button
@@ -185,9 +200,10 @@ const AdminMentors = () => {
                     </Button>
                     <Button
                         icon={<Filter size={16} />}
-                        className="flex items-center gap-2 h-10 border-gray-100 bg-white text-gray-600 rounded-lg px-4"
+                        className={`flex items-center gap-2 h-10 border-gray-100 rounded-lg px-4 ${selectedGroup ? 'bg-green-50 text-green-600 border-green-200' : 'bg-white text-gray-600'}`}
+                        onClick={() => setIsFilterModalOpen(true)}
                     >
-                        Filter
+                        Filter {selectedGroup && <span className="ml-1 w-2 h-2 bg-green-500 rounded-full"></span>}
                     </Button>
                     <Button
                         icon={<Download size={16} />}
@@ -232,6 +248,15 @@ const AdminMentors = () => {
                 open={isImportModalOpen}
                 onCancel={() => setIsImportModalOpen(false)}
                 refetch={refetch}
+            />
+            <FilterMentorModal
+                open={isFilterModalOpen}
+                onCancel={() => setIsFilterModalOpen(false)}
+                onFilter={(groupId) => {
+                    setSelectedGroup(groupId);
+                    setPage(1); // Reset to first page on filter
+                }}
+                initialGroupId={selectedGroup}
             />
             <AddMentorModal
                 open={isAddMentorModalOpen}

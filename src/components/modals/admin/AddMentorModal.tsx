@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Button, Form, Input, Select, Switch } from 'antd';
+import { Modal, Button, Form, Input, Select } from 'antd';
 import { X } from 'lucide-react';
 import { useAddMentorMutation } from '../../../redux/apiSlices/admin/adminMentorsApi';
 import { toast } from 'sonner';
@@ -70,18 +70,18 @@ const AddMentorModal: React.FC<AddMentorModalProps> = ({ open, onCancel, refetch
                     </Form.Item>
                 </div>
 
-                <Form.Item
-                    label={<span className="font-semibold text-gray-700">Email</span>}
-                    name="email"
-                    rules={[
-                        { required: true, message: 'Please input email!' },
-                        { type: 'email', message: 'Please enter a valid email!' },
-                    ]}
-                >
-                    <Input placeholder="Enter email address" className="h-11 rounded-md" />
-                </Form.Item>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                    <Form.Item
+                        label={<span className="font-semibold text-gray-700">Email</span>}
+                        name="email"
+                        rules={[
+                            { required: true, message: 'Please input email!' },
+                            { type: 'email', message: 'Please enter a valid email!' },
+                        ]}
+                    >
+                        <Input placeholder="Enter email address" className="h-11 rounded-md" />
+                    </Form.Item>
+
                     <Form.Item
                         label={<span className="font-semibold text-gray-700">Contact Number</span>}
                         name="contactNumber"
@@ -89,9 +89,12 @@ const AddMentorModal: React.FC<AddMentorModalProps> = ({ open, onCancel, refetch
                     >
                         <Input placeholder="Enter contact number" className="h-11 rounded-md" />
                     </Form.Item>
-                    <Form.Item label={<span className="font-semibold text-gray-700">vNumber</span>} name="vNumber">
-                        <Input placeholder="Enter vNumber (optional)" className="h-11 rounded-md" />
-                    </Form.Item>
+                    {/* <Form.Item
+                        label={<span className="font-semibold text-gray-700">Highest Education</span>}
+                        name="highestEducation"
+                    >
+                        <Input placeholder="e.g. Master's in CS" className="h-11 rounded-md" />
+                    </Form.Item> */}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
@@ -115,31 +118,15 @@ const AddMentorModal: React.FC<AddMentorModalProps> = ({ open, onCancel, refetch
                     </Form.Item>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                    <Form.Item
-                        label={<span className="font-semibold text-gray-700">Highest Education</span>}
-                        name="highestEducation"
-                    >
-                        <Input placeholder="e.g. Master's in CS" className="h-11 rounded-md" />
-                    </Form.Item>
-                    <Form.Item
-                        label={<span className="font-semibold text-gray-700">Have a Laptop?</span>}
-                        name="havealaptop"
-                        valuePropName="checked"
-                    >
-                        <Switch />
-                    </Form.Item>
-                </div>
-
                 <Form.Item
-                    label={<span className="font-semibold text-gray-700">Career Directions</span>}
+                    label={<span className="font-semibold text-gray-700">job Title</span>}
                     name="careerDirections"
                 >
                     <Select
                         mode="multiple"
-                        placeholder="Select career directions"
+                        placeholder="Select job title"
                         className="w-full"
-                        style={{ height: 'auto', minHeight: '44px' }}
+                        style={{ height: '44px', minHeight: '44px' }}
                         options={[
                             { label: 'App development', value: 'App development' },
                             { label: 'AI (Artificial Intelligence)', value: 'AI (Artificial Intelligence)' },
