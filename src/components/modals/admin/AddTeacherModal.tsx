@@ -74,19 +74,24 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onCancel, refet
                     </Col>
                 </Row>
 
-                <Form.Item
-                    label={<span className="font-semibold text-gray-700">Email</span>}
-                    name="email"
-                    rules={[
-                        { required: true, message: 'Please input email!' },
-                        { type: 'email', message: 'Please enter a valid email!' },
-                    ]}
-                >
-                    <Input placeholder="Enter email address" className="h-11 rounded-md" />
-                </Form.Item>
-
                 <Row gutter={24}>
                     <Col span={24}>
+                        <Form.Item
+                            label={<span className="font-semibold text-gray-700">Email</span>}
+                            name="email"
+                            rules={[
+                                { required: true, message: 'Please input email!' },
+                                { type: 'email', message: 'Please enter a valid email!' },
+                            ]}
+                        >
+                            <Input placeholder="Enter email address" className="h-11 rounded-md" />
+                        </Form.Item>
+                        {/* <Form.Item label={<span className="font-semibold text-gray-700">vNumber</span>} name="vNumber">
+                            <Input placeholder="Enter vNumber (optional)" className="h-11 rounded-md" />
+                        </Form.Item> */}
+                    </Col>
+
+                    <Col span={12}>
                         <Form.Item
                             label={<span className="font-semibold text-gray-700">Contact Number</span>}
                             name="contactNumber"

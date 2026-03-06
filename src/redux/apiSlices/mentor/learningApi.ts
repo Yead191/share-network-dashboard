@@ -4,7 +4,7 @@ const learningApi = api.injectEndpoints({
     endpoints: (build) => ({
         getLearningMaterials: build.query<any, void>({
             query: () => ({
-                url: '/learning',
+                url: '/learning?targeteAudience=MENTOR',
                 method: 'GET',
             }),
         }),

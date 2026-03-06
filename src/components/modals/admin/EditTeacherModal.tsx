@@ -124,15 +124,18 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({ open, onCancel, tea
                         </Form.Item>
                     </Col>
                     <Col span={12}>
-                        <Form.Item label={<span className="font-bold text-gray-700">Status</span>} name="status">
+                        {/* <Form.Item label={<span className="font-semibold text-gray-700">vNumber</span>} name="vNumber">
+                            <Input placeholder="Enter vNumber" className="h-11 rounded-md" />
+                        </Form.Item> */}
+                        <Form.Item label={<span className="font-medium text-gray-700">Status</span>} name="status">
                             <Select
                                 placeholder="Select status"
                                 className="h-11 rounded-md"
-                                variant="filled"
-                                style={{ backgroundColor: '#f9f9f9' }}
                                 options={[
-                                    { label: 'Active', value: 'active' },
-                                    { label: 'Inactive', value: 'inactive' },
+                                    { label: 'Pending', value: 'Pending' },
+                                    { label: 'Active', value: 'Active' },
+                                    { label: 'Non-active', value: 'Non-active' },
+                                    { label: 'Alumni/Graduated', value: 'Alumni/Graduated' },
                                 ]}
                             />
                         </Form.Item>

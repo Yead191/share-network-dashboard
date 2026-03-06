@@ -16,7 +16,7 @@ export default function ChatLayout() {
     const [messageId, setMessageId] = useState<string | null>(null);
     const { data, isLoading, refetch } = useGetChatRoomsQuery(undefined);
     const chatRooms = data?.data || [];
-    console.log(chatRooms);
+    // console.log(chatRooms);
 
     const socket = useMemo(() => io(`${socketUrl}?userId=${user?._id}`), []);
 

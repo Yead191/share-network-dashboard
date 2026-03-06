@@ -2,10 +2,10 @@ const Spinner = () => {
     return (
         <div className="flex flex-col items-center justify-center h-screen  gap-4 w-full bg-transparent rounded-xl">
             {/* Logo with scale animation */}
-            <div className="scale-pulse">
+            <div className="scale-pulse p-2 rounded-2xl bg-[#21c45d] ">
                 {/* Logo */}
                 <div className="flex items-center w-full ">
-                    <img src={'/logo.png'} alt="logo" className="h-20 w-fit object-contain" />
+                    <img src={'/logo.png'} alt="logo" className="w-20 h-fit object-contain" />
                 </div>
             </div>
 

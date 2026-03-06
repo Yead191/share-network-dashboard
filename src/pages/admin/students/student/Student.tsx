@@ -5,7 +5,6 @@ import ImportExcelModal from '../../../../components/modals/admin/ImportExcelMod
 import StudentDetailsModal from '../../../../components/modals/admin/StudentDetailsModal';
 import EditStudentModal from '../../../../components/modals/admin/EditStudentModal';
 import AssignMentorModal from '../../../../components/modals/admin/AssignMentorModal';
-import AssignIndividualClassModal from '../../../../components/modals/admin/AssignIndividualClassModal';
 import ReviewModal from '../../../../components/modals/admin/ReviewModal';
 import HeaderTitle from '../../../../components/shared/HeaderTitle';
 import {
@@ -17,13 +16,15 @@ import {
 import { useGetAdminMentorsQuery } from '../../../../redux/apiSlices/admin/adminMentorsApi';
 import { imageUrl } from '../../../../redux/api/baseApi';
 import { toast } from 'sonner';
+import { GoGoal } from 'react-icons/go';
+import CreateGoalModal from '../../../../components/modals/admin/CreateGoalModal';
 
 const Student = () => {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-    const [isClassModalOpen, setIsClassModalOpen] = useState(false);
+    const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState<any>(null);
@@ -39,7 +40,6 @@ const Student = () => {
     const allMentors = mentorsApi?.data?.mentors || [];
     const userGroups = userGroupsApi?.data;
     const userTracks = userTracksApi?.data;
-
     const pagination = studentsApi?.data?.pagination;
 
     const handleDeleteStudent = async () => {
@@ -58,7 +58,6 @@ const Student = () => {
     };
 
     const columns = [
-        // ... (columns definitions)
         {
             title: 'STUDENT',
             dataIndex: 'firstName',
@@ -122,12 +121,11 @@ const Student = () => {
         },
         {
             title: 'STATUS',
-            dataIndex: 'verified',
+            dataIndex: 'status',
             key: 'status',
-            render: (verified: boolean) => {
-                const status = verified ? 'Verified' : 'Unverified';
-                const color = verified ? '#f6ffed' : '#fff7e6';
-                const textColor = verified ? '#52c41a' : '#faad14';
+            render: (status: string) => {
+                const color = status === 'ACTIVE' || status === 'Active' ? '#f6ffed' : '#fff7e6';
+                const textColor = status === 'ACTIVE' || status === 'Active' ? '#52c41a' : '#faad14';
                 return (
                     <Tag
                         className="rounded-full px-4 py-0.5 border-none font-medium"
@@ -173,16 +171,16 @@ const Student = () => {
                     >
                         Assign
                     </Button>
-                    {/* <Button
-                        icon={<Calendar size={14} />}
+                    <Button
+                        icon={<GoGoal size={14} />}
                         onClick={() => {
                             setSelectedStudent(record);
-                            setIsClassModalOpen(true);
+                            setIsGoalModalOpen(true);
                         }}
                         className="flex items-center gap-2 border-gray-200 text-gray-500 rounded-md h-8"
                     >
-                        Class
-                    </Button> */}
+                        Goals
+                    </Button>
                     <Button
                         onClick={() => {
                             setSelectedStudent(record);
@@ -255,11 +253,14 @@ const Student = () => {
                 isUserGroupsLoading={isUserGroupsLoading}
                 isUserTracksLoading={isUserTracksLoading}
             />
-            <AssignIndividualClassModal
-                open={isClassModalOpen}
-                onCancel={() => setIsClassModalOpen(false)}
-                student={selectedStudent}
+
+            <CreateGoalModal
+                open={isGoalModalOpen}
+                onCancel={() => setIsGoalModalOpen(false)}
+                studentId={selectedStudent?._id}
+                refetch={refetch}
             />
+
             <ReviewModal
                 open={isReviewModalOpen}
                 onCancel={() => setIsReviewModalOpen(false)}

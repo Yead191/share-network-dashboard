@@ -1,6 +1,18 @@
 import { Modal, Avatar, Divider } from 'antd';
 import { imageUrl } from '../../../redux/api/baseApi';
-import { User, Mail, Phone, MapPin, BookOpen, Briefcase, UserCheck } from 'lucide-react';
+import {
+    User,
+    Mail,
+    Phone,
+    MapPin,
+    BookOpen,
+    Briefcase,
+    UserCheck,
+    Sparkles,
+    Users,
+    GraduationCap,
+    Target,
+} from 'lucide-react';
 
 interface StudentProfileModalProps {
     isOpen: boolean;
@@ -10,7 +22,7 @@ interface StudentProfileModalProps {
 
 const StudentProfileModal = ({ isOpen, onClose, student }: StudentProfileModalProps) => {
     if (!student) return null;
-
+    console.log(student);
     const infoItems = [
         { icon: <Mail className="w-4 h-4 text-primary" />, label: 'Email', value: student.email },
         { icon: <Phone className="w-4 h-4 text-primary" />, label: 'Mobile', value: student.mobileNumber },
@@ -21,13 +33,29 @@ const StudentProfileModal = ({ isOpen, onClose, student }: StudentProfileModalPr
             value: student.professionalTitle,
         },
         { icon: <BookOpen className="w-4 h-4 text-primary" />, label: 'Read Books', value: student.readBooks },
+
+        // ✅ New Fields
         {
-            icon: <UserCheck className="w-4 h-4 text-primary" />,
-            label: 'Mentor',
-            value: `${student.mentorId?.firstName} ${student.mentorId?.lastName}`,
+            icon: <Sparkles className="w-4 h-4 text-primary" />,
+            label: 'Motivation',
+            value: student.motivationLearning,
+        },
+        {
+            icon: <Users className="w-4 h-4 text-primary" />,
+            label: 'Groups',
+            value: student.userGroup?.map((group: any) => group.name).join(', ') || 'No groups joined',
+        },
+        {
+            icon: <Target className="w-4 h-4 text-primary" />,
+            label: 'Track',
+            value: student?.userGroupTrack?.name || 'Not assigned',
+        },
+        {
+            icon: <GraduationCap className="w-4 h-4 text-primary" />,
+            label: 'Highest Education',
+            value: student?.highestEducation,
         },
     ];
-
     return (
         <Modal
             open={isOpen}

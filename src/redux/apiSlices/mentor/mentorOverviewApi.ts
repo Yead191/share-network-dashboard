@@ -15,7 +15,15 @@ const mentorOverviewApi = api.injectEndpoints({
                 method: 'GET',
             }),
         }),
+        // mentor overview resources
+        getMentorOverviewResources: build.query<any, { targetedAudience: string }>({
+            query: ({ targetedAudience }) => ({
+                url: `/learning?targeteAudience=${targetedAudience}`,
+                method: 'GET',
+            }),
+        }),
     }),
 });
 
-export const { useGetMentorOverviewQuery, useGetUpcomingEventsQuery } = mentorOverviewApi;
+export const { useGetMentorOverviewQuery, useGetUpcomingEventsQuery, useGetMentorOverviewResourcesQuery } =
+    mentorOverviewApi;

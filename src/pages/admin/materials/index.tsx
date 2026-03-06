@@ -27,6 +27,7 @@ const AdminLearningMaterials = () => {
         description: item?.description,
         type: item?.type,
         url: item?.contentUrl,
+        pdf: item?.pdf,
         targetAudience: item?.targeteAudience,
         target: item?.targertGroup,
         status: item?.markAsAssigned ? 'Active' : 'Inactive',

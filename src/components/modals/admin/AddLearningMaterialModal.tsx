@@ -25,6 +25,7 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
                 title: selectedMaterial?.title,
                 description: selectedMaterial?.description,
                 type: selectedMaterial?.type,
+                pdf: selectedMaterial?.pdf,
                 contentUrl: selectedMaterial?.url,
                 targetAudience: selectedMaterial?.targetAudience,
                 targertGroup: selectedMaterial?.target?._id || selectedMaterial?.target,
@@ -37,13 +38,12 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
 
     const onFinish = async (values: Record<string, any>) => {
         try {
-
             const finalData = {
                 ...values,
                 markAsAssigned: !!values.markAsAssigned,
             };
             const formdata = new FormData();
-            for(const key in finalData){
+            for (const key in finalData) {
                 formdata.append(key, String(finalData[key as keyof typeof finalData]));
             }
             if (file) {
@@ -52,10 +52,8 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
             const mutation = selectedMaterial?._id
                 ? editMaterial({ id: selectedMaterial._id, data: formdata }).unwrap()
                 : addMaterial(formdata).unwrap();
-
             toast.promise(mutation, {
                 loading: selectedMaterial?._id ? 'Updating material...' : 'Creating material...',
-
                 success: (res: any) => {
                     if (res?.success) {
                         refetch();
@@ -63,18 +61,14 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
                         setFile(null);
                         onCancel();
                     }
-                    return (
-                        res?.message || `Class schedule ${selectedMaterial?._id ? 'updated' : 'created'} successfully`
-                    );
+                    return res?.message || 'Material saved successfully';
                 },
-                error: (err: any) =>
-                    err?.message || `Failed to ${selectedMaterial?._id ? 'update' : 'create'} class schedule`,
+                error: (err: any) => err?.message || 'Failed to save material',
             });
         } catch (error: any) {
             toast.error(error?.data?.message || 'Something went wrong');
         }
     };
-
     return (
         <Modal
             title={null}
@@ -151,12 +145,15 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
                     </Form.Item>
                 </div>
                 <div className="">
-                    <Form.Item name="file" label={<span className="text-sm font-semibold text-gray-700">Upload PDF</span>}>
+                    <Form.Item
+                        name="file"
+                        label={<span className="text-sm font-semibold text-gray-700">Upload PDF</span>}
+                    >
                         <Dragger
                             className="border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:border-indigo-400 transition-colors"
                             height={180}
                             accept=".pdf"
-                            onChange={(v)=>setFile(v)}
+                            onChange={(v) => setFile(v)}
                         >
                             <div className="flex flex-col items-center justify-center py-5 px-4 text-center">
                                 <InboxOutlined className="text-5xl text-indigo-500 mb-4" />
@@ -191,6 +188,17 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
                                 label: track.name,
                             }))}
                         />
+                    </Form.Item>
+                </div>
+
+                <div className="mb-4">
+                    <Form.Item
+                        name="pdf"
+                        label={<span className="text-sm font-semibold text-gray-700">Upload PDF</span>}
+                        valuePropName="fileList"
+                        getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
+                    >
+                        <Input type="file" accept=".pdf" className="h-11 rounded-lg border-gray-200" />
                     </Form.Item>
                 </div>
 

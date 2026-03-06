@@ -17,7 +17,7 @@ const AdminEvents = () => {
     // API CALLS
     const { data: eventsApi, refetch } = useGetEventsQuery({ page: page, limit: 10, searchTerm: searchTerm });
     const [deleteEvents] = useDeleteEventsMutation();
-
+    console.log(eventsApi);
     const eventsData = eventsApi?.data?.data?.map((item: any) => ({
         _id: item?._id,
         key: item?._id,
@@ -25,7 +25,7 @@ const AdminEvents = () => {
         description: item?.description,
         type: item?.type,
         location: item?.location,
-        targetGroup: item?.group,
+        targetGroup: item?.targetGroup,
         targetUser: item?.targetUser,
         date: moment(item?.date).format('YYYY-MM-DD'),
     }));
@@ -95,13 +95,13 @@ const AdminEvents = () => {
             title: 'TARGET',
             dataIndex: 'targetGroup',
             key: 'targetGroup',
-            render: (tags: { name: string; _id: string }) => (
+            render: (target: { name: string; _id: string }) => (
                 <div className="flex gap-2">
                     <span
-                        key={tags?._id!||crypto.randomUUID! as any}
+                        key={target?._id}
                         className="px-3 py-1 bg-gray-50 text-gray-400 text-[11px] rounded-full border border-gray-100 font-medium"
                     >
-                        {tags?.name}
+                        {target?.name}
                     </span>
                 </div>
             ),

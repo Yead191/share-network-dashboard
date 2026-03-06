@@ -1,7 +1,7 @@
 import { Tabs } from 'antd';
 import { useState } from 'react';
 import Student from './student/Student';
-import Goals from './goals/Goals';
+
 import TakeAttendance from './take-attendance/TakeAttendance';
 
 const AdminStudents = () => {
@@ -14,11 +14,6 @@ const AdminStudents = () => {
         },
         {
             key: '2',
-            label: 'Goals',
-            children: <Goals />,
-        },
-        {
-            key: '3',
             label: 'Take Attendance',
             children: <TakeAttendance />,
         },

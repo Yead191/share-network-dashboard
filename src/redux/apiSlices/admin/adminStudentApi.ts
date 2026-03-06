@@ -54,11 +54,13 @@ const adminStudentApi = api.injectEndpoints({
             }),
         }),
         createGoal: build.mutation({
-            query: (data: any) => ({
-                url: `/goal`,
-                method: 'POST',
-                body: data,
-            }),
+            query: ({ studentId, data }) => {
+                return {
+                    url: `/goal/${studentId}`,
+                    method: 'PUT',
+                    body: data,
+                }
+            },
         }),
         updateGoal: build.mutation({
             query: ({ id, data }: { id: string; data: any }) => ({

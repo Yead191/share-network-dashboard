@@ -73,6 +73,7 @@ const CoordinatorDetailsModal: React.FC<Props> = ({
           >
             Open Resource
           </Button>
+          
         </div>
       ) : null}
     </Modal>

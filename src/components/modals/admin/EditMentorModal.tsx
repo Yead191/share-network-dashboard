@@ -96,9 +96,16 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({ open, onCancel, mento
                     {/* <Form.Item label={<span className="font-semibold text-gray-700">vNumber</span>} name="vNumber">
                         <Input placeholder="Enter vNumber" className="h-11 rounded-md" />
                     </Form.Item> */}
+
+                    <Form.Item
+                        label={<span className="font-semibold text-gray-700">Professional Title</span>}
+                        name="professionalTitle"
+                    >
+                        <Input placeholder="Enter title" className="h-11 rounded-md" />
+                    </Form.Item>
                 </div>
 
-                <div className="grid grid-cols-1 gap-x-6">
+                <div className="grid grid-cols-2 gap-x-6">
                     <Form.Item label={<span className="font-semibold text-gray-700">Gender</span>} name="gender">
                         <Select
                             placeholder="Select gender"
@@ -110,32 +117,37 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({ open, onCancel, mento
                             ]}
                         />
                     </Form.Item>
-                    <Form.Item
-                        label={<span className="font-semibold text-gray-700">Career Directions</span>}
-                        name="careerDirections"
-                    >
+                    <Form.Item label={<span className="font-medium text-gray-700">Status</span>} name="status">
                         <Select
-                            mode="multiple"
-                            placeholder="Select directions"
-                            className="h-11 rounded-md w-full"
+                            placeholder="Select status"
+                            className="h-11 rounded-md"
                             options={[
-                                { label: 'App development', value: 'App development' },
-                                { label: 'AI (Artificial Intelligence)', value: 'AI (Artificial Intelligence)' },
-                                { label: 'Cybersecurity', value: 'Cybersecurity' },
+                                { label: 'Pending', value: 'Pending' },
+                                { label: 'Active', value: 'Active' },
+                                { label: 'Non-active', value: 'Non-active' },
+                                { label: 'Alumni/Graduated', value: 'Alumni/Graduated' },
                             ]}
                         />
                     </Form.Item>
                 </div>
+                <Form.Item
+                    label={<span className="font-semibold text-gray-700">Job Title</span>}
+                    name="careerDirections"
+                >
+                    <Select
+                        mode="multiple"
+                        placeholder="Select job title"
+                        className="h-11 rounded-md w-full"
+                        options={[
+                            { label: 'App development', value: 'App development' },
+                            { label: 'AI (Artificial Intelligence)', value: 'AI (Artificial Intelligence)' },
+                            { label: 'Cybersecurity', value: 'Cybersecurity' },
+                        ]}
+                    />
+                </Form.Item>
 
                 <Form.Item label={<span className="font-semibold text-gray-700">Address</span>} name="address">
                     <Input placeholder="Enter address" className="h-11 rounded-md" />
-                </Form.Item>
-
-                <Form.Item
-                    label={<span className="font-semibold text-gray-700">Professional Title</span>}
-                    name="professionalTitle"
-                >
-                    <Input placeholder="Enter title" className="h-11 rounded-md" />
                 </Form.Item>
 
                 <Form.Item label={<span className="font-semibold text-gray-700">About</span>} name="about">

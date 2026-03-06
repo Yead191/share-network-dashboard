@@ -1,28 +1,56 @@
 import { useState } from 'react';
-import { Table, Button } from 'antd';
-import { Eye, Plus } from 'lucide-react';
+import { Table, Button, Popconfirm } from 'antd';
+import { Eye, Plus, Edit, Trash2 } from 'lucide-react';
 import AddReportModal from '../../../components/modals/mentor/AddReportModal';
 import ReportDetailsModal from '../../../components/modals/mentor/ReportDetailsModal';
+import EditReportModal from '../../../components/modals/mentor/EditReportModal';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
-import { useGetWeeklyReportsQuery } from '../../../redux/apiSlices/mentor/weeklyReportApi';
+import {
+    useGetWeeklyReportsQuery,
+    useDeleteWeeklyReportMutation,
+} from '../../../redux/apiSlices/mentor/weeklyReportApi';
 import { useProfileQuery } from '../../../redux/apiSlices/authSlice';
+import { toast } from 'sonner';
 
 const WeeklyReport = () => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedReport, setSelectedReport] = useState<any>(null);
     const { data, refetch } = useGetWeeklyReportsQuery(undefined);
     const weeklyReportsData = data?.data?.reports || [];
-    // console.log(weeklyReportsData);
     const { data: profileData } = useProfileQuery(undefined);
+    const [deleteReport] = useDeleteWeeklyReportMutation();
+
     const assignedStudent = profileData?.data?.assignedStudents;
+
+    const handleDelete = async (id: string) => {
+        try {
+            toast.promise(deleteReport(id).unwrap(), {
+                loading: 'Deleting report...',
+                success: (res) => {
+                    refetch();
+                    return res.message || 'Report deleted successfully';
+                },
+                error: (err) => {
+                    return err?.data?.message || 'Failed to delete report';
+                },
+            });
+        } catch (error) {
+            console.error('Failed to delete report', error);
+        }
+    };
 
     const columns = [
         {
             title: 'Student Name',
-            dataIndex: ['studentId', 'name'],
+            dataIndex: 'studentId',
             key: 'studentName',
-            render: (text: string) => <span className="text-gray-600 font-medium">{text}</span>,
+            render: (student: any) => (
+                <span className="text-gray-600 font-medium">
+                    {student?.firstName} {student?.lastName}
+                </span>
+            ),
         },
         {
             title: 'Duration',
@@ -68,16 +96,37 @@ const WeeklyReport = () => {
             title: 'Action',
             key: 'action',
             render: (_: any, record: any) => (
-                <Button
-                    icon={<Eye className="w-4 h-4 mr-1" />}
-                    onClick={() => {
-                        setSelectedReport(record);
-                        setIsDetailsModalOpen(true);
-                    }}
-                    className="flex items-center text-gray-400 border-gray-200 hover:text-primary hover:border-primary transition-colors h-9 px-4 rounded-lg"
-                >
-                    View
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button
+                        icon={<Eye className="w-4 h-4" />}
+                        onClick={() => {
+                            setSelectedReport(record);
+                            setIsDetailsModalOpen(true);
+                        }}
+                        className="flex items-center justify-center text-gray-400 border-gray-200 hover:text-primary hover:border-primary transition-colors h-9 w-9 rounded-lg"
+                    />
+                    <Button
+                        icon={<Edit className="w-4 h-4" />}
+                        onClick={() => {
+                            setSelectedReport(record);
+                            setIsEditModalOpen(true);
+                        }}
+                        className="flex items-center justify-center text-gray-400 border-gray-200 hover:text-blue-500 hover:border-blue-500 transition-colors h-9 w-9 rounded-lg"
+                    />
+                    <Popconfirm
+                        title="Delete the report"
+                        description="Are you sure to delete this report?"
+                        onConfirm={() => handleDelete(record._id)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button
+                            icon={<Trash2 className="w-4 h-4" />}
+                            danger
+                            className="flex items-center justify-center h-9 w-9 rounded-lg"
+                        />
+                    </Popconfirm>
+                </div>
             ),
         },
     ];
@@ -120,6 +169,14 @@ const WeeklyReport = () => {
                 open={isDetailsModalOpen}
                 onCancel={() => setIsDetailsModalOpen(false)}
                 data={selectedReport}
+            />
+
+            <EditReportModal
+                open={isEditModalOpen}
+                onCancel={() => setIsEditModalOpen(false)}
+                data={selectedReport}
+                assignedStudent={assignedStudent}
+                refetch={refetch}
             />
         </section>
     );

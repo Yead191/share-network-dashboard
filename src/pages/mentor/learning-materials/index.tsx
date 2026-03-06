@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Table, Button } from 'antd';
-import { Eye, Trash2, Plus } from 'lucide-react';
+import { Eye} from 'lucide-react';
 import AddResourceModal from '../../../components/modals/mentor/learning-materials/AddResourceModal';
 import ResourceDetailsModal from '../../../components/modals/mentor/learning-materials/ResourceDetailsModal';
 import RemoveResourceModal from '../../../components/modals/mentor/learning-materials/RemoveResourceModal';
@@ -55,7 +55,7 @@ const LearningMaterials = () => {
                     >
                         View
                     </Button>
-                    <Button
+                    {/* <Button
                         danger
                         icon={<Trash2 size={16} />}
                         onClick={() => {
@@ -65,7 +65,7 @@ const LearningMaterials = () => {
                         className="flex items-center gap-2 border-[#FF4D4F] text-[#FF4D4F] bg-white hover:bg-red-50"
                     >
                         Remove
-                    </Button>
+                    </Button> */}
                 </div>
             ),
         },
@@ -78,14 +78,14 @@ const LearningMaterials = () => {
                     <h1 className="text-2xl font-bold text-gray-800">Mentor Resources</h1>
                     <p className="text-gray-500 mt-1">Access curriculum guides, roadmaps, and templates.</p>
                 </div>
-                <Button
+                {/* <Button
                     type="default"
                     icon={<Plus size={18} className="text-gray-400" />}
                     onClick={() => setIsAddModalOpen(true)}
                     className="h-11 px-4 rounded-xl flex items-center gap-2 text-gray-500 font-medium border-gray-200"
                 >
                     Add Resources
-                </Button>
+                </Button> */}
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">

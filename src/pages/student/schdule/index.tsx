@@ -14,7 +14,7 @@ const StudentSchedule = () => {
     const [searchTerm, setSearchTerm] = useState('');
     // API CALLS
     const { data: scheduleApi } = useGetStudentClassScheduleQuery({ page: page, limit: 10, searchTerm: searchTerm });
-    console.log('scheduleApi', scheduleApi);
+    // console.log('scheduleApi', scheduleApi);
 
     const scheduleData = scheduleApi?.data?.map((item: any) => ({
         _id: item?._id,

@@ -30,7 +30,7 @@ const AddEventModal = ({ open, onCancel, refetch, selectedEvent }: AddEventModal
                 date: selectedEvent.date ? dayjs(selectedEvent.date) : undefined,
                 location: selectedEvent.location,
                 type: selectedEvent.type,
-                group: selectedEvent.targetGroup?._id || selectedEvent.group,
+                targetGroup: selectedEvent.targetGroup?._id || selectedEvent.targetGroup,
                 targetUser: selectedEvent.targetUser?._id || selectedEvent.targetUser,
             });
         } else if (open && !selectedEvent) {
@@ -155,7 +155,7 @@ const AddEventModal = ({ open, onCancel, refetch, selectedEvent }: AddEventModal
                         </Select>
                     </Form.Item>
                     <Form.Item
-                        name="group"
+                        name="targetGroup"
                         label={<span className="text-sm font-semibold text-gray-700">Target Group</span>}
                     >
                         <Select
