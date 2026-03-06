@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, Select, Button, message } from 'antd';
+import { Modal, Form, Input, Select, Button } from 'antd';
 import { X } from 'lucide-react';
 import { useUpdateCoordinatorMutation } from '../../../redux/apiSlices/admin/adminCoordinatorApi';
 import { toast } from 'sonner';

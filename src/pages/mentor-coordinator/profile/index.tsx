@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Avatar, Spin } from 'antd';
+import { Button, Avatar } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 import EditProfile from './components/EditProfile';
 import { imageUrl } from '../../../redux/api/baseApi';

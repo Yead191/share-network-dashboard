@@ -1,18 +1,6 @@
 import { Modal, Avatar, Divider } from 'antd';
 import { imageUrl } from '../../../redux/api/baseApi';
-import {
-    User,
-    Mail,
-    Phone,
-    MapPin,
-    BookOpen,
-    Briefcase,
-    UserCheck,
-    Sparkles,
-    Users,
-    GraduationCap,
-    Target,
-} from 'lucide-react';
+import { User, Mail, Phone, MapPin, BookOpen, Briefcase, Sparkles, Users, GraduationCap, Target } from 'lucide-react';
 
 interface StudentProfileModalProps {
     isOpen: boolean;
