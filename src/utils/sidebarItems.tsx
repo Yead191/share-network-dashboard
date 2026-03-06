@@ -36,12 +36,12 @@ export const adminSidebarItems: TSidebarItem[] = [
         path: 'admin/mentors',
         icon: <GiTeacher size={24} />,
     },
-    // {
-    //     key: 'coordinator',
-    //     label: 'Coordinator',
-    //     path: 'admin/coordinator',
-    //     icon: <ShieldCheck size={24} />,
-    // },
+    {
+        key: 'coordinator',
+        label: 'Coordinator',
+        path: 'admin/coordinator',
+        icon: <ShieldCheck size={24} />,
+    },
     {
         key: 'teacher',
         label: 'Teacher',
