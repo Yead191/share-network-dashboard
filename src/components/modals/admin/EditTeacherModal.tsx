@@ -23,13 +23,16 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({ open, onCancel, tea
                 phone: teacher.mobileNumber || teacher.phone,
                 assignedStudents: teacher.assignedStudents?.map((s: any) => s._id) || [],
                 userGroup: teacher.userGroup?.map((g: any) => g._id) || [],
+                status:teacher?.verified?"active":"inactive"
             });
         }
     }, [teacher, form]);
 
     const onFinish = async (values: any) => {
+        console.log(values);
+        
         try {
-            toast.promise(updateTeacher({ id: teacher._id, data: values }).unwrap(), {
+            toast.promise(updateTeacher({ id: teacher._id, data: {...values,...(values.status?{verified:values.status=="active"?true:false}:{})} }).unwrap(), {
                 loading: 'Updating teacher...',
                 success: (res: any) => {
                     if (res?.success) {

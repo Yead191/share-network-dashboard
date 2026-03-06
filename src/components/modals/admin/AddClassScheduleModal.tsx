@@ -9,7 +9,7 @@ import {
 import { toast } from 'sonner';
 import { useGetAllUserGroupsQuery } from '../../../redux/apiSlices/userGroupSlice';
 import { useGetAllUserGroupTracksQuery } from '../../../redux/apiSlices/userGroupTrackSlice';
-import { useGetTeachersQuery } from '../../../redux/apiSlices/admin/adminTeachersApi';
+// import { useGetTeachersQuery } from '../../../redux/apiSlices/admin/adminTeachersApi';
 
 interface AddClassScheduleModalProps {
     open: boolean;
@@ -24,7 +24,7 @@ const AddClassScheduleModal = ({ open, onCancel, refetch, selectedSchedule }: Ad
     const [editClass, { isLoading: isEditLoading }] = useUpdateClassScheduleMutation();
     const { data: userGroups } = useGetAllUserGroupsQuery(undefined, { skip: !open });
     const { data: userGroupTracks } = useGetAllUserGroupTracksQuery(undefined, { skip: !open });
-    const { data: teachersData } = useGetTeachersQuery({ page: 1, limit: 100, searchTerm: '' }, { skip: !open });
+    // const { data: teachersData } = useGetTeachersQuery({ page: 1, limit: 100, searchTerm: '' }, { skip: !open });
 
     useEffect(() => {
         if (open && selectedSchedule) {
@@ -128,7 +128,7 @@ const AddClassScheduleModal = ({ open, onCancel, refetch, selectedSchedule }: Ad
                 className="space-y-4"
                 initialValues={{ published: true, status: true }}
             >
-                <Form.Item
+                {/* <Form.Item
                     name="teacher"
                     label={<span className="text-sm font-semibold text-gray-700">Assign Teacher</span>}
                     rules={[{ required: true, message: 'Please select a teacher' }]}
@@ -141,7 +141,7 @@ const AddClassScheduleModal = ({ open, onCancel, refetch, selectedSchedule }: Ad
                             label: `${teacher.firstName} ${teacher.lastName}`,
                         }))}
                     />
-                </Form.Item>
+                </Form.Item> */}
                 <Form.Item
                     name="title"
                     label={<span className="text-sm font-semibold text-gray-700">Class Title</span>}

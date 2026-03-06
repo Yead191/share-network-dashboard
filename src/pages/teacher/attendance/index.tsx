@@ -69,7 +69,7 @@ export default function AttendanceTeacher() {
         }))
     }
      const {error}=await studentAttendance(data);
-     console.log(error);
+
      
      if(!error){
         toast.success('Attendance saved successfully')

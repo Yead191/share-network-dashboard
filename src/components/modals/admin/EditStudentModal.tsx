@@ -3,7 +3,7 @@ import { Modal, Button, Form, Select, Row, Col, Input, Checkbox } from 'antd';
 import { X } from 'lucide-react';
 import {
     useUpdateStudentMutation,
-    useGetUserGroupsQuery,
+    // useGetUserGroupsQuery,
     useGetUserTracksQuery,
 } from '../../../redux/apiSlices/admin/adminStudentApi';
 import { toast } from 'sonner';
@@ -19,9 +19,9 @@ interface EditStudentModalProps {
 const EditStudentModal: React.FC<EditStudentModalProps> = ({ open, onCancel, student, refetch }) => {
     const [form] = Form.useForm();
     const [updateStudent, { isLoading }] = useUpdateStudentMutation();
-    const { data: userGroupsApi } = useGetUserGroupsQuery({});
+    // const { data: userGroupsApi } = useGetUserGroupsQuery({});
     const { data: userTracksApi } = useGetUserTracksQuery({});
-    const userGroups = userGroupsApi?.data || [];
+    // const userGroups = userGroupsApi?.data || [];
     const userTracks = userTracksApi?.data || [];
 
     useEffect(() => {
@@ -160,6 +160,9 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ open, onCancel, stu
                 </Row>
 
                 <Row gutter={24}>
+                    {/* <Col span={12}>
+                        <Form.Item label={<span className="font-bold text-gray-700">V Number</span>} name="vNumber">
+                            <Input
                     <Col span={12}>
                         <Form.Item label={<span className="font-medium text-gray-700">Group</span>} name="userGroup">
                             <Select
@@ -169,8 +172,8 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ open, onCancel, stu
                                 options={userGroups.map((g: any) => ({ label: g.name, value: g._id }))}
                             />
                         </Form.Item>
-                    </Col>
-                    <Col span={12}>
+                    </Col> */}
+                    <Col span={24}>
                         <Form.Item
                             label={<span className="font-medium text-gray-700">Track</span>}
                             name="userGroupTrack"
