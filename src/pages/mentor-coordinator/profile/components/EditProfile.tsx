@@ -187,12 +187,12 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, onCancel, refetch }) =>
                     >
                         <Input className="h-12 rounded-lg" placeholder="Coordinator" />
                     </Form.Item>
-                    <Form.Item
+                    {/* <Form.Item
                         label={<span className="font-semibold text-gray-700">Preferred Group</span>}
                         name="preferredGroup"
                     >
                         <Input className="h-12 rounded-lg" placeholder="Expedition" />
-                    </Form.Item>
+                    </Form.Item> */}
                     <Form.Item label={<span className="font-semibold text-gray-700">Phone</span>} name="mobileNumber">
                         <Input className="h-12 rounded-lg" placeholder="+31 6123456789" />
                     </Form.Item>

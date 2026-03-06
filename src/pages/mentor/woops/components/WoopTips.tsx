@@ -9,7 +9,7 @@ interface WoopTipsProps {
 const WoopTips: React.FC<WoopTipsProps> = ({ onReset }) => {
     return (
         <div className="p-6 max-w-5xl mx-auto animate-fadeIn">
-            <h2 className="text-xl font-semibold mb-6">Tips for Effective WOOP</h2>
+            {/* <h2 className="text-xl font-semibold mb-6">Tips for Effective WOOP</h2> */}
 
             <div className="bg-[#1E4E8C] text-white p-8 rounded-2xl mb-6 relative overflow-hidden">
                 <div className="flex items-center gap-4 relative z-10">
@@ -39,12 +39,23 @@ const WoopTips: React.FC<WoopTipsProps> = ({ onReset }) => {
                     </div>
                 ))}
             </div>
+            <div className="my-6 rounded-2xl overflow-hidden shadow-lg aspect-[16/9] w-full bg-gray-100">
+                <iframe
+                    className="w-full h-full"
+                    src="https://www.youtube.com/embed/DpbCMzQqZAU?si=KmhniMF_ghlHEvYU"
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                ></iframe>
+            </div>
 
             <button
                 onClick={onReset}
                 className="w-full mt-10 bg-[#22C55E] text-white py-4 rounded-xl font-bold text-lg hover:bg-green-600 transition-colors shadow-lg shadow-green-100"
             >
-                Start a New WOOP
+                Start New WOOP
             </button>
         </div>
     );
