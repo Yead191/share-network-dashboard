@@ -15,6 +15,7 @@ import { GiTeacher } from 'react-icons/gi';
 import { MdOutlineEventNote, MdOutlineAssignment } from 'react-icons/md';
 import { TbReportAnalytics } from 'react-icons/tb';
 import { AiOutlineSchedule } from 'react-icons/ai';
+import { ShieldCheck } from 'lucide-react';
 
 export const adminSidebarItems: TSidebarItem[] = [
     {
@@ -35,6 +36,12 @@ export const adminSidebarItems: TSidebarItem[] = [
         path: 'admin/mentors',
         icon: <GiTeacher size={24} />,
     },
+    // {
+    //     key: 'coordinator',
+    //     label: 'Coordinator',
+    //     path: 'admin/coordinator',
+    //     icon: <ShieldCheck size={24} />,
+    // },
     {
         key: 'teacher',
         label: 'Teacher',
