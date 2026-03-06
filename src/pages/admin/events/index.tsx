@@ -17,7 +17,7 @@ const AdminEvents = () => {
     // API CALLS
     const { data: eventsApi, refetch } = useGetEventsQuery({ page: page, limit: 10, searchTerm: searchTerm });
     const [deleteEvents] = useDeleteEventsMutation();
-    console.log(eventsApi);
+   
     const eventsData = eventsApi?.data?.data?.map((item: any) => ({
         _id: item?._id,
         key: item?._id,
@@ -28,6 +28,7 @@ const AdminEvents = () => {
         targetGroup: item?.targetGroup,
         targetUser: item?.targetUser,
         date: moment(item?.date).format('YYYY-MM-DD'),
+        students:item?.studentAssigned ||[]
     }));
 
     const handleDelete = (id: string) => {

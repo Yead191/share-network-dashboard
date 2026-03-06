@@ -6,6 +6,7 @@ import { useGetAllUserGroupsQuery } from '../../../redux/apiSlices/userGroupSlic
 import { useGetAllUserGroupTracksQuery } from '../../../redux/apiSlices/userGroupTrackSlice';
 import { useAddEventsMutation, useUpdateEventsMutation } from '../../../redux/apiSlices/admin/adminEventsApi';
 import { toast } from 'sonner';
+import { useGetAllStudentsQuery } from '../../../redux/apiSlices/admin/adminTeachersApi';
 
 interface AddEventModalProps {
     open: boolean;
@@ -18,7 +19,11 @@ const AddEventModal = ({ open, onCancel, refetch, selectedEvent }: AddEventModal
     const [form] = Form.useForm();
     const [addEvent, { isLoading: isAdding }] = useAddEventsMutation();
     const [updateEvent, { isLoading: isUpdating }] = useUpdateEventsMutation();
+    const {data:studentsQuery}=useGetAllStudentsQuery({page:1,limit:100,searchTerm:""},{skip:!open})
+    const students = studentsQuery?.data?.data
 
+    
+    
     const { data: userGroups } = useGetAllUserGroupsQuery(undefined, { skip: !open });
     const { data: userGroupTracks } = useGetAllUserGroupTracksQuery(undefined, { skip: !open });
 
@@ -32,6 +37,9 @@ const AddEventModal = ({ open, onCancel, refetch, selectedEvent }: AddEventModal
                 type: selectedEvent.type,
                 targetGroup: selectedEvent.targetGroup?._id || selectedEvent.targetGroup,
                 targetUser: selectedEvent.targetUser?._id || selectedEvent.targetUser,
+                students: selectedEvent.students
+                    ? selectedEvent.students.map((s: any) => s._id || s)
+                    : undefined,
             });
         } else if (open && !selectedEvent) {
             form.resetFields();
@@ -43,7 +51,9 @@ const AddEventModal = ({ open, onCancel, refetch, selectedEvent }: AddEventModal
             const finalData = {
                 ...values,
                 date: values.date ? dayjs(values.date).format('YYYY-MM-DD') : undefined,
+                studentAssigned:values.students
             };
+            
 
             const mutation = selectedEvent?._id
                 ? updateEvent({ id: selectedEvent._id, data: finalData }).unwrap()
@@ -65,6 +75,9 @@ const AddEventModal = ({ open, onCancel, refetch, selectedEvent }: AddEventModal
             toast.error(error?.data?.message || 'Something went wrong');
         }
     };
+
+
+    
 
     return (
         <Modal
@@ -182,6 +195,28 @@ const AddEventModal = ({ open, onCancel, refetch, selectedEvent }: AddEventModal
                             value: track._id,
                             label: track.name,
                         }))}
+                    />
+                </Form.Item>
+
+                <Form.Item
+                    name="students"
+                    label={<span className="text-sm font-semibold text-gray-700">Select Students (optional)</span>}
+                >
+                    <Select
+                        mode="multiple"
+                        placeholder="Choose students"
+                        className="w-full"
+                        style={{ height: 'auto', minHeight: '44px' }}
+                        options={students?.map((student: any) => ({
+                            value: student?._id,
+                            label: `${student?.firstName} ${student?.lastName} (${student?.email})`,
+                        }))||[]}
+                        filterOption={(input, option) =>
+                            (option?.label ?? '')
+                                .toString()
+                                .toLowerCase()
+                                .includes(input.toLowerCase())
+                        }
                     />
                 </Form.Item>
 
