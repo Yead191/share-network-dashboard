@@ -112,7 +112,7 @@ const Login = () => {
                     <div className="bg-white w-[540px] rounded-2xl shadow-xl p-12 ">
                         <div className="text-center mb-10">
                             <h1 className="text-[32px] text-[#000000] font-bold mb-2">Login</h1>
-                            <p className="text-[#64748B] text-lg font-normal">Access the EduTech dashboard</p>
+                            <p className="text-[#64748B] text-lg font-normal">Access the Share Network App dashboard</p>
                         </div>
 
                         <Form

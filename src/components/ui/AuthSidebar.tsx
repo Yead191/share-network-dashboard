@@ -20,7 +20,7 @@ const AuthSidebar: React.FC<AuthSidebarProps> = ({ backgroundImage }) => {
                 </div>
 
                 <div className=" space-y-3">
-                    <h2 className="text-4xl font-bold">EduTech Portal</h2>
+                    <h2 className="text-4xl font-bold">Share Network App</h2>
                     <p className="text-xl font-medium">Share Network Administration</p>
                     <p className="text-lg max-w-[400px] leading-relaxed mx-auto">
                         Secure access to manage users, content, and platform settings. Monitor analytics and oversee the
