@@ -59,7 +59,11 @@ const TimeTracking = () => {
         {
             title: 'Student',
             key: 'student',
-            render: (_: any, record: any) => <span className="text-gray-700">{record?.studentId}</span>,
+            render: (_: any, record: any) => (
+                <span className="text-gray-700">
+                    {record?.studentId ? `${record?.studentId?.firstName} ${record?.studentId?.lastName}` : 'N/A'}
+                </span>
+            ),
         },
         {
             title: 'Start Time',

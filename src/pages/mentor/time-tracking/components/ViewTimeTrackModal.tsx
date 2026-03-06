@@ -42,8 +42,7 @@ const ViewTimeTrackModal = ({ isOpen, onClose, data }: ViewTimeTrackModalProps) 
                     <div>
                         <p className="text-sm text-gray-500 font-semibold mb-1">Student</p>
                         <p className="text-gray-800 font-medium">
-                            {/* {data.studentId ? `${data.studentId.firstName} ${data.studentId.lastName}` : 'N/A'} */}
-                            {data.studentId}
+                            {data.studentId ? `${data.studentId.firstName} ${data.studentId.lastName}` : 'N/A'}
                         </p>
                     </div>
                     <div>
