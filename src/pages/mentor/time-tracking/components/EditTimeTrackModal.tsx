@@ -1,11 +1,14 @@
 import { Modal, Form, Input, DatePicker, Button, Select, InputNumber } from 'antd';
-import { useCreateTimeTrackingMutation } from '../../../../redux/apiSlices/mentor/timeTrackingApi';
+import { useUpdateTimeTrackingMutation } from '../../../../redux/apiSlices/mentor/timeTrackingApi';
 import { toast } from 'sonner';
+import { useEffect } from 'react';
+import dayjs from 'dayjs';
 
-interface AddTimeTrackModalProps {
+interface EditTimeTrackModalProps {
     isOpen: boolean;
     onClose: () => void;
     assignedStudents: any[];
+    data: any;
 }
 
 const SESSION_TYPES = [
@@ -18,24 +21,37 @@ const SESSION_TYPES = [
     'Other',
 ];
 
-const AddTimeTrackModal = ({ isOpen, onClose, assignedStudents }: AddTimeTrackModalProps) => {
+const EditTimeTrackModal = ({ isOpen, onClose, assignedStudents, data }: EditTimeTrackModalProps) => {
     const [form] = Form.useForm();
-    const [createTimeTracking, { isLoading }] = useCreateTimeTrackingMutation();
+    const [updateTimeTracking, { isLoading }] = useUpdateTimeTrackingMutation();
+
+    useEffect(() => {
+        if (data && isOpen) {
+            form.setFieldsValue({
+                studentId: data.studentId?._id || data.studentId,
+                startTime: data.startTime ? dayjs(data.startTime) : undefined,
+                endTime: data.endTime ? dayjs(data.endTime) : undefined,
+                spentHours: data.spentHours,
+                timeType: data.timeType,
+                comments: data.comments,
+            });
+        }
+    }, [data, isOpen, form]);
 
     const onFinish = async (values: any) => {
         const payload = {
+            id: data._id,
             ...values,
             startTime: values.startTime.toISOString(),
             endTime: values.endTime.toISOString(),
         };
 
         try {
-            await createTimeTracking(payload).unwrap();
-            toast.success('Time track created successfully');
-            form.resetFields();
+            await updateTimeTracking(payload).unwrap();
+            toast.success('Time track updated successfully');
             onClose();
         } catch (error: any) {
-            toast.error(error?.data?.message || 'Failed to create time track');
+            toast.error(error?.data?.message || 'Failed to update time track');
         }
     };
 
@@ -51,14 +67,15 @@ const AddTimeTrackModal = ({ isOpen, onClose, assignedStudents }: AddTimeTrackMo
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth={2}
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                         />
                     </svg>
-                    Log Mentorship Time
+                    Edit Time Track
                 </div>
             }
             width={600}
             centered
+            destroyOnClose
         >
             <Form form={form} layout="vertical" onFinish={onFinish} className="space-y-4 pt-4">
                 <Form.Item
@@ -151,7 +168,7 @@ const AddTimeTrackModal = ({ isOpen, onClose, assignedStudents }: AddTimeTrackMo
                         loading={isLoading}
                         className="flex-1 h-12 rounded-xl font-bold bg-primary border-none hover:opacity-90 transition-opacity text-white"
                     >
-                        Log Time
+                        Update Time
                     </Button>
                 </div>
             </Form>
@@ -159,4 +176,4 @@ const AddTimeTrackModal = ({ isOpen, onClose, assignedStudents }: AddTimeTrackMo
     );
 };
 
-export default AddTimeTrackModal;
+export default EditTimeTrackModal;
