@@ -1,19 +1,60 @@
 import { useState } from 'react';
-import GoalCards from './components/GoalCards';
 import WoopStepper from './components/WoopStepper';
 import WoopForm from './components/WoopForm';
 import WoopTips from './components/WoopTips';
 import { stepsData } from '../../../constants/mentor-data';
+import { useCreateMentorWoopsMutation } from '../../../redux/apiSlices/mentor/mentorWoops';
+import { toast } from 'sonner';
 
 const Woops = () => {
+    const [createWoops, { isLoading }] = useCreateMentorWoopsMutation();
     const [currentStep, setCurrentStep] = useState(1);
-    const [showTips, setShowTips] = useState(false);
+    const [showTips, setShowTips] = useState(true);
 
-    const handleNext = () => {
+    const [formData, setFormData] = useState({
+        wish: { detail: '' },
+        outcome: { detail: '' },
+        obstacle: { detail: '' },
+        plan: { detail: '' },
+    });
+
+    const stepKeys: Record<number, 'wish' | 'outcome' | 'obstacle' | 'plan'> = {
+        1: 'wish',
+        2: 'outcome',
+        3: 'obstacle',
+        4: 'plan',
+    };
+
+    const handleDetailChange = (detail: string) => {
+        const key = stepKeys[currentStep];
+        setFormData((prev) => ({
+            ...prev,
+            [key]: { detail },
+        }));
+    };
+
+    const handleNext = async () => {
         if (currentStep < 4) {
             setCurrentStep(currentStep + 1);
         } else {
-            setShowTips(true);
+            try {
+                const res = await createWoops(formData).unwrap();
+                if (res?.success) {
+                    toast.success(res.message || 'WOOP created successfully!');
+                } else {
+                    toast.success('WOOP created successfully!');
+                }
+                setShowTips(true);
+                setCurrentStep(1);
+                setFormData({
+                    wish: { detail: '' },
+                    outcome: { detail: '' },
+                    obstacle: { detail: '' },
+                    plan: { detail: '' },
+                });
+            } catch (error: any) {
+                toast.error(error?.data?.message || 'Failed to create WOOP');
+            }
         }
     };
 
@@ -33,12 +74,10 @@ const Woops = () => {
     }
 
     const currentStepData = stepsData[currentStep];
+    const currentStepKey = stepKeys[currentStep];
 
     return (
         <div className=" mx-auto">
-            {/* Header Goals */}
-            <GoalCards />
-
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <h2 className="text-xl font-bold text-gray-800 mb-1">WOOP Method</h2>
@@ -59,24 +98,30 @@ const Woops = () => {
             <WoopStepper currentStep={currentStep} />
 
             {/* Form Section */}
-            <WoopForm stepData={currentStepData} />
+            <WoopForm
+                stepData={currentStepData}
+                detailValue={formData[currentStepKey].detail}
+                onDetailChange={handleDetailChange}
+            />
 
             {/* Navigation */}
             <div className="mt-12 flex justify-end gap-3">
                 {currentStep > 1 && (
                     <button
                         onClick={handleBack}
-                        className="px-8 py-3 bg-gray-50 text-gray-500 font-bold rounded-lg hover:bg-gray-100 transition-colors"
+                        disabled={isLoading}
+                        className="px-8 py-3 bg-gray-50 text-gray-500 font-bold rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
                     >
                         Back
                     </button>
                 )}
                 <button
                     onClick={handleNext}
-                    className="px-10 py-3 text-white font-bold rounded-lg transition-all transform active:scale-95 shadow-md"
+                    disabled={isLoading}
+                    className="px-10 py-3 text-white font-bold rounded-lg transition-all transform active:scale-95 shadow-md disabled:opacity-50 flex items-center gap-2"
                     style={{ backgroundColor: currentStepData.color }}
                 >
-                    {currentStep === 4 ? 'Save Woop' : 'Next Step'}
+                    {currentStep === 4 ? (isLoading ? 'Saving...' : 'Save Woop') : 'Next Step'}
                 </button>
             </div>
         </div>

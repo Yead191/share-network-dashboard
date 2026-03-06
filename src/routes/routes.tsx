@@ -42,6 +42,7 @@ import ChatLayout from '../components/shared/chat';
 import StudentSchedule from '../pages/student/schdule';
 
 import PrivateRoute from '../provider/PrivateRoutes';
+import HomeRedirect from '../provider/HomeRedirect';
 
 const router = createBrowserRouter([
     {
@@ -53,6 +54,11 @@ const router = createBrowserRouter([
         ),
         errorElement: <ErrorPage />,
         children: [
+            // home element
+            {
+                index: true,
+                element: <HomeRedirect />,
+            },
             // Admin
             {
                 path: '/admin/overview',
