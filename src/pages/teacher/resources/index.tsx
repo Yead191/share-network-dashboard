@@ -30,7 +30,7 @@ const Resources = () => {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [selectedResource, setSelectedResource] = useState<ResourceItem | null>(null);
-    const {data: resources, isLoading, isFetching}= useGetResourcesQuery({page: page, limit: 10, searchTerm: searchText});
+    const {data: resources, isLoading, isFetching,refetch}= useGetResourcesQuery({page: page, limit: 10, searchTerm: searchText});
     const [createResourse] = useCreateResourseMutation();
     const [updateResource] = useUpdateResourseMutation();
     const [deleteResource] = useDeleteResourseMutation();
@@ -80,6 +80,7 @@ const Resources = () => {
                 const { error }: any = await deleteResource({id: key});
                 if (!error) {
                     toast.success('Resource deleted successfully');
+                    refetch()
                     return;
                 }
                 toast.error(error?.data?.message || 'Failed to delete resource');
@@ -99,6 +100,7 @@ const Resources = () => {
             if (!error) {
                 setIsCreateModalOpen(false);
                 toast.success(data?.message || 'Resource updated successfully');
+                refetch()
                 return;
             }
             toast.error(error?.data?.message || 'Failed to update resource');
@@ -111,6 +113,7 @@ const Resources = () => {
             if (!error) {
                 setIsCreateModalOpen(false);
                 toast.success(data?.message || 'Resource created successfully');
+                refetch()
                 return;
             }
             toast.error(error?.data?.message || 'Failed to create resource');

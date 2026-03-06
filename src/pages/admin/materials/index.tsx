@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { useGetMaterialsQuery } from '../../../redux/apiSlices/admin/adminMaterialsApi';
 import { useDeleteMaterialsMutation } from '../../../redux/apiSlices/mentor/learningApi';
 import moment from 'moment';
+import FileViewerButton from '../../../components/shared/FileViewButton';
 
 const AdminLearningMaterials = () => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -31,6 +32,7 @@ const AdminLearningMaterials = () => {
         target: item?.targertGroup,
         status: item?.markAsAssigned ? 'Active' : 'Inactive',
         date: moment(item?.createdAt).format('YYYY-MM-DD'),
+        file: item?.pdf,
     }));
 
     const handleDelete = (id: string) => {
@@ -98,6 +100,19 @@ const AdminLearningMaterials = () => {
                         >
                             {record.url}
                         </a>
+                    )}
+                </div>
+            ),
+        },
+        {
+            title: 'FILE',
+            key: 'file',
+            render: (_: any, record: any) => (
+                <div>
+                    {record.file ? (
+                        <FileViewerButton fileUrl={record.file} fileName={record.title} />
+                    ) : (
+                        <span className="font-medium text-gray-700">No File</span>
                     )}
                 </div>
             ),

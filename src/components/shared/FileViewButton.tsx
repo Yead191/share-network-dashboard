@@ -24,6 +24,7 @@ function getFileIcon(type: FileType) {
 }
 
 export default function FileViewerButton({ fileUrl, fileName = "File Preview" }: FileViewerButtonProps) {
+  fileUrl=fileUrl?.replace("/uploads","")
   const [open, setOpen] = useState(false);
   const fileType = getFileType(fileUrl);
 
