@@ -59,7 +59,7 @@ const adminStudentApi = api.injectEndpoints({
                     url: `/goal/${studentId}`,
                     method: 'PUT',
                     body: data,
-                }
+                };
             },
         }),
         updateGoal: build.mutation({
@@ -90,6 +90,23 @@ const adminStudentApi = api.injectEndpoints({
                 method: 'GET',
             }),
         }),
+        getAttendanceLogs: build.query({
+            query: ({ classId, date }: { classId: string; date: string }) => ({
+                url: `/student-attendance`,
+                method: 'GET',
+                params: {
+                    classId,
+                    date,
+                },
+            }),
+        }),
+        updateIndividualAttendance: build.mutation({
+            query: (data: any) => ({
+                url: `/student-attendance/update-student-status`,
+                method: 'PATCH',
+                body: data,
+            }),
+        }),
     }),
 });
 
@@ -106,4 +123,6 @@ export const {
     useTakeAttendanceMutation,
     useGetAllClassesQuery,
     useDeleteStudentMutation,
+    useGetAttendanceLogsQuery,
+    useUpdateIndividualAttendanceMutation,
 } = adminStudentApi;
