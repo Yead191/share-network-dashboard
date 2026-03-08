@@ -58,24 +58,24 @@ const Login = () => {
         } else {
             setHiddenForget(false);
         }
-        if (changedValues.role) {
-            const roleCredentials: Record<string, { email: string }> = {
-                admin: { email: 'azizulsparktech@gmail.com' },
-                student: { email: 'woyik33076@helesco.com' },
-                mentor: { email: 'bonodej524@gamening.com' },
-                teacher: { email: 'teacher@gxuzi.com' },
-                'mentor-coordinator': { email: 'matin51126@codgal.com' },
-            };
+        // if (changedValues.role) {
+        //     const roleCredentials: Record<string, { email: string }> = {
+        //         admin: { email: 'azizulsparktech@gmail.com' },
+        //         student: { email: 'woyik33076@helesco.com' },
+        //         mentor: { email: 'bonodej524@gamening.com' },
+        //         teacher: { email: 'teacher@gxuzi.com' },
+        //         'mentor-coordinator': { email: 'matin51126@codgal.com' },
+        //     };
 
-            const creds = roleCredentials[changedValues.role];
-            if (creds) {
-                form.setFieldsValue({
-                    email: creds.email,
-                    // password: creds.email === 'segiba3385@gxuzi.com' ? '123456' : '12345678',
-                    password: '12345678',
-                });
-            }
-        }
+        //     const creds = roleCredentials[changedValues.role];
+        //     if (creds) {
+        //         form.setFieldsValue({
+        //             email: creds.email,
+        //             // password: creds.email === 'segiba3385@gxuzi.com' ? '123456' : '12345678',
+        //             password: '12345678',
+        //         });
+        //     }
+        // }
     };
 
     return (
