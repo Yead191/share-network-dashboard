@@ -23,6 +23,10 @@ const StudentOverview = () => {
     const { data: eventsData } = useGetUpcomingSessionsQuery(undefined);
     const { data: assignmentsData } = useGetActiveAssignmentsQuery(undefined);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const studentName = profileData?.data?.firstName || profileData?.data?.name || 'Student';
+    const userGroup = profileData?.data?.userGroup?.[0];
+    const groupName = userGroup?.name || 'Skill Path';
+    const groupDescription = userGroup?.description || 'Welcome to your coding journey!';
     const handleEventClick = (event: any) => {
         setSelectedEvent(event);
         setIsModalOpen(true);
@@ -92,10 +96,7 @@ const StudentOverview = () => {
 
     return (
         <section className="space-y-8 pb-10">
-            <WelcomeBanner
-                name={`${profileData?.data?.firstName || ''}`}
-                group={profileData?.data?.preferedGroup || ''}
-            />
+            <WelcomeBanner name={studentName} group={groupName} description={groupDescription} />
 
             <MentorCard
                 mentor={{
