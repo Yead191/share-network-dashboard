@@ -2,16 +2,32 @@ import { api } from '../../api/baseApi';
 
 const adminStudentApi = api.injectEndpoints({
     endpoints: (build) => ({
-        getAllStudents: build.query({
-            query: ({ page, searchTerm }: { page: number; searchTerm: string }) => ({
-                url: `/student-admin`,
-                method: 'GET',
-                params: {
-                    page,
-                    limit: 10,
-                    searchTerm,
-                },
-            }),
+        getStudents: build.query({
+            query: ({
+                page,
+                searchTerm,
+                limit,
+                selectedGroup,
+                selectedStatus,
+            }: {
+                page?: number;
+                searchTerm?: string;
+                limit?: number;
+                selectedGroup?: string;
+                selectedStatus?: string;
+            }) => {
+                console.log('Query hit', page, limit, searchTerm);
+                const params = new URLSearchParams();
+                if (searchTerm) params.append('searchTerm', searchTerm);
+                params.append('page', (page ?? 0).toString());
+                params.append('limit', (limit ?? 0).toString());
+                if (selectedGroup) params.append('userGroup', selectedGroup);
+                if (selectedStatus) params.append('status', selectedStatus);
+                return {
+                    url: `/student-admin?${params.toString()}`,
+                    method: 'GET',
+                };
+            },
         }),
         updateStudent: build.mutation({
             query: ({ id, data }: { id: string; data: any }) => ({
@@ -111,7 +127,6 @@ const adminStudentApi = api.injectEndpoints({
 });
 
 export const {
-    useGetAllStudentsQuery,
     useUpdateStudentMutation,
     useUpdateMentorMutation,
     useGetUserGroupsQuery,
@@ -125,4 +140,5 @@ export const {
     useDeleteStudentMutation,
     useGetAttendanceLogsQuery,
     useUpdateIndividualAttendanceMutation,
+    useGetStudentsQuery,
 } = adminStudentApi;

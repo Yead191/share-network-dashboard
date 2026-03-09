@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Table, Button, Input, Tag, Avatar, Modal } from 'antd';
+import { Table, Button, Input, Tag, Avatar, Modal, Select } from 'antd';
 import { Search, Eye, Edit2, Trash2, Link, GraduationCap } from 'lucide-react';
 import ImportExcelModal from '../../../../components/modals/admin/ImportExcelModal';
 import StudentDetailsModal from '../../../../components/modals/admin/StudentDetailsModal';
@@ -9,15 +9,16 @@ import ReviewModal from '../../../../components/modals/admin/ReviewModal';
 import HeaderTitle from '../../../../components/shared/HeaderTitle';
 import {
     useDeleteStudentMutation,
-    useGetAllStudentsQuery,
+    useGetStudentsQuery,
     useGetUserGroupsQuery,
     useGetUserTracksQuery,
 } from '../../../../redux/apiSlices/admin/adminStudentApi';
 import { useGetAdminMentorsQuery } from '../../../../redux/apiSlices/admin/adminMentorsApi';
-import { imageUrl } from '../../../../redux/api/baseApi';
 import { toast } from 'sonner';
 import { GoGoal } from 'react-icons/go';
 import CreateGoalModal from '../../../../components/modals/admin/CreateGoalModal';
+import Spinner from '../../../../components/shared/Spinner';
+import { getImageUrl } from '../../../../utils/getImageUrl';
 
 const Student = () => {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -30,12 +31,19 @@ const Student = () => {
     const [selectedStudent, setSelectedStudent] = useState<any>(null);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedGroup, setSelectedGroup] = useState('');
+    const [selectedStatus, setSelectedStatus] = useState('');
     // API CALLS
-    const { data: studentsApi, refetch } = useGetAllStudentsQuery({ page, searchTerm });
-    const { data: mentorsApi, isLoading: isMentorsLoading } = useGetAdminMentorsQuery({ page, searchTerm });
+
+    const { data: mentorsApi, isLoading: isMentorsLoading } = useGetAdminMentorsQuery({});
     const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({});
     const { data: userTracksApi, isLoading: isUserTracksLoading } = useGetUserTracksQuery({});
     const [deleteStudent, { isLoading: isDeleting }] = useDeleteStudentMutation();
+    const {
+        data: studentsApi,
+        isLoading: isStudentsLoading,
+        refetch,
+    } = useGetStudentsQuery({ page, searchTerm, limit: 10, selectedGroup, selectedStatus });
     const allStudents = studentsApi?.data?.data;
     const allMentors = mentorsApi?.data?.mentors || [];
     const userGroups = userGroupsApi?.data;
@@ -66,7 +74,7 @@ const Student = () => {
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-[#f6ffed] flex items-center justify-center text-[#52c41a] overflow-hidden">
                         {record.profile ? (
-                            <Avatar src={imageUrl + record.profile} size={40} />
+                            <Avatar src={getImageUrl(record.profile)} size={40} />
                         ) : (
                             <GraduationCap size={20} />
                         )}
@@ -111,7 +119,7 @@ const Student = () => {
                 }
                 return (
                     <div className="flex items-center gap-2">
-                        <Avatar src={imageUrl + mentor.profile || mentor.profile} size="small" />
+                        <Avatar src={getImageUrl(mentor.profile)} size="small" />
                         <span className="text-gray-600 font-medium">
                             {mentor.firstName} {mentor.lastName}
                         </span>
@@ -195,17 +203,55 @@ const Student = () => {
         },
     ];
 
+    if (isStudentsLoading || isMentorsLoading || isUserGroupsLoading || isUserTracksLoading) {
+        return <Spinner />;
+    }
+
     return (
         <div className="py-6">
             <div className="flex justify-between items-center mb-8">
                 <HeaderTitle title="Student Management" />
-                <Input
-                    placeholder="Search student"
-                    prefix={<Search size={16} className="text-gray-400" />}
-                    className="h-10 w-64 border-gray-100 bg-white rounded-md"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
+                <div className="flex items-center gap-4">
+                    <Select
+                        placeholder="Filter by Group"
+                        className="h-10 w-48"
+                        allowClear
+                        onChange={(value) => {
+                            setSelectedGroup(value);
+                            setPage(1);
+                        }}
+                        options={userGroups?.map((group: any) => ({
+                            label: group.name,
+                            value: group._id,
+                        }))}
+                    />
+                    <Select
+                        placeholder="Filter by Status"
+                        className="h-10 w-40"
+                        allowClear
+                        onChange={(value) => {
+                            setSelectedStatus(value);
+                            setPage(1);
+                        }}
+                        options={[
+                            { label: 'All', value: '' },
+                            { label: 'Pending', value: 'PENDING' },
+                            { label: 'Active', value: 'ACTIVE' },
+                            { label: 'Non Active', value: 'NON_ACTIVE' },
+                            { label: 'Alumni Graduated', value: 'ALUMNI_GRADUATED' },
+                        ]}
+                    />
+                    <Input
+                        placeholder="Search student"
+                        prefix={<Search size={16} className="text-gray-400" />}
+                        className="h-10 w-64 border-gray-100 bg-white rounded-md"
+                        value={searchTerm}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            setPage(1);
+                        }}
+                    />
+                </div>
             </div>
 
             <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
@@ -213,15 +259,12 @@ const Student = () => {
                     columns={columns}
                     dataSource={allStudents}
                     loading={!allStudents && !studentsApi}
-                    pagination={
-                        pagination && {
-                            current: page,
-                            total: pagination.total,
-                            pageSize: pagination.limit,
-                            onChange: (p) => setPage(p),
-                            showSizeChanger: false,
-                        }
-                    }
+                    pagination={{
+                        total: pagination.total,
+                        current: page,
+                        onChange: (p) => setPage(p),
+                        showSizeChanger: false,
+                    }}
                     className="admin-students-table"
                     rowClassName="border-b last:border-0 border-gray-50"
                     rowKey="_id"

@@ -32,6 +32,18 @@ const AssignMentorModal: React.FC<AssignMentorModalProps> = ({
     const [form] = Form.useForm();
     const [updateMentor, { isLoading: isUpdating }] = useUpdateMentorMutation();
 
+    const selectedGroups = Form.useWatch('userGroup', form);
+
+    const isSkillPathSelected = () => {
+        if (!selectedGroups || !userGroups) return false;
+        // Handle both single string and array (multiple mode)
+        const currentGroups = Array.isArray(selectedGroups) ? selectedGroups : [selectedGroups];
+        return currentGroups.some((groupId: string) => {
+            const group = userGroups.find((g: any) => g._id === groupId);
+            return group?.name === 'Skill Path';
+        });
+    };
+
     useEffect(() => {
         if (student) {
             form.setFieldsValue({
@@ -105,7 +117,7 @@ const AssignMentorModal: React.FC<AssignMentorModalProps> = ({
                 <Form.Item
                     label={<span className="font-bold text-gray-700">Select Mentor</span>}
                     name="mentorId"
-                    rules={[{ required: true, message: 'Please select a mentor' }]}
+                    rules={[{ required: false, message: 'Please select a mentor' }]}
                 >
                     <Select
                         placeholder="Choose a mentor"
@@ -117,15 +129,18 @@ const AssignMentorModal: React.FC<AssignMentorModalProps> = ({
                             label: `${m.firstName} ${m.lastName}`,
                             value: m._id,
                         }))}
+                        allowClear
+                        showSearch
+                        optionFilterProp="label"
+                        autoClearSearchValue
                     />
                 </Form.Item>
                 <Form.Item
                     label={<span className="font-bold text-gray-700">Select Group</span>}
                     name="userGroup"
-                    rules={[{ required: true, message: 'Please select at least one group' }]}
+                    rules={[{ required: false, message: 'Please select at least one group' }]}
                 >
                     <Select
-                        mode="multiple"
                         placeholder="Choose groups"
                         className="h-11 rounded-md"
                         variant="filled"
@@ -135,25 +150,29 @@ const AssignMentorModal: React.FC<AssignMentorModalProps> = ({
                             label: g.name,
                             value: g._id,
                         }))}
+                        allowClear
                     />
                 </Form.Item>
-                <Form.Item
-                    label={<span className="font-bold text-gray-700">Select Track</span>}
-                    name="userGroupTrack"
-                    rules={[{ required: true, message: 'Please select a track' }]}
-                >
-                    <Select
-                        placeholder="Choose a track"
-                        className="h-11 rounded-md"
-                        variant="filled"
-                        style={{ backgroundColor: '#f9f9f9' }}
-                        loading={isUserTracksLoading}
-                        options={userTracks?.map((t: any) => ({
-                            label: t.name,
-                            value: t._id,
-                        }))}
-                    />
-                </Form.Item>
+                {isSkillPathSelected() && (
+                    <Form.Item
+                        label={<span className="font-bold text-gray-700">Select Track</span>}
+                        name="userGroupTrack"
+                        rules={[{ required: true, message: 'Please select a track' }]}
+                    >
+                        <Select
+                            placeholder="Choose a track"
+                            className="h-11 rounded-md"
+                            variant="filled"
+                            style={{ backgroundColor: '#f9f9f9' }}
+                            loading={isUserTracksLoading}
+                            options={userTracks?.map((t: any) => ({
+                                label: t.name,
+                                value: t._id,
+                            }))}
+                            allowClear
+                        />
+                    </Form.Item>
+                )}
             </Form>
         </Modal>
     );
