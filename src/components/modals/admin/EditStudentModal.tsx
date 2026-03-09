@@ -204,10 +204,10 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ open, onCancel, stu
                                 placeholder="Select status"
                                 className="h-11 rounded-md"
                                 options={[
-                                    { label: 'Pending', value: 'Pending' },
-                                    { label: 'Active', value: 'Active' },
-                                    { label: 'Non-active', value: 'Non-active' },
-                                    { label: 'Alumni/Graduated', value: 'Alumni/Graduated' },
+                                    { label: 'Pending', value: 'PENDING' },
+                                    { label: 'Active', value: 'ACTIVE' },
+                                    { label: 'Non-active', value: 'NON_ACTIVE' },
+                                    { label: 'Alumni/Graduated', value: 'ALUMNI_GRADUATED' },
                                 ]}
                             />
                         </Form.Item>
