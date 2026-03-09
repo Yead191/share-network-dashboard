@@ -1,8 +1,8 @@
-import { Card, Progress } from 'antd';
+import { Card } from 'antd';
 
 interface CurriculumItem {
     name: string;
-    percentage: number;
+    description?: string;
     color: string;
 }
 
@@ -17,21 +17,24 @@ const CurriculumOverview = ({ data }: CurriculumOverviewProps) => {
             title={<span className="text-xl font-bold">Curriculum Overview</span>}
         >
             <div className="space-y-6">
-                {data.map((item, idx) => (
-                    <div key={idx}>
-                        <div className="flex justify-between mb-2">
-                            <span className="font-medium text-gray-700">{item.name}</span>
-                            <span className="font-bold text-gray-800">{item.percentage}%</span>
+                {data.length === 0 ? (
+                    <p className="text-gray-400 text-center py-4">No curriculum assigned yet.</p>
+                ) : (
+                    data.map((item, idx) => (
+                        <div key={idx} className="flex items-start gap-3">
+                            <div
+                                className="w-3 h-3 rounded-full mt-1.5 flex-shrink-0"
+                                style={{ backgroundColor: item.color }}
+                            />
+                            <div>
+                                <span className="font-medium text-gray-700">{item.name}</span>
+                                {item.description && (
+                                    <p className="text-sm text-gray-400 mt-1">{item.description}</p>
+                                )}
+                            </div>
                         </div>
-                        <Progress
-                            percent={item.percentage}
-                            showInfo={false}
-                            strokeColor={item.color}
-                            strokeWidth={12}
-                            className="mb-0"
-                        />
-                    </div>
-                ))}
+                    ))
+                )}
             </div>
         </Card>
     );

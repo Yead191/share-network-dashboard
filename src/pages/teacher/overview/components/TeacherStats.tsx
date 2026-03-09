@@ -1,37 +1,38 @@
-import { FaUsers, FaCalendarAlt, FaBookOpen, FaChartLine } from 'react-icons/fa';
-import { teacherStatsData } from '../../../../constants/teacher-data';
+import { FaUsers, FaCalendarAlt, FaBookOpen } from 'react-icons/fa';
 import { useGetOverViewTeacherQuery } from '../../../../redux/apiSlices/teacher/homeSlice';
-;
-
-
-
-
-const iconMap: Record<string, React.ReactNode> = {
-    users: <FaUsers className="text-blue-500 text-2xl" />,
-    calendar: <FaCalendarAlt className="text-orange-500 text-2xl" />,
-    book: <FaBookOpen className="text-purple-500 text-2xl" />,
-    chart: <FaChartLine className="text-red-500 text-2xl" />,
-};
 
 const TeacherStats = () => {
   const { data, isLoading, isFetching } = useGetOverViewTeacherQuery();
 
-  const newData = teacherStatsData.map((item) => {
-    if (item.id === 1) {
-      return { ...item, count: data?.data.totalStudent || 0 };
-    } else if (item.id === 2) {
-      return { ...item, count: data?.data.totalClass || 0 };
-    } else if (item.id === 3) {
-      return { ...item, count: data?.data.totalAssignment || 0 };
-    }
-    return item;
-  });
+  const newData = [
+    {
+      id: 1,
+      title: 'My Students',
+      count: data?.data.totalStudent ?? 0,
+      icon: <FaUsers className="text-blue-500 text-2xl" />,
+      bgColor: 'bg-blue-50',
+    },
+    {
+      id: 2,
+      title: 'Schedule Class',
+      count: data?.data.totalClass ?? 0,
+      icon: <FaCalendarAlt className="text-orange-500 text-2xl" />,
+      bgColor: 'bg-orange-50',
+    },
+    {
+      id: 3,
+      title: 'Learning Material',
+      count: data?.data.totalAssignment ?? 0,
+      icon: <FaBookOpen className="text-purple-500 text-2xl" />,
+      bgColor: 'bg-purple-50',
+    },
+  ];
 
   // 🔹 Skeleton UI
   if (isLoading || isFetching) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        {[...Array(4)].map((_, index) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        {[...Array(3)].map((_, index) => (
           <div
             key={index}
             className="bg-white p-4 rounded-xl shadow-sm border border-gray-50 flex items-center space-x-4 animate-pulse"
@@ -48,14 +49,14 @@ const TeacherStats = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
       {newData.map((stat) => (
         <div
           key={stat.id}
           className="bg-white p-4 rounded-xl shadow-sm border border-gray-50 flex items-center space-x-4 transition-all hover:shadow-md"
         >
           <div className={`p-4 rounded-xl ${stat.bgColor} flex items-center justify-center`}>
-            {iconMap[stat.iconType] || null}
+            {stat.icon}
           </div>
           <div>
             <h2 className="text-2xl font-bold text-gray-800 leading-none">

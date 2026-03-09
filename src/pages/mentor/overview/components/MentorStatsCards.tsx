@@ -33,13 +33,13 @@ const MentorStatsCards = () => {
                 </div>
                 <div className="mt-4">
                     <Progress
-                        percent={70}
+                        percent={mentorData?.totalHours ? Math.min(Math.round((mentorData.totalHours / 10) * 100), 100) : 0}
                         showInfo={false}
                         strokeColor="#7c3aed"
                         trailColor="#f3f4f6"
                         strokeWidth={12}
                     />
-                    <p className="text-[10px] text-gray-400 mt-1 text-center font-medium">7/10 Hours Mentored</p>
+                    <p className="text-[10px] text-gray-400 mt-1 text-center font-medium">{mentorData?.totalHours?.toFixed(1) || 0}/10 Hours Mentored</p>
                 </div>
             </Card>
 

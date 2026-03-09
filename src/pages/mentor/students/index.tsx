@@ -4,7 +4,6 @@ import CurriculumOverview from './components/CurriculumOverview';
 import LearningMaterials from './components/LearningMaterials';
 import UpcomingEvents from './components/UpcomingEvents';
 import ActiveAssignments from './components/ActiveAssignments';
-import { curriculum } from '../../../constants/mentor-data';
 import { useProfileQuery } from '../../../redux/apiSlices/authSlice';
 import {
     useGetActiveAssignmentsQuery,
@@ -35,6 +34,13 @@ const Students = () => {
     const activeAssignments = activeAssignmentsData?.data || [];
     const studentUpcomingEvents = studentUpcomingEventsData?.data?.data || [];
 
+    const curriculumColors = ['#4ADE80', '#60A5FA', '#F472B6'];
+    const curriculumData = (student?.userGroup || []).map((group: any, idx: number) => ({
+        name: group?.name || 'Unknown Group',
+        description: group?.description || '',
+        color: curriculumColors[idx % curriculumColors.length],
+    }));
+
     if (
         mentorLoading ||
         studentLoading ||
@@ -51,10 +57,10 @@ const Students = () => {
                     <StudentProfile student={student} />
                 </div>
                 <div className="lg:col-span-2">
-                    <CoreGoals />
+                    <CoreGoals goals={student?.Goals || []} />
                 </div>
                 <div className="lg:col-span-3">
-                    <CurriculumOverview data={curriculum} />
+                    <CurriculumOverview data={curriculumData} />
                 </div>
             </div>
             <div className="mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">

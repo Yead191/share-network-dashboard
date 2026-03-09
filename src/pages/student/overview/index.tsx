@@ -101,8 +101,8 @@ const StudentOverview = () => {
             id: a._id,
             title: a.title,
             dueDate: new Date(a.dueDate).toLocaleDateString(),
-            subject: 'COMPUTER',
-            status: 'PENDING',
+            subject: a.userGroup?.[0]?.name || a.userGroupTrack?.name || 'General',
+            status: a.status || 'PENDING',
         })) || [];
 
     return (
