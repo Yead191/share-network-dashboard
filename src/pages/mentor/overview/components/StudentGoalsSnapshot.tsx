@@ -74,7 +74,7 @@ const StudentGoalsSnapshot = ({ snapshots }: { snapshots: StudentSnapshot[] }) =
                                 <p className="text-sm text-gray-500 font-medium">{student?.email}</p>
                             </div>
                         </div>
-
+{/* 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div className="bg-slate-50 rounded-xl p-4 border border-slate-100/50">
                                 <div className="flex items-center gap-2 text-slate-600 mb-2">
@@ -117,7 +117,7 @@ const StudentGoalsSnapshot = ({ snapshots }: { snapshots: StudentSnapshot[] }) =
                                     "{student?.Onboarding?.proud_moment || 'No proud moment shared yet'}"
                                 </p>
                             </div>
-                        </div>
+                        </div> */}
 
                         {student?.Goals && student?.Goals?.length > 0 && (
                             <div className="space-y-3">
