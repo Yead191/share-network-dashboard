@@ -3,8 +3,8 @@ import { api } from '../../api/baseApi';
 const weeklyReportsApi = api.injectEndpoints({
     endpoints: (build) => ({
         getWeeklyReports: build.query({
-            query: () => ({
-                url: '/mentor/report',
+            query: ({id}) => ({
+                url: `/mentor/report/student/${id}`,
                 method: 'GET',
             }),
         }),

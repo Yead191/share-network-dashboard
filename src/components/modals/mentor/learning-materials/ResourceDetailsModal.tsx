@@ -2,7 +2,7 @@ import { Modal, Button } from 'antd';
 import { imageUrl } from '../../../../redux/api/baseApi';
 
 const ResourceDetailsModal = ({ open, onCancel, resource }: any) => {
-    // console.log(resource);
+    console.log(resource);
     return (
         <Modal
             title={<span className="text-xl font-bold">Resources Details</span>}

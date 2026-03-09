@@ -12,6 +12,7 @@ import TeacherDetailsModal from '../../../components/modals/admin/TeacherDetails
 import EditTeacherModal from '../../../components/modals/admin/EditTeacherModal';
 import { Modal, message } from 'antd';
 import { toast } from 'sonner';
+import FilterMentorModal from '../../../components/modals/admin/FilterMentorModal';
 
 const AdminTeachers = () => {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -21,9 +22,14 @@ const AdminTeachers = () => {
     const [selectedTeacher, setSelectedTeacher] = useState<any>(null);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
-
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+    const [selectedGroup, setSelectedGroup] = useState<string | undefined>(undefined);
     // API CALLS
-    const { data: teachersApi, refetch } = useGetTeachersQuery({ page: page, limit: 10, searchTerm: searchTerm });
+    const { data: teachersApi, refetch } = useGetTeachersQuery({
+        page: page,
+        searchTerm: searchTerm,
+        userGroup: selectedGroup,
+    });
     const { data: studentsApi } = useGetAllStudentsQuery({});
     const [deleteTeacher] = useDeleteTeacherMutation();
     const teachers = teachersApi?.data || [];
@@ -172,6 +178,7 @@ const AdminTeachers = () => {
                 <div className="flex items-center gap-4">
                     <Button
                         icon={<Filter size={16} />}
+                        onClick={() => setIsFilterModalOpen(true)}
                         className="flex items-center gap-2 h-10 border-gray-100 bg-white text-gray-600"
                     >
                         Filter
@@ -230,6 +237,15 @@ const AdminTeachers = () => {
                 open={isDetailsModalOpen}
                 onCancel={() => setIsDetailsModalOpen(false)}
                 teacher={selectedTeacher}
+            />
+            <FilterMentorModal
+                open={isFilterModalOpen}
+                onCancel={() => setIsFilterModalOpen(false)}
+                onFilter={(groupId) => {
+                    setSelectedGroup(groupId);
+                    setPage(1); // Reset to first page on filter
+                }}
+                initialGroupId={selectedGroup}
             />
             <EditTeacherModal
                 refetch={refetch}

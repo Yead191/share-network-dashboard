@@ -3,10 +3,17 @@ import { api } from '../../api/baseApi';
 const adminTeachersApi = api.injectEndpoints({
     endpoints: (build) => ({
         getTeachers: build.query({
-            query: ({ page, limit, searchTerm }: { page: number; limit: number; searchTerm: string }) => ({
-                url: `/admin-teacher?page=${page}&limit=${limit}&searchTerm=${searchTerm}`,
-                method: 'GET',
-            }),
+            query: ({ page, searchTerm, userGroup }: { page: number; searchTerm: string; userGroup?: string }) => {
+                const params = new URLSearchParams();
+                if (userGroup) params.append('userGroup', userGroup);
+                if (searchTerm) params.append('searchTerm', searchTerm);
+                params.append('limit', '10');
+                params.append('page', page.toString());
+                return {
+                    url: `/admin-teacher?${params.toString()}`,
+                    method: 'GET',
+                };
+            },
         }),
         addTeacher: build.mutation({
             query: ({ data }: { data: any }) => ({
