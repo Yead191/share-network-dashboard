@@ -1,12 +1,11 @@
 import { Card, Button } from 'antd';
 import { MessageSquare, Eye } from 'lucide-react';
-
-import { imageUrl } from '../../../../redux/api/baseApi';
 import { useState } from 'react';
 import StudentProfileModal from '../../../../components/modals/mentor/StudentProfileModal';
 import { useNavigate } from 'react-router-dom';
 import { useCreateChatRoomMutation } from '../../../../redux/apiSlices/chatSlice';
 import { toast } from 'sonner';
+import { getImageUrl } from '../../../../utils/getImageUrl';
 
 const StudentProfile = ({ student }: { student: any }) => {
     const navigate = useNavigate();
@@ -39,7 +38,7 @@ const StudentProfile = ({ student }: { student: any }) => {
             <div className="flex flex-col items-center">
                 <div className="relative mb-2">
                     <img
-                        src={imageUrl + student?.profile}
+                        src={getImageUrl(student?.profile)}
                         alt="Student"
                         className="w-24 h-24 rounded-full border-4 border-white shadow-sm object-cover"
                     />
