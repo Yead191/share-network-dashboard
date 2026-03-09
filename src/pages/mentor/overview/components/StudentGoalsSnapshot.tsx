@@ -47,10 +47,9 @@ const StudentGoalsSnapshot = ({ snapshots }: { snapshots: StudentSnapshot[] }) =
                 </h3>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+            {/* <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
                 {snapshots?.map((student, index) => (
                     <div key={student._id} className="relative">
-                        {/* Student Profile Header */}
                         <div className="flex items-center gap-4 mb-6">
                             <div className="relative">
                                 <img
@@ -76,20 +75,18 @@ const StudentGoalsSnapshot = ({ snapshots }: { snapshots: StudentSnapshot[] }) =
                             </div>
                         </div>
 
-                        {/* Onboarding Info Grid */}
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                            {/* Computer Comfort */}
                             <div className="bg-slate-50 rounded-xl p-4 border border-slate-100/50">
                                 <div className="flex items-center gap-2 text-slate-600 mb-2">
                                     <Laptop size={16} className="text-blue-500" />
                                     <span className="text-xs font-bold uppercase tracking-wider">Computer Comfort</span>
                                 </div>
                                 <p className="text-sm text-gray-700 leading-relaxed">
-                                    {student.Onboarding?.computer_comfort?.join(', ') || 'Not specified'}
+                                    {student?.Onboarding?.computer_comfort?.join(', ') || 'Not specified'}
                                 </p>
                             </div>
 
-                            {/* Curious Activities */}
                             <div className="bg-rose-50 rounded-xl p-4 border border-rose-100/50">
                                 <div className="flex items-center gap-2 text-rose-600 mb-2">
                                     <Search size={16} className="text-rose-500" />
@@ -100,7 +97,6 @@ const StudentGoalsSnapshot = ({ snapshots }: { snapshots: StudentSnapshot[] }) =
                                 </p>
                             </div>
 
-                            {/* Hardest to Learn */}
                             <div className="bg-amber-50 rounded-xl p-4 border border-amber-100/50">
                                 <div className="flex items-center gap-2 text-amber-600 mb-2">
                                     <Brain size={16} className="text-amber-500" />
@@ -113,7 +109,6 @@ const StudentGoalsSnapshot = ({ snapshots }: { snapshots: StudentSnapshot[] }) =
                                 </p>
                             </div>
 
-                            {/* Proud Moment */}
                             <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-100/50">
                                 <div className="flex items-center gap-2 text-emerald-600 mb-2">
                                     <Quote size={16} className="text-emerald-500" />
@@ -125,7 +120,6 @@ const StudentGoalsSnapshot = ({ snapshots }: { snapshots: StudentSnapshot[] }) =
                             </div>
                         </div>
 
-                        {/* Active Goals Section */}
                         {student.Goals && student.Goals.length > 0 && (
                             <div className="space-y-3">
                                 <div className="flex items-center gap-2 px-1">
@@ -150,7 +144,7 @@ const StudentGoalsSnapshot = ({ snapshots }: { snapshots: StudentSnapshot[] }) =
                         )}
                     </div>
                 ))}
-            </div>
+            </div> */}
         </div>
     );
 };

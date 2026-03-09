@@ -17,12 +17,12 @@ const WeeklyReport = () => {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedReport, setSelectedReport] = useState<any>(null);
-    const { data, refetch } = useGetWeeklyReportsQuery(undefined);
-    const weeklyReportsData = data?.data?.reports || [];
     const { data: profileData } = useProfileQuery(undefined);
-    const [deleteReport] = useDeleteWeeklyReportMutation();
-
     const assignedStudent = profileData?.data?.assignedStudents;
+    const { data, refetch } = useGetWeeklyReportsQuery({ id: profileData?.data?._id }, { skip: !profileData?.data?._id });
+    const weeklyReportsData = data?.data?.reports || [];
+    const [deleteReport] = useDeleteWeeklyReportMutation();
+    console.log("SDASD", data);
 
     const handleDelete = async (id: string) => {
         try {
@@ -140,7 +140,7 @@ const WeeklyReport = () => {
                 </div>
                 <button
                     onClick={() => setIsAddModalOpen(true)}
-                    className="h-10 px-6 rounded-lg bg-gray-50 border border-[#d9d9d9] text-[#666] flex items-center font-medium"
+                    className="h-10 px-6 rounded-lg bg-primary border border-[#d9d9d9] text-white flex items-center font-medium"
                 >
                     <span className="flex items-center">
                         <Plus className="w-4 h-4 mr-1" /> Add Report

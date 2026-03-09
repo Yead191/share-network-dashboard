@@ -37,7 +37,6 @@ const AdminMentors = () => {
     const [deleteMentor] = useDeleteAdminMentorMutation();
     const mentors = mentorsApi?.data?.mentors || [];
     const pagination = mentorsApi?.data?.pagination;
-    console.log('all mentor data', selectedGroup);
 
     const columns = [
         {
