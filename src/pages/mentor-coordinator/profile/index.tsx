@@ -99,7 +99,7 @@ export default function MentorCoordinatorProfile() {
                         {infoItem('Email', user?.email)}
                         {infoItem('Gender', user?.gender)}
                         {infoItem('Professional Title', user?.professionalTitle)}
-                        {infoItem('Preferred Group', user?.preferredGroup || user?.preferedGroup)}
+                        {infoItem('Group', user?.userGroup?.[0]?.name || 'Group not assigned yet')}
                         {infoItem('Phone', user?.contactNumber || user?.mobileNumber)}
                         {infoItem('LinkedIn', user?.linkedInProfile)}
                         {infoItem('GitHub', user?.githubProfile)}
