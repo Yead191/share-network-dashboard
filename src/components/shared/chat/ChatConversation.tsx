@@ -2,9 +2,10 @@ import { useRef, useEffect, useMemo } from 'react';
 import { Image as AntdImage, Avatar, Typography } from 'antd';
 import MessageInput from './MessageInput';
 import { io } from 'socket.io-client';
-import { imageUrl, socketUrl } from '../../../redux/api/baseApi';
+import { socketUrl } from '../../../redux/api/baseApi';
 import { useGetMessagesQuery, useSendMessageMutation } from '../../../redux/apiSlices/chatSlice';
 import { useProfileQuery } from '../../../redux/apiSlices/authSlice';
+import { getImageUrl } from '../../../utils/getImageUrl';
 
 const { Text } = Typography;
 
@@ -64,7 +65,7 @@ export function ChatConversation({ messageId, activeUser }: { messageId: any; ac
                 <div className="flex items-center gap-3">
                     <Avatar
                         size={44}
-                        src={imageUrl + activeUser?.participants[0]?.profile}
+                        src={getImageUrl(activeUser?.participants[0]?.profile)}
                         className="border border-gray-100"
                     />
                     <div>
@@ -91,7 +92,7 @@ export function ChatConversation({ messageId, activeUser }: { messageId: any; ac
                                 {!isMe && (
                                     <Avatar
                                         size={32}
-                                        src={imageUrl + activeUser?.participants[0]?.profile}
+                                        src={getImageUrl(activeUser?.participants[0]?.profile)}
                                         className="mb-1 shrink-0"
                                     />
                                 )}
@@ -108,7 +109,7 @@ export function ChatConversation({ messageId, activeUser }: { messageId: any; ac
                                                 msg.images?.map((img: any) => (
                                                     <div key={img._id} className="mb-2 rounded-lg overflow-hidden">
                                                         <AntdImage
-                                                            src={imageUrl + img}
+                                                            src={getImageUrl(img)}
                                                             width={200}
                                                             className="object-cover"
                                                         />

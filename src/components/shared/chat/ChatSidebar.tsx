@@ -1,5 +1,5 @@
 import { Empty } from 'antd';
-import { imageUrl } from '../../../redux/api/baseApi';
+import { getImageUrl } from '../../../utils/getImageUrl';
 
 interface ChatSidebarProps {
     messageId: string | null;
@@ -30,7 +30,7 @@ export function ChatSidebar({ messageId, onSelect, chatRooms }: ChatSidebarProps
                             <img
                                 src={
                                     room?.participants[0]?.profile
-                                        ? imageUrl + room?.participants[0]?.profile
+                                        ? getImageUrl(room?.participants[0]?.profile)
                                         : '/assets/images/provider/no_user.png'
                                 }
                                 alt={room?.participants[0]?.firstName + ' ' + room?.participants[0]?.lastName}

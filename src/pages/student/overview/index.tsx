@@ -12,10 +12,10 @@ import {
     useGetUpcomingSessionsQuery,
     useGetActiveAssignmentsQuery,
 } from '../../../redux/apiSlices/students/overview.slice';
-import { imageUrl } from '../../../redux/api/baseApi';
 import Spinner from '../../../components/shared/Spinner';
 import { EventDetailsModal } from '../../../components/modals/student/EventDetailsModal';
 import { useState } from 'react';
+import { getImageUrl } from '../../../utils/getImageUrl';
 
 const StudentOverview = () => {
     const { data: overviewData, isLoading, error } = useGetstudentOverviewQuery(undefined);
@@ -48,24 +48,28 @@ const StudentOverview = () => {
             count: statsResponse?.totalSubmittedAssignments ?? 0,
             icon: <PiBookOpenTextLight className="w-6 h-6 text-[#3BB77E]" />,
             iconBgColor: '#EBF9F1',
+            link: '/student/assignment',
         },
         {
             title: 'Schedule',
             count: statsResponse?.totalClasses ?? 0,
             icon: <PiCalendarBlankLight className="w-6 h-6 text-[#84CC16]" />,
             iconBgColor: '#F7FEE7',
+            link: '/student/schedule',
         },
         {
             title: 'Mentor',
             count: statsResponse?.totalMentors ?? 0,
             icon: <PiUsersLight className="w-6 h-6 text-[#F97316]" />,
             iconBgColor: '#FFF7ED',
+            link: '/student/mentor',
         },
         {
             title: 'Goals',
             count: statsResponse?.totalWoops ?? 0,
             icon: <PiTargetLight className="w-6 h-6 text-[#8B5CF6]" />,
             iconBgColor: '#F5EEFB',
+            link: '/student/goal',
         },
     ];
 
@@ -100,9 +104,7 @@ const StudentOverview = () => {
 
             <MentorCard
                 mentor={{
-                    profile: profileData?.data?.mentorId?.profile
-                        ? `${imageUrl}${profileData.data.mentorId.profile}`
-                        : 'https://via.placeholder.com/150',
+                    profile: getImageUrl(profileData?.data?.mentorId?.profile),
 
                     firstName: profileData?.data?.mentorId?.firstName || '',
                     lastName: profileData?.data?.mentorId?.lastName || '',
@@ -119,7 +121,7 @@ const StudentOverview = () => {
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map((stat, index) => (
+                {stats?.map((stat, index) => (
                     <StatCard key={index} {...stat} />
                 ))}
             </div>

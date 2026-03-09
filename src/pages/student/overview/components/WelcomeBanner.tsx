@@ -12,8 +12,6 @@ const WelcomeBanner = ({ name, group, description }: WelcomeBannerProps) => {
             </h1>
             <div className="mt-4 space-y-3 text-[#555555] text-[15px] leading-relaxed">
                 <p>{description}</p>
-                
-                <p className="font-medium text-[#333333] pt-1">Good luck, you've got this! 🚀</p>
             </div>
         </div>
     );

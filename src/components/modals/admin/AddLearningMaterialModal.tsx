@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { useAddMaterialsMutation, useUpdateMaterialsMutation } from '../../../redux/apiSlices/admin/adminMaterialsApi';
 import { toast } from 'sonner';
-import { useGetAllUserGroupTracksQuery } from '../../../redux/apiSlices/userGroupTrackSlice';
 import Dragger from 'antd/es/upload/Dragger';
 import { InboxOutlined } from '@ant-design/icons';
+import { useGetUserGroupsQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
 interface AddLearningMaterialModalProps {
     open: boolean;
     onCancel: () => void;
@@ -17,7 +17,10 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
     const [form] = Form.useForm();
     const [addMaterial, { isLoading }] = useAddMaterialsMutation();
     const [editMaterial, { isLoading: isEditLoading }] = useUpdateMaterialsMutation();
-    const { data: userGroupTracks } = useGetAllUserGroupTracksQuery(undefined, { skip: !open });
+    const { data: userGroupsApi } = useGetUserGroupsQuery({});
+
+    const userGroups = userGroupsApi?.data;
+
     const [file, setFile] = useState<any | null>(null);
     useEffect(() => {
         if (open && selectedMaterial) {
@@ -132,8 +135,6 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
                         <Select placeholder="Select" className="w-full h-11">
                             <Select.Option value="PDF">PDF</Select.Option>
                             <Select.Option value="DOCX">DOCX</Select.Option>
-                            <Select.Option value="VIDEO">VIDEO</Select.Option>
-                            <Select.Option value="AUDIO">AUDIO</Select.Option>
                             <Select.Option value="LINK">LINK</Select.Option>
                         </Select>
                     </Form.Item>
@@ -183,15 +184,15 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
                         <Select
                             placeholder="Select group"
                             className="w-full h-11"
-                            options={userGroupTracks?.data?.map((track: any) => ({
-                                value: track._id,
-                                label: track.name,
+                            options={userGroups?.map((group: any) => ({
+                                value: group._id,
+                                label: group.name,
                             }))}
                         />
                     </Form.Item>
                 </div>
 
-                <div className="mb-4">
+                {/* <div className="mb-4">
                     <Form.Item
                         name="pdf"
                         label={<span className="text-sm font-semibold text-gray-700">Upload PDF</span>}
@@ -200,7 +201,7 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
                     >
                         <Input type="file" accept=".pdf" className="h-11 rounded-lg border-gray-200" />
                     </Form.Item>
-                </div>
+                </div> */}
 
                 <Form.Item name="markAsAssigned" valuePropName="checked">
                     <Checkbox className="text-gray-600">Mark as Assigned</Checkbox>

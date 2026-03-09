@@ -1,86 +1,109 @@
-import { Download } from 'lucide-react';
-import { Button } from 'antd';
-import { FaFilePdf } from 'react-icons/fa';
-import { useGetStudentResourcesQuery } from "../../../redux/apiSlices/students/resources.slice";
+import { BookOpen, Clock, Download, ExternalLink, FileText } from 'lucide-react';
+import { useGetStudentResourcesQuery } from '../../../redux/apiSlices/students/resources.slice';
 import { imageUrl } from '../../../redux/api/baseApi';
+import Spinner from '../../../components/shared/Spinner';
+import { useState } from 'react';
+import { Pagination } from 'antd';
 
 export default function StudentResources() {
-
-    const { data, isLoading } = useGetStudentResourcesQuery(undefined);
+    const [page, setPage] = useState(1);
+    const { data, isLoading } = useGetStudentResourcesQuery({ page, limit: 10 });
 
     const resources = data?.data?.resources || [];
-
-
+    const pagination = data?.data?.pagination;
     if (isLoading) {
-        return <div className="p-6">Loading...</div>;
+        return <Spinner />;
     }
 
     return (
         <section className="space-y-6 animate-fadeIn">
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <div className="flex items-start gap-4">
-                    <div className="mt-1">
-                        <FaFilePdf className="w-8 h-8 text-[#1E1E1E]" />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-[#1E1E1E] leading-tight font-heading">Resources</h1>
-                        <p className="text-[#888888] mt-1 text-[15px]">
-                            Helpful materials and references for effective mentoring
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <div className="space-y-4 ">
+                {resources.length > 0 ? (
+                    <div className="divide-y divide-gray-50 flex flex-col gap-4">
+                        {resources?.map((resource: any) => (
+                            <div
+                                key={resource._id}
+                                className="xl:p-4 hover:bg-white/90 transition-colors group bg-white rounded-2xl"
+                            >
+                                <div className="flex items-start justify-between gap-4">
+                                    <div className="flex gap-4">
+                                        <div className="mt-1 p-3 bg-indigo-50 rounded-xl text-indigo-600 group-hover:bg-indigo-100 transition-colors xl:flex h-fit hidden ">
+                                            <FileText size={24} />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-2">
+                                                <h4 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors leading-tight">
+                                                    {resource.title}
+                                                </h4>
+                                                {/* <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] font-bold uppercase tracking-wider rounded-md">
+                                                    {resource.type}
+                                                </span> */}
+                                            </div>
+                                            <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
+                                                {resource.description}
+                                            </p>
+                                            <div className="flex flex-col xl:flex-row xl:items-center justify-start  gap-4 pt-2">
+                                                <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                                                    <Clock size={12} />
+                                                    {new Date(resource.createdAt).toLocaleDateString()}
+                                                </div>
+                                                {resource.createdBy && (
+                                                    <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                                                        <span className="w-1 h-1 bg-gray-300 rounded-full" />
+                                                        By {resource.createdBy.firstName} {resource.createdBy.lastName}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
 
-            <div className="space-y-4">
-                {resources?.map((resource: any) => (
-                    <div
-                        key={resource._id}
-                        className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between group hover:border-[#3BB77E]/30 transition-all duration-300"
-                    >
-                        <div className="flex items-center gap-5">
-                            <div className="w-12 h-12 rounded-full bg-[#EBF9F1] flex items-center justify-center flex-shrink-0">
-                                <span className="text-[10px] font-bold text-[#3BB77E]">
-                                    {resource.type}
-                                </span>
-                            </div>
-
-                            <div>
-                                <h3 className="text-[17px] font-semibold text-[#333333] group-hover:text-[#3BB77E] transition-colors">
-                                    {resource.title}
-                                </h3>
-
-                                <p className="text-[#888888] text-sm mt-1">
-                                 {resource.description} {resource.description}
-                                </p>
-
-                                <div className="flex items-center gap-2 mt-2 text-xs text-[#BCBCBC]">
-                                    {/* <span>
-                                        {new Date(resource.dueDate).toLocaleDateString()}
-                                    </span> */}
-                              <span>
-                                Due:{" "}
-                                {new Date(resource.dueDate || resource.createdAt).toLocaleString("en-US", {
-                                    day: "numeric",
-                                    month: "long",
-                                    year: "numeric",
-                                    hour: "numeric",
-                                    minute: "2-digit",
-                                    hour12: true,
-                                })}
-                                </span>
+                                    <div className="flex flex-col gap-2 shrink-0">
+                                        {resource.contentUrl && (
+                                            <a
+                                                href={resource.contentUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm active:scale-95"
+                                            >
+                                                <ExternalLink size={16} /> View
+                                            </a>
+                                        )}
+                                        {resource.pdf && (
+                                            <a
+                                                href={`${imageUrl}${resource.pdf}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100 active:scale-95"
+                                            >
+                                                <Download size={16} /> Download
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-
-            <Button
-                icon={<Download className="w-5 h-5" />}
-                className="flex items-center justify-center border-gray-100 text-[#60A5FA] hover:text-[#3B82F6] hover:border-[#3B82F6] !rounded-full !h-12 !w-12 p-0 shadow-sm"
-                onClick={() =>
-                    window.open(`${imageUrl}/${resource.pdf}`, "_blank")
-                }
-            />
+                        ))}
                     </div>
-                ))}
+                ) : (
+                    <div className="h-full flex flex-col items-center justify-center p-12 text-center">
+                        <div className="p-4 bg-gray-50 rounded-full text-gray-300 mb-4">
+                            <BookOpen size={48} />
+                        </div>
+                        <h4 className="text-gray-900 font-bold mb-1">No resources found</h4>
+                        <p className="text-sm text-gray-500 max-w-[200px]">
+                            Check back later for new learning materials.
+                        </p>
+                    </div>
+                )}
+                {/* Pagination */}
+                <div className="flex justify-end pt-6">
+                    <Pagination
+                        current={pagination?.page || page}
+                        total={pagination?.total}
+                        pageSize={pagination?.limit}
+                        onChange={(page) => setPage(page)}
+                        showSizeChanger={false}
+                    />
+                </div>
             </div>
         </section>
     );

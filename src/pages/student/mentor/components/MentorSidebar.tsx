@@ -1,4 +1,4 @@
-import { LuMapPin, LuUsers, LuClock, LuMessageSquare, LuMail, LuUser, LuCalendar } from 'react-icons/lu';
+import { LuMapPin, LuClock, LuMessageSquare, LuMail, LuUser, LuCalendar, LuBriefcase } from 'react-icons/lu';
 
 export const MentorSidebar = ({ mentor, handleChat }: { mentor: any; handleChat: any }) => (
     <div className="lg:col-span-5 space-y-6">
@@ -19,7 +19,7 @@ export const MentorSidebar = ({ mentor, handleChat }: { mentor: any; handleChat:
                         <span>{mentor.location}</span>
                     </div>
                     <div className="flex items-center gap-3 text-[#64748B]">
-                        <LuUsers className="text-[#8B5CF6]" size={18} />
+                        <LuBriefcase className="text-[#8B5CF6]" size={18} />
                         <span>{mentor.specialization}</span>
                     </div>
                     <div className="flex items-center gap-3 text-[#64748B]">

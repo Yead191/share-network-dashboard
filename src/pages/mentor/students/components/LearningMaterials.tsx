@@ -6,7 +6,7 @@ const LearningMaterials = ({ resources }: any) => {
     return (
         <Card
             className="shadow-sm border-none rounded-2xl overflow-hidden"
-            title={<span className="text-xl font-bold">Learning Materials</span>}
+            title={<span className="text-xl font-bold">Resources</span>}
         >
             <div className="flex-1 overflow-y-auto custom-scrollbar max-h-[280px]">
                 {resources.length > 0 ? (

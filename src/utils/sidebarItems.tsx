@@ -3,12 +3,12 @@ import { TSidebarItem } from './generateSidebarItems';
 import {
     LuLayoutDashboard,
     LuBookOpen,
-    LuCalendarDays,
     LuSettings,
     LuUser,
     LuUsers,
     LuFileText,
     LuMessageSquare,
+    LuTarget,
 } from 'react-icons/lu';
 import { PiStudent, PiChalkboardTeacher } from 'react-icons/pi';
 import { GiTeacher } from 'react-icons/gi';
@@ -161,9 +161,9 @@ export const studentSidebarItems: TSidebarItem[] = [
     },
     {
         key: 'goal',
-        label: 'Goal',
+        label: 'Goals',
         path: 'student/goal',
-        icon: <LuCalendarDays size={24} />,
+        icon: <LuTarget size={24} />,
     },
     {
         key: 'schedule',

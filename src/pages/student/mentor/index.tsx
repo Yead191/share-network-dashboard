@@ -3,10 +3,10 @@ import { useProfileQuery } from '../../../redux/apiSlices/authSlice';
 import { MentorHeader } from './components/MentorHeader';
 import { MentorSidebar } from './components/MentorSidebar';
 import { MentorJourney } from './components/MentorJourney';
-import { imageUrl } from '../../../redux/api/baseApi';
 import { Empty } from 'antd';
 import { useCreateChatRoomMutation } from '../../../redux/apiSlices/chatSlice';
 import { toast } from 'sonner';
+import { getImageUrl } from '../../../utils/getImageUrl';
 
 export default function Mentor() {
     const navigate = useNavigate();
@@ -24,11 +24,11 @@ export default function Mentor() {
     const formattedMentor = mentorRaw
         ? {
               ...mentorRaw,
-              profile: mentorRaw.profile ? `${imageUrl}${mentorRaw.profile}` : 'https://via.placeholder.com/150',
+              profile: getImageUrl(mentorRaw.profile),
               role: 'Mentor',
               subtext: 'Guiding you towards success',
               location: mentorRaw.address || 'Not provided',
-              specialization: mentorRaw.professionalTitle || 'Not provided',
+              specialization: mentorRaw.jobTitle || 'Not provided',
               availability: 'Available',
           }
         : null;

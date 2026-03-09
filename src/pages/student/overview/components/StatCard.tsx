@@ -1,15 +1,20 @@
 import { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 
 interface StatCardProps {
     title: string;
     count: string | number;
     icon: ReactNode;
     iconBgColor: string;
+    link: string;
 }
 
-const StatCard = ({ title, count, icon, iconBgColor }: StatCardProps) => {
+const StatCard = ({ title, count, icon, iconBgColor, link }: StatCardProps) => {
     return (
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+        <Link
+            to={link}
+            className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between"
+        >
             <div>
                 <p className="text-[#888888] text-sm font-medium">{title}</p>
                 <h2 className="text-3xl font-bold text-[#1E1E1E] mt-1">{count}</h2>
@@ -20,7 +25,7 @@ const StatCard = ({ title, count, icon, iconBgColor }: StatCardProps) => {
             >
                 {icon}
             </div>
-        </div>
+        </Link>
     );
 };
 

@@ -1,6 +1,6 @@
 import { Avatar } from 'antd';
-import { imageUrl } from '../../../../redux/api/baseApi';
 import { Link } from 'react-router-dom';
+import { getImageUrl } from '../../../../utils/getImageUrl';
 
 const MentorProfileCard = ({ mentor }: { mentor: any }) => {
     return (
@@ -13,7 +13,7 @@ const MentorProfileCard = ({ mentor }: { mentor: any }) => {
                     size={100}
                     src={
                         mentor?.assignedStudents[0]?.profile
-                            ? imageUrl + mentor?.assignedStudents[0]?.profile
+                            ? getImageUrl(mentor?.assignedStudents[0]?.profile)
                             : undefined
                     }
                     className="border-2 border-white shadow-md"
