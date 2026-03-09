@@ -19,6 +19,7 @@ import { GoGoal } from 'react-icons/go';
 import CreateGoalModal from '../../../../components/modals/admin/CreateGoalModal';
 import Spinner from '../../../../components/shared/Spinner';
 import { getImageUrl } from '../../../../utils/getImageUrl';
+import { statusConfig } from '../../../../utils/statusConfig';
 
 const Student = () => {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -92,7 +93,7 @@ const Student = () => {
             title: 'GROUP/TRACK',
             dataIndex: 'userGroup',
             key: 'userGroup',
-            render: (userGroup: string[]) => (
+            render: (userGroup: any[], record: any) => (
                 <div className="flex gap-2 flex-wrap w-[200px]">
                     {userGroup?.map((group: any) => (
                         <Tag
@@ -100,6 +101,9 @@ const Student = () => {
                             className="rounded-full px-4 py-0.5 bg-[#f6ffed] border-none text-[#52c41a] font-medium"
                         >
                             {group.name || group}
+                            {group?.name === 'Skill Path' && record?.userGroupTrack?.name
+                                ? ` (${record.userGroupTrack.name})`
+                                : ''}
                         </Tag>
                     ))}
                 </div>
@@ -132,12 +136,12 @@ const Student = () => {
             dataIndex: 'status',
             key: 'status',
             render: (status: string) => {
-                const color = status === 'ACTIVE' || status === 'Active' ? '#f6ffed' : '#fff7e6';
-                const textColor = status === 'ACTIVE' || status === 'Active' ? '#52c41a' : '#faad14';
+                const style = statusConfig[status] || { bg: '#f5f5f5', color: '#595959' };
+
                 return (
                     <Tag
                         className="rounded-full px-4 py-0.5 border-none font-medium"
-                        style={{ backgroundColor: color, color: textColor }}
+                        style={{ backgroundColor: style.bg, color: style.color }}
                     >
                         {status}
                     </Tag>
@@ -246,6 +250,7 @@ const Student = () => {
                         prefix={<Search size={16} className="text-gray-400" />}
                         className="h-10 w-64 border-gray-100 bg-white rounded-md"
                         value={searchTerm}
+                        allowClear
                         onChange={(e) => {
                             setSearchTerm(e.target.value);
                             setPage(1);

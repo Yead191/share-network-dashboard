@@ -118,23 +118,8 @@ const AddMentorModal: React.FC<AddMentorModalProps> = ({ open, onCancel, refetch
                     </Form.Item>
                 </div>
 
-                <Form.Item
-                    label={<span className="font-semibold text-gray-700">job Title</span>}
-                    name="careerDirections"
-                >
-                    <Select
-                        mode="multiple"
-                        placeholder="Select job title"
-                        className="w-full"
-                        style={{ height: '44px', minHeight: '44px' }}
-                        options={[
-                            { label: 'App development', value: 'App development' },
-                            { label: 'AI (Artificial Intelligence)', value: 'AI (Artificial Intelligence)' },
-                            { label: 'Cybersecurity', value: 'Cybersecurity' },
-                            { label: 'Web Development', value: 'Web Development' },
-                            { label: 'Data Science', value: 'Data Science' },
-                        ]}
-                    />
+                <Form.Item label={<span className="font-semibold text-gray-700">job Title</span>} name="jobTitle">
+                    <Input placeholder="Enter job title" className="h-11 rounded-md" />
                 </Form.Item>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">

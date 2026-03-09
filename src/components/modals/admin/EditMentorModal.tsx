@@ -10,11 +10,37 @@ interface EditMentorModalProps {
     mentor: any;
     students: any[];
     refetch: () => void;
+    userTracks: any;
+    userGroups: any;
+    isUserTracksLoading: boolean;
+    isUserGroupsLoading: boolean;
 }
 
-const EditMentorModal: React.FC<EditMentorModalProps> = ({ open, onCancel, mentor, students, refetch }) => {
+const EditMentorModal: React.FC<EditMentorModalProps> = ({
+    open,
+    onCancel,
+    mentor,
+    students,
+    refetch,
+    userGroups,
+    userTracks,
+    isUserTracksLoading,
+    isUserGroupsLoading,
+}) => {
     const [form] = Form.useForm();
     const [updateMentor, { isLoading }] = useUpdateAdminMentorMutation();
+
+    const selectedGroups = Form.useWatch('userGroup', form);
+
+    const isSkillPathSelected = () => {
+        if (!selectedGroups || !userGroups) return false;
+        // Handle both single string and array (multiple mode)
+        const currentGroups = Array.isArray(selectedGroups) ? selectedGroups : [selectedGroups];
+        return currentGroups.some((groupId: string) => {
+            const group = userGroups.find((g: any) => g._id === groupId);
+            return group?.name === 'Skill Path';
+        });
+    };
 
     useEffect(() => {
         if (mentor) {
@@ -23,6 +49,8 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({ open, onCancel, mento
                 mobileNumber: mentor.mobileNumber || mentor.contactNumber,
                 assignedStudents: mentor.assignedStudents?.[0]?._id || undefined,
                 careerDirections: mentor.careerDirections || [],
+                userGroup: mentor.userGroup?.map((g: any) => g._id) || [],
+                userGroupTrack: mentor.userGroupTrack?._id || mentor.userGroupTrack,
             });
         }
     }, [mentor, form]);
@@ -67,7 +95,7 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({ open, onCancel, mento
                 </div>
 
                 <Form.Item label={<span className="font-semibold text-gray-700">Email</span>} name="email">
-                    <Input placeholder="Enter email" className="h-11 rounded-md" />
+                    <Input disabled placeholder="Enter email" className="h-11 rounded-md" />
                 </Form.Item>
 
                 <Form.Item
@@ -86,6 +114,7 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({ open, onCancel, mento
                         filterOption={(input, option) =>
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                         }
+                        showSearch
                     />
                 </Form.Item>
 
@@ -98,8 +127,8 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({ open, onCancel, mento
                     </Form.Item> */}
 
                     <Form.Item
-                        label={<span className="font-semibold text-gray-700">Professional Title</span>}
-                        name="professionalTitle"
+                        label={<span className="font-semibold text-gray-700">Highest Education</span>}
+                        name="highestEducation"
                     >
                         <Input placeholder="Enter title" className="h-11 rounded-md" />
                     </Form.Item>
@@ -122,28 +151,56 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({ open, onCancel, mento
                             placeholder="Select status"
                             className="h-11 rounded-md"
                             options={[
-                                { label: 'Pending', value: 'Pending' },
-                                { label: 'Active', value: 'Active' },
-                                { label: 'Non-active', value: 'Non-active' },
-                                { label: 'Alumni/Graduated', value: 'Alumni/Graduated' },
+                                { label: 'Pending', value: 'PENDING' },
+                                { label: 'Active', value: 'ACTIVE' },
+                                { label: 'Non-active', value: 'NON-ACTIVE' },
+                                { label: 'Reserve', value: 'RESERVE' },
                             ]}
                         />
                     </Form.Item>
                 </div>
-                <Form.Item
-                    label={<span className="font-semibold text-gray-700">Job Title</span>}
-                    name="careerDirections"
-                >
-                    <Select
-                        mode="multiple"
-                        placeholder="Select job title"
-                        className="h-11 rounded-md w-full"
-                        options={[
-                            { label: 'App development', value: 'App development' },
-                            { label: 'AI (Artificial Intelligence)', value: 'AI (Artificial Intelligence)' },
-                            { label: 'Cybersecurity', value: 'Cybersecurity' },
-                        ]}
-                    />
+                <div className="grid grid-cols-2 gap-x-6">
+                    <Form.Item
+                        label={<span className="font-bold text-gray-700">Select Group</span>}
+                        name="userGroup"
+                        rules={[{ required: false, message: 'Please select at least one group' }]}
+                    >
+                        <Select
+                            placeholder="Choose groups"
+                            className="h-11 rounded-md"
+                            variant="filled"
+                            style={{ backgroundColor: '#f9f9f9' }}
+                            loading={isUserGroupsLoading}
+                            options={userGroups?.map((g: any) => ({
+                                label: g.name,
+                                value: g._id,
+                            }))}
+                            allowClear
+                        />
+                    </Form.Item>
+                    {isSkillPathSelected() && (
+                        <Form.Item
+                            label={<span className="font-bold text-gray-700">Select Track</span>}
+                            name="userGroupTrack"
+                            rules={[{ required: true, message: 'Please select a track' }]}
+                        >
+                            <Select
+                                placeholder="Choose a track"
+                                className="h-11 rounded-md"
+                                variant="filled"
+                                style={{ backgroundColor: '#f9f9f9' }}
+                                loading={isUserTracksLoading}
+                                options={userTracks?.map((t: any) => ({
+                                    label: t.name,
+                                    value: t._id,
+                                }))}
+                                allowClear
+                            />
+                        </Form.Item>
+                    )}
+                </div>
+                <Form.Item label={<span className="font-semibold text-gray-700">Job Title</span>} name="jobTitle">
+                    <Input placeholder="Enter Job Title" className="h-11 rounded-md" />
                 </Form.Item>
 
                 <Form.Item label={<span className="font-semibold text-gray-700">Address</span>} name="address">

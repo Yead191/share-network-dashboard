@@ -23,26 +23,35 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({ open, onCancel, tea
                 phone: teacher.mobileNumber || teacher.phone,
                 assignedStudents: teacher.assignedStudents?.map((s: any) => s._id) || [],
                 userGroup: teacher.userGroup?.map((g: any) => g._id) || [],
-                status:teacher?.verified?"active":"inactive"
+                status: teacher?.status,
             });
         }
     }, [teacher, form]);
 
     const onFinish = async (values: any) => {
         console.log(values);
-        
+
         try {
-            toast.promise(updateTeacher({ id: teacher._id, data: {...values,...(values.status?{verified:values.status=="active"?true:false}:{})} }).unwrap(), {
-                loading: 'Updating teacher...',
-                success: (res: any) => {
-                    if (res?.success) {
-                        refetch();
-                        onCancel();
-                    }
-                    return res?.message || 'Teacher updated successfully';
+            toast.promise(
+                updateTeacher({
+                    id: teacher._id,
+                    data: {
+                        ...values,
+                        ...(values.status ? { verified: values.status == 'active' ? true : false } : {}),
+                    },
+                }).unwrap(),
+                {
+                    loading: 'Updating teacher...',
+                    success: (res: any) => {
+                        if (res?.success) {
+                            refetch();
+                            onCancel();
+                        }
+                        return res?.message || 'Teacher updated successfully';
+                    },
+                    error: (err: any) => err?.message || 'Failed to update teacher',
                 },
-                error: (err: any) => err?.message || 'Failed to update teacher',
-            });
+            );
         } catch (error: any) {
             toast.error(error?.data?.message || 'Something went wrong');
         }
@@ -132,10 +141,9 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({ open, onCancel, tea
                                 placeholder="Select status"
                                 className="h-11 rounded-md"
                                 options={[
-                                    { label: 'Pending', value: 'Pending' },
-                                    { label: 'Active', value: 'Active' },
-                                    { label: 'Non-active', value: 'Non-active' },
-                                    { label: 'Alumni/Graduated', value: 'Alumni/Graduated' },
+                                    { label: 'PENDING', value: 'PENDING' },
+                                    { label: 'ACTIVE', value: 'ACTIVE' },
+                                    { label: 'NON-ACTIVE', value: 'NON_ACTIVE' },
                                 ]}
                             />
                         </Form.Item>

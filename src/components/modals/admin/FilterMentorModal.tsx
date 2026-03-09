@@ -16,6 +16,7 @@ const FilterMentorModal: React.FC<FilterMentorModalProps> = ({ open, onCancel, o
     const groups = groupsApi?.data || [];
 
     const onFinish = (values: { userGroup: string | undefined }) => {
+        // console.log(values);
         onFilter(values.userGroup);
         onCancel();
     };

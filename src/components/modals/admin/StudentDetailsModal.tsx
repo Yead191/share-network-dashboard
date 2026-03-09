@@ -73,9 +73,19 @@ const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ open, onCance
                     <InfoRow label="Track" value={student.userGroupTrack?.name} isTag />
                     <InfoRow
                         label="Status"
-                        value={student.verified ? 'Verified' : 'Unverified'}
+                        value={student?.status}
                         isTag
-                        tagColor={student.verified ? '#f6ffed' : '#fff7e6'}
+                        tagColor={
+                            student?.status === 'ACTIVE'
+                                ? '#f6ffed'
+                                : student?.status === 'PENDING'
+                                  ? '#fff7e6'
+                                  : student?.status === 'NON_ACTIVE'
+                                    ? '#fff1f0'
+                                    : student?.status === 'ALUMNI_GRADUATED'
+                                      ? '#e6f7ff'
+                                      : '#f5f5f5'
+                        }
                     />
                     <InfoRow label="About" value={student.about} />
                     <InfoRow label="V Number" value={student.vNumber} />

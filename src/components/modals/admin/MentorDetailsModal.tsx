@@ -22,7 +22,6 @@ const MentorDetailsModal: React.FC<MentorDetailsModalProps> = ({ open, onCancel,
         { label: 'Last Name', value: mentor.lastName },
         { label: 'Email', value: mentor.email },
         { label: 'Phone', value: mentor.mobileNumber || mentor.contactNumber },
-        { label: 'vNumber', value: mentor.vNumber || 'N/A' },
         { label: 'Gender', value: mentor.gender },
         { label: 'Highest Education', value: mentor.highestEducation || 'N/A' },
         {
@@ -41,18 +40,30 @@ const MentorDetailsModal: React.FC<MentorDetailsModalProps> = ({ open, onCancel,
                     <span className="text-gray-400 italic">No Group</span>
                 ),
         },
-        { label: 'Laptop', value: mentor.havealaptop ? 'Yes' : 'No' },
         {
-            label: 'Career Directions',
-            value: mentor.careerDirections?.length > 0 ? mentor.careerDirections.join(', ') : 'None',
+            label: 'jobTitle',
+            value: mentor?.jobTitle || 'None',
         },
         { label: 'Address', value: mentor.address || 'N/A' },
         { label: 'Professional Title', value: mentor.professionalTitle || 'N/A' },
         {
-            label: 'Verified',
+            label: 'Status',
             value: (
-                <Tag color={mentor.verified ? 'success' : 'error'} className="rounded-full">
-                    {mentor.verified ? 'Verified' : 'Unverified'}
+                <Tag
+                    className="rounded-full"
+                    color={
+                        mentor.status === 'ACTIVE'
+                            ? 'success'
+                            : mentor.status === 'PENDING'
+                              ? 'warning'
+                              : mentor.status === 'RESERVE'
+                                ? 'processing'
+                                : mentor.status === 'NON_ACTIVE'
+                                  ? 'error'
+                                  : 'default'
+                    }
+                >
+                    {mentor.status}
                 </Tag>
             ),
         },

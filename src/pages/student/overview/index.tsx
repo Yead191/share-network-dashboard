@@ -22,8 +22,8 @@ const StudentOverview = () => {
     const { data: profileData } = useGetprofileQuery(undefined);
     const { data: eventsData } = useGetUpcomingSessionsQuery(undefined);
     const { data: assignmentsData } = useGetActiveAssignmentsQuery(undefined);
-const [isModalOpen, setIsModalOpen] = useState(false);
-const handleEventClick = (event: any) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const handleEventClick = (event: any) => {
         setSelectedEvent(event);
         setIsModalOpen(true);
     };
@@ -65,20 +65,22 @@ const handleEventClick = (event: any) => {
         },
     ];
 
-const rawEvents = eventsData?.data?.data || eventsData?.data || [];
+    const rawEvents = eventsData?.data?.data || eventsData?.data || [];
 
-const formattedEvents = Array.isArray(rawEvents) ? rawEvents.map((event: any) => ({
-    ...event,
-    id: event._id,
-    title: event.title,
-    date: event.date,
-    color: '#3BB77E',
-    month: new Date(event.date).toLocaleString('en-US', { month: 'short' }),
-    day: new Date(event.date).getDate(),
-    startTime: new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    endTime: "End Time",
-    location: event.location || 'Online',
-})) : [];
+    const formattedEvents = Array.isArray(rawEvents)
+        ? rawEvents.map((event: any) => ({
+              ...event,
+              id: event._id,
+              title: event.title,
+              date: event.date,
+              color: '#3BB77E',
+              month: new Date(event.date).toLocaleString('en-US', { month: 'short' }),
+              day: new Date(event.date).getDate(),
+              startTime: new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              endTime: 'End Time',
+              location: event.location || 'Online',
+          }))
+        : [];
     const formattedAssignments =
         assignmentsData?.data?.map((a: any) => ({
             id: a._id,
@@ -121,25 +123,17 @@ const formattedEvents = Array.isArray(rawEvents) ? rawEvents.map((event: any) =>
                 ))}
             </div>
 
-        <div>
+            <div>
                 <HeaderTitle title="Upcoming Events" />
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-3">
                     {formattedEvents.map((event: any) => (
-                        <div 
-                            key={event.id} 
-                            onClick={() => handleEventClick(event)} 
-                            className="cursor-pointer"
-                        >
+                        <div key={event.id} onClick={() => handleEventClick(event)} className="cursor-pointer">
                             <EventCard event={event} />
                         </div>
                     ))}
                 </div>
-    
-                <EventDetailsModal 
-                    isOpen={isModalOpen} 
-                    onCancel={() => setIsModalOpen(false)} 
-                    event={selectedEvent} 
-                />
+
+                <EventDetailsModal isOpen={isModalOpen} onCancel={() => setIsModalOpen(false)} event={selectedEvent} />
             </div>
             <div>
                 <HeaderTitle title="Active Assignments" />

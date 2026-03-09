@@ -8,11 +8,16 @@ import EditMentorModal from '../../../components/modals/admin/EditMentorModal';
 import ReviewMentorModal from '../../../components/modals/admin/ReviewMentorModal';
 import MentorStudentsModal from '../../../components/modals/admin/MentorStudentsModal';
 import { useDeleteAdminMentorMutation, useGetAdminMentorsQuery } from '../../../redux/apiSlices/admin/adminMentorsApi';
-import { useGetAllStudentsQuery } from '../../../redux/apiSlices/admin/adminTeachersApi';
 import AddMentorModal from '../../../components/modals/admin/AddMentorModal';
 import FilterMentorModal from '../../../components/modals/admin/FilterMentorModal';
 import { toast } from 'sonner';
 import { Modal, message } from 'antd';
+import {
+    useGetStudentsQuery,
+    useGetUserGroupsQuery,
+    useGetUserTracksQuery,
+} from '../../../redux/apiSlices/admin/adminStudentApi';
+import Spinner from '../../../components/shared/Spinner';
 
 const AdminMentors = () => {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -30,14 +35,17 @@ const AdminMentors = () => {
     // API CALLS
     const {
         data: mentorsApi,
-        isLoading,
+        isLoading: isMentorLoading,
         refetch,
     } = useGetAdminMentorsQuery({ page, searchTerm, userGroup: selectedGroup });
-    const { data: studentsApi } = useGetAllStudentsQuery({});
+    const { data: studentsApi } = useGetStudentsQuery({ page: 0, limit: 0 });
+    const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({});
+    const { data: userTracksApi, isLoading: isUserTracksLoading } = useGetUserTracksQuery({});
     const [deleteMentor] = useDeleteAdminMentorMutation();
     const mentors = mentorsApi?.data?.mentors || [];
+    const userGroups = userGroupsApi?.data;
+    const userTracks = userTracksApi?.data;
     const pagination = mentorsApi?.data?.pagination;
-    console.log('all mentor data', selectedGroup);
 
     const columns = [
         {
@@ -61,31 +69,42 @@ const AdminMentors = () => {
             ),
         },
         {
-            title: 'GROUPS',
+            title: 'GROUP/TRACK',
             dataIndex: 'userGroup',
-            key: 'groups',
-            render: (userGroup: any[]) => (
-                <div className="flex flex-wrap gap-2">
-                    {userGroup && userGroup.length > 0 ? (
-                        userGroup.map((group: any) => (
-                            <Tag
-                                key={group._id}
-                                className="rounded-full px-4 py-0.5 bg-gray-50 border-gray-100 text-gray-500 font-medium"
-                            >
-                                {group.name}
-                            </Tag>
-                        ))
-                    ) : (
-                        <span className="text-gray-400 italic">No Group</span>
-                    )}
+            key: 'userGroup',
+            render: (userGroup: any[], record: any) => (
+                <div className="flex gap-2 flex-wrap w-[200px]">
+                    {userGroup?.map((group: any) => (
+                        <Tag
+                            key={group._id || group}
+                            className="rounded-full px-4 py-0.5 bg-[#f6ffed] border-none text-[#52c41a] font-medium"
+                        >
+                            {group?.name}
+                            {group?.name === 'Skill Path' && record?.userGroupTrack?.name
+                                ? ` (${record.userGroupTrack.name})`
+                                : ''}
+                        </Tag>
+                    ))}
                 </div>
             ),
         },
+
         {
-            title: 'TRACK',
-            dataIndex: 'userGroupTrack',
-            key: 'track',
-            render: (track: string) => <span className="text-gray-500 font-medium">{track || 'N/A'}</span>,
+            title: 'Assigned Student',
+            dataIndex: 'assignedStudents',
+            key: 'assignedStudents',
+            render: (assignedStudents: any[]) => (
+                <div className="flex flex-wrap gap-2">
+                    {assignedStudents?.map((student: any) => (
+                        <Tag
+                            key={student._id}
+                            className="rounded-full px-4 py-0.5 bg-gray-50 border-gray-100 text-gray-500 font-medium"
+                        >
+                            {student?.firstName} {student?.lastName}
+                        </Tag>
+                    ))}
+                </div>
+            ),
         },
         {
             title: 'LOCATION',
@@ -184,6 +203,9 @@ const AdminMentors = () => {
         });
     };
 
+    if (isMentorLoading || isUserGroupsLoading || isUserTracksLoading) {
+        return <Spinner />;
+    }
     return (
         <div className="">
             {/* Management Section Header */}
@@ -229,7 +251,7 @@ const AdminMentors = () => {
                 <Table
                     columns={columns}
                     dataSource={mentors}
-                    loading={isLoading}
+                    loading={isMentorLoading}
                     pagination={{
                         total: pagination?.totalItems,
                         current: pagination?.currentPage,
@@ -274,6 +296,10 @@ const AdminMentors = () => {
                 mentor={selectedMentor}
                 students={studentsApi?.data?.data || []}
                 refetch={refetch}
+                userGroups={userGroups}
+                userTracks={userTracks}
+                isUserTracksLoading={isUserTracksLoading}
+                isUserGroupsLoading={isUserGroupsLoading}
             />
             <ReviewMentorModal open={isReviewModalOpen} onCancel={() => setIsReviewModalOpen(false)} />
             <MentorStudentsModal
