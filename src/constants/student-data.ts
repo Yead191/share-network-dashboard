@@ -34,7 +34,7 @@ const questionnaireData: Section[] = [
             {
                 id: 'computer_comfort',
                 question: 'How comfortable do you feel with computers right now?',
-                type: 'radio',
+                type: 'checkbox',
                 options: [
                     'I have never really used a computer',
                     'I can use basic things (email, browser)',
@@ -45,7 +45,7 @@ const questionnaireData: Section[] = [
             {
                 id: 'hardest_to_learn',
                 question: 'When you need to learn something new, what is hardest for you?',
-                type: 'radio',
+                type: 'checkbox',
                 options: [
                     'Understanding instructions',
                     'Language',
@@ -70,7 +70,7 @@ const questionnaireData: Section[] = [
             {
                 id: 'curious_activities',
                 question: 'Which activities do you enjoy or feel curious about?',
-                type: 'radio',
+                type: 'checkbox',
                 options: [
                     'Learning new things',
                     'Helping other people',

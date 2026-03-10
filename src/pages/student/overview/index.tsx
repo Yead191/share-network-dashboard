@@ -5,12 +5,12 @@ import EventCard from './components/EventCard';
 import ActiveAssignmentCard from './components/ActiveAssignmentCard';
 import { PiBookOpenTextLight, PiCalendarBlankLight, PiUsersLight, PiTargetLight } from 'react-icons/pi';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
-
+import { useGetAssignmentsStudentQuery } from '../../../redux/apiSlices/students/assignmentsSlice';
 import {
     useGetstudentOverviewQuery,
     useGetprofileQuery,
     useGetUpcomingSessionsQuery,
-    useGetActiveAssignmentsQuery,
+    // useGetAssignmentsStudentQuery,
 } from '../../../redux/apiSlices/students/overview.slice';
 import Spinner from '../../../components/shared/Spinner';
 import { EventDetailsModal } from '../../../components/modals/student/EventDetailsModal';
@@ -21,7 +21,7 @@ const StudentOverview = () => {
     const { data: overviewData, isLoading, error } = useGetstudentOverviewQuery(undefined);
     const { data: profileData } = useGetprofileQuery(undefined);
     const { data: eventsData } = useGetUpcomingSessionsQuery(undefined);
-    const { data: assignmentsData } = useGetActiveAssignmentsQuery(undefined);
+    const { data: assignmentsData } = useGetAssignmentsStudentQuery(undefined);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const studentName = profileData?.data?.firstName || profileData?.data?.name || 'Student';
     const userGroup = profileData?.data?.userGroup?.[0];
@@ -44,7 +44,14 @@ const StudentOverview = () => {
 
     const stats = [
         {
-            title: 'Assignments',
+            title: 'Pending Assignments',
+            count: statsResponse?.totalPendingAssignments ?? 0,
+            icon: <PiBookOpenTextLight className="w-6 h-6 text-[#3BB77E]" />,
+            iconBgColor: '#EBF9F1',
+            link: '/student/assignment',
+        },
+        {
+            title: 'Submitted Assignments',
             count: statsResponse?.totalSubmittedAssignments ?? 0,
             icon: <PiBookOpenTextLight className="w-6 h-6 text-[#3BB77E]" />,
             iconBgColor: '#EBF9F1',
@@ -120,7 +127,7 @@ const StudentOverview = () => {
                 }}
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
                 {stats?.map((stat, index) => (
                     <StatCard key={index} {...stat} />
                 ))}
