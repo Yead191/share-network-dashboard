@@ -1,10 +1,8 @@
 import StudentProfile from './components/StudentProfile';
 import CoreGoals from './components/CoreGoals';
-import CurriculumOverview from './components/CurriculumOverview';
 import LearningMaterials from './components/LearningMaterials';
 import UpcomingEvents from './components/UpcomingEvents';
 import ActiveAssignments from './components/ActiveAssignments';
-import { curriculum } from '../../../constants/mentor-data';
 import { useProfileQuery } from '../../../redux/apiSlices/authSlice';
 import {
     useGetActiveAssignmentsQuery,
