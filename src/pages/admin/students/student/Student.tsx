@@ -307,6 +307,7 @@ const Student = () => {
                 onCancel={() => setIsGoalModalOpen(false)}
                 studentId={selectedStudent?._id}
                 refetch={refetch}
+                goals={selectedStudent?.Goals}
             />
 
             <ReviewModal
