@@ -1,4 +1,4 @@
-import { GraduationCap, Heart, Laptop, Search, Brain, Quote } from 'lucide-react';
+import { GraduationCap, Heart } from 'lucide-react';
 import { getImageUrl } from '../../../../utils/getImageUrl';
 
 interface Goal {
