@@ -13,8 +13,9 @@ const StudentSchedule = () => {
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     // API CALLS
-    const { data: scheduleApi } = useGetStudentClassScheduleQuery({ page: page, limit: 10, searchTerm: searchTerm });
+    const { data: scheduleApi, isLoading } = useGetStudentClassScheduleQuery({ page: page, limit: 10, searchTerm: searchTerm });
     // console.log('scheduleApi', scheduleApi);
+    const  pagination= scheduleApi?.pagination;
 
     const scheduleData = scheduleApi?.data?.map((item: any) => ({
         _id: item?._id,
@@ -44,7 +45,13 @@ const StudentSchedule = () => {
                     </div>
                     <div>
                         <p className="font-semibold text-gray-800">{record.title}</p>
-                        <p className="text-xs text-gray-400">{record.description}</p>
+             
+  <p className="text-xs text-gray-400">
+    {record.description?.length > 50
+      ? record.description.slice(0, 50) + "..."
+      : record.description}
+  </p>
+
                     </div>
                 </div>
             ),
@@ -152,10 +159,11 @@ const StudentSchedule = () => {
                 <Table
                     columns={columns}
                     dataSource={scheduleData}
+                    loading={isLoading}
                     pagination={{
                         current: page,
                         pageSize: 10,
-                        total: scheduleApi?.data?.total,
+                        total: pagination?.total,
                         showSizeChanger: false,
                         onChange: (page) => setPage(page),
                     }}
