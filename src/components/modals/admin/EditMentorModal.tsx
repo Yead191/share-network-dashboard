@@ -182,7 +182,7 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({
                         <Form.Item
                             label={<span className="font-bold text-gray-700">Select Track</span>}
                             name="userGroupTrack"
-                            rules={[{ required: true, message: 'Please select a track' }]}
+                            rules={[{ required: false, message: 'Please select a track' }]}
                         >
                             <Select
                                 placeholder="Choose a track"

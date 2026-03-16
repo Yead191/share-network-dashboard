@@ -88,11 +88,11 @@ const StudentGoalsSnapshot = ({ snapshots }: { snapshots: StudentSnapshot[] }) =
                                         src={
                                             student?.profile ? `${getImageUrl(student.profile)}` : '/default-avatar.png'
                                         }
-                                        alt={`${student.firstName} ${student.lastName}`}
+                                        alt={`${student?.firstName} ${student?.lastName}`}
                                         className="relative w-16 h-16 rounded-[1.25rem] object-cover border-2 border-white shadow-xl ring-1 ring-gray-50"
                                         onError={(e) => {
                                             (e.target as HTMLImageElement).src =
-                                                `https://ui-avatars.com/api/?name=${student.firstName}+${student.lastName}&background=f3f4f6&color=6366f1&bold=true&rounded=true`;
+                                                `https://ui-avatars.com/api/?name=${student?.firstName}+${student?.lastName}&background=f3f4f6&color=6366f1&bold=true&rounded=true`;
                                         }}
                                     />
                                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-[3px] border-white rounded-full shadow-lg" />
@@ -114,7 +114,7 @@ const StudentGoalsSnapshot = ({ snapshots }: { snapshots: StudentSnapshot[] }) =
                         {/* Goals Section */}
                         <div className="grid grid-cols-1 gap-5 pl-4 border-l-2 border-gray-50 relative">
                             {student?.Goals && student?.Goals?.length > 0 ? (
-                                student.Goals.slice(0, 3).map((goal, goalIndex) => (
+                                student?.Goals?.slice(0, 3).map((goal, goalIndex) => (
                                     <div
                                         key={goal?._id}
                                         className={`group/goal p-5 bg-gradient-to-br ${goalGradients[goalIndex] || 'from-gray-50 to-white'} rounded-[1.5rem] border ${goalBorders[goalIndex] || 'border-gray-100'} shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden`}
@@ -155,7 +155,7 @@ const StudentGoalsSnapshot = ({ snapshots }: { snapshots: StudentSnapshot[] }) =
                             )}
                         </div>
 
-                        {studentIndex < snapshots.length - 1 && (
+                        {studentIndex < snapshots?.length - 1 && (
                             <div className="mt-16 mb-8 flex items-center gap-4">
                                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-100 to-transparent"></div>
                                 <div className="w-1.5 h-1.5 rounded-full bg-gray-100"></div>

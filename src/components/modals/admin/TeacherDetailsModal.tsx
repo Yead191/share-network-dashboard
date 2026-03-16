@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Button } from 'antd';
+import { Modal, Button, Tag } from 'antd';
 import { X } from 'lucide-react';
 
 interface TeacherDetailsModalProps {
@@ -19,9 +19,24 @@ const TeacherDetailsModal: React.FC<TeacherDetailsModalProps> = ({ open, onCance
         { label: 'Gender', value: teacher.gender || 'Not specified' },
         {
             label: 'Groups',
-            value: teacher.userGroup?.length > 0 ? teacher.userGroup.map((g: any) => g.name).join(', ') : 'No groups',
+            value:
+                teacher.userGroup && teacher.userGroup.length > 0 ? (
+                    teacher.userGroup.map((group: any) => (
+                        <Tag
+                            key={group._id || group}
+                            className="rounded-full px-4 py-0.5 bg-[#f6ffed] border-none text-[#52c41a] font-medium"
+                        >
+                            {group?.name}
+                            {group?.name === 'Skill Path' && teacher?.userGroupTrack?.name
+                                ? ` (${teacher.userGroupTrack.name})`
+                                : ''}
+                        </Tag>
+                    ))
+                ) : (
+                    <span className="text-gray-400 italic">No Group</span>
+                ),
         },
-        { label: 'Track', value: teacher.userGroupTrack || 'N/A' },
+        // { label: 'Track', value: teacher?.userGroupTrack?.name || 'N/A' },
         { label: 'About', value: teacher.about || 'No bio provided' },
         { label: 'Verified', value: teacher.verified ? 'Yes' : 'No' },
         { label: 'Subscribed', value: teacher.isSubscribed ? 'Yes' : 'No' },

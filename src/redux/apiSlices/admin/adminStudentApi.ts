@@ -123,6 +123,12 @@ const adminStudentApi = api.injectEndpoints({
                 body: data,
             }),
         }),
+        removeAssign: build.mutation({
+            query: ({ studentId, mentorId }: { studentId: string; mentorId: string }) => ({
+                url: `/user/remove-assigned/${mentorId}/${studentId}`,
+                method: 'DELETE',
+            }),
+        }),
     }),
 });
 
@@ -141,4 +147,5 @@ export const {
     useGetAttendanceLogsQuery,
     useUpdateIndividualAttendanceMutation,
     useGetStudentsQuery,
+    useRemoveAssignMutation,
 } = adminStudentApi;

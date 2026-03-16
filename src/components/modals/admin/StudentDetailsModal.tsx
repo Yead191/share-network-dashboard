@@ -1,15 +1,19 @@
 import React from 'react';
-import { Modal, Tag } from 'antd';
+import { Button, Modal, Tag } from 'antd';
 import { X } from 'lucide-react';
 import { GoalCard } from './GoalCard';
+import { useRemoveAssignMutation } from '../../../redux/apiSlices/admin/adminStudentApi';
+import { toast } from 'sonner';
 
 interface StudentDetailsModalProps {
     open: boolean;
     onCancel: () => void;
     student: any;
+    refetch: () => void;
 }
 
-const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ open, onCancel, student }) => {
+const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ open, onCancel, student, refetch }) => {
+    const [removeAssign] = useRemoveAssignMutation();
     if (!student) return null;
 
     const InfoRow = ({
@@ -87,6 +91,16 @@ const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ open, onCance
                                       : '#f5f5f5'
                         }
                     />
+                    <InfoRow
+                        label="Registered At"
+                        value={new Date(student.createdAt).toLocaleString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                        })}
+                    />
                     <InfoRow label="About" value={student.about} />
                     <InfoRow label="V Number" value={student.vNumber} />
                     <InfoRow label="Gender" value={student.gender} />
@@ -126,6 +140,31 @@ const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ open, onCance
                                 value={`${student.mentorId.firstName} ${student.mentorId.lastName}`}
                             />
                             <InfoRow label="Mentor Email" value={student.mentorId.email} />
+                            <div className="m-4 flex justify-end ">
+                                <Button
+                                    type="primary"
+                                    danger
+                                    onClick={() => {
+                                        console.log(student._id, student.mentorId._id);
+                                        toast.promise(
+                                            removeAssign({
+                                                studentId: student._id,
+                                                mentorId: student.mentorId._id,
+                                            }).unwrap(),
+                                            {
+                                                loading: 'Removing mentor...',
+                                                success: (res: any) => {
+                                                    refetch();
+                                                    return res?.message || 'Mentor removed successfully';
+                                                },
+                                                error: (err: any) => err?.data?.message || 'Failed to remove mentor',
+                                            },
+                                        );
+                                    }}
+                                >
+                                    Remove Mentor
+                                </Button>
+                            </div>
                         </div>
                     </>
                 )}

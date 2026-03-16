@@ -289,6 +289,7 @@ const AdminMentors = () => {
                 open={isDetailsModalOpen}
                 onCancel={() => setIsDetailsModalOpen(false)}
                 mentor={selectedMentor}
+                refetch={refetch}
             />
             <EditMentorModal
                 open={isEditModalOpen}

@@ -10,12 +10,36 @@ interface EditTeacherModalProps {
     teacher: any;
     students: any[];
     refetch: () => void;
+    userGroups: any[];
+    userTracks: any[];
+    isUserGroupsLoading: boolean;
+    isUserTracksLoading: boolean;
 }
 
-const EditTeacherModal: React.FC<EditTeacherModalProps> = ({ open, onCancel, teacher, students, refetch }) => {
+const EditTeacherModal: React.FC<EditTeacherModalProps> = ({
+    open,
+    onCancel,
+    teacher,
+    students,
+    refetch,
+    userGroups,
+    userTracks,
+    isUserGroupsLoading,
+    isUserTracksLoading,
+}) => {
     const [form] = Form.useForm();
     const [updateTeacher, { isLoading }] = useUpdateTeacherMutation();
+    const selectedGroups = Form.useWatch('userGroup', form);
 
+    const isSkillPathSelected = () => {
+        if (!selectedGroups || !userGroups) return false;
+        // Handle both single string and array (multiple mode)
+        const currentGroups = Array.isArray(selectedGroups) ? selectedGroups : [selectedGroups];
+        return currentGroups.some((groupId: string) => {
+            const group = userGroups.find((g: any) => g._id === groupId);
+            return group?.name === 'Skill Path';
+        });
+    };
     useEffect(() => {
         if (teacher) {
             form.setFieldsValue({
@@ -23,6 +47,7 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({ open, onCancel, tea
                 phone: teacher.mobileNumber || teacher.phone,
                 assignedStudents: teacher.assignedStudents?.map((s: any) => s._id) || [],
                 userGroup: teacher.userGroup?.map((g: any) => g._id) || [],
+                userGroupTrack: teacher.userGroupTrack?._id || teacher.userGroupTrack,
                 status: teacher?.status,
             });
         }
@@ -35,10 +60,7 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({ open, onCancel, tea
             toast.promise(
                 updateTeacher({
                     id: teacher._id,
-                    data: {
-                        ...values,
-                        ...(values.status ? { verified: values.status == 'active' ? true : false } : {}),
-                    },
+                    data: values,
                 }).unwrap(),
                 {
                     loading: 'Updating teacher...',
@@ -91,18 +113,46 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({ open, onCancel, tea
                     <Input placeholder="Enter email" className="h-11 rounded-md" />
                 </Form.Item>
 
-                <Form.Item label={<span className="font-semibold text-gray-700">User Groups</span>} name="userGroup">
-                    <Select
-                        mode="multiple"
-                        placeholder="Select groups"
-                        className="w-full"
-                        style={{ height: 'auto', minHeight: '44px' }}
-                        options={[
-                            { label: 'Skill Path', value: '697ee75db5bd6a1c68bf8685' },
-                            { label: 'Beginners', value: '697ee745b5bd6a1c68bf867f' },
-                        ]}
-                    />
-                </Form.Item>
+                <div className="grid grid-cols-2 gap-x-6">
+                    <Form.Item
+                        label={<span className="font-bold text-gray-700">Select Group</span>}
+                        name="userGroup"
+                        rules={[{ required: false, message: 'Please select at least one group' }]}
+                    >
+                        <Select
+                            placeholder="Choose groups"
+                            className="h-11 rounded-md"
+                            variant="filled"
+                            style={{ backgroundColor: '#f9f9f9' }}
+                            loading={isUserGroupsLoading}
+                            options={userGroups?.map((g: any) => ({
+                                label: g.name,
+                                value: g._id,
+                            }))}
+                            allowClear
+                        />
+                    </Form.Item>
+                    {isSkillPathSelected() && (
+                        <Form.Item
+                            label={<span className="font-bold text-gray-700">Select Track</span>}
+                            name="userGroupTrack"
+                            rules={[{ required: false, message: 'Please select a track' }]}
+                        >
+                            <Select
+                                placeholder="Choose a track"
+                                className="h-11 rounded-md"
+                                variant="filled"
+                                style={{ backgroundColor: '#f9f9f9' }}
+                                loading={isUserTracksLoading}
+                                options={userTracks?.map((t: any) => ({
+                                    label: t.name,
+                                    value: t._id,
+                                }))}
+                                allowClear
+                            />
+                        </Form.Item>
+                    )}
+                </div>
 
                 <Form.Item
                     label={<span className="font-semibold text-gray-700">Assign Students</span>}
@@ -162,14 +212,6 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({ open, onCancel, tea
                                     { label: 'Other', value: 'Other' },
                                 ]}
                             />
-                        </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                        <Form.Item
-                            label={<span className="font-semibold text-gray-700">Track</span>}
-                            name="userGroupTrack"
-                        >
-                            <Input placeholder="Enter track ID" className="h-11 rounded-md" />
                         </Form.Item>
                     </Col>
                 </Row>

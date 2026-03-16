@@ -1,11 +1,14 @@
 import React from 'react';
-import { Modal, Tag } from 'antd';
+import { Button, Modal, Popconfirm, Tag } from 'antd';
 import { X } from 'lucide-react';
+import { toast } from 'sonner';
+import { useRemoveAssignMutation } from '../../../redux/apiSlices/admin/adminStudentApi';
 
 interface MentorDetailsModalProps {
     open: boolean;
     onCancel: () => void;
     mentor: any;
+    refetch: () => void;
 }
 
 interface DetailItem {
@@ -13,8 +16,10 @@ interface DetailItem {
     value: React.ReactNode;
 }
 
-const MentorDetailsModal: React.FC<MentorDetailsModalProps> = ({ open, onCancel, mentor }) => {
+const MentorDetailsModal: React.FC<MentorDetailsModalProps> = ({ open, onCancel, mentor, refetch }) => {
     // console.log(mentor, 'selected mentor');
+    const [removeAssign] = useRemoveAssignMutation();
+
     if (!mentor) return null;
 
     const details: DetailItem[] = [
@@ -30,10 +35,13 @@ const MentorDetailsModal: React.FC<MentorDetailsModalProps> = ({ open, onCancel,
                 mentor.userGroup && mentor.userGroup.length > 0 ? (
                     mentor.userGroup.map((group: any) => (
                         <Tag
-                            key={group._id}
-                            className="rounded-full px-4 py-0.5 bg-gray-50 border-gray-100 text-gray-500 font-medium"
+                            key={group._id || group}
+                            className="rounded-full px-4 py-0.5 bg-[#f6ffed] border-none text-[#52c41a] font-medium"
                         >
-                            {group.name}
+                            {group?.name}
+                            {group?.name === 'Skill Path' && mentor?.userGroupTrack?.name
+                                ? ` (${mentor?.userGroupTrack?.name})`
+                                : ''}
                         </Tag>
                     ))
                 ) : (
@@ -69,6 +77,23 @@ const MentorDetailsModal: React.FC<MentorDetailsModalProps> = ({ open, onCancel,
         },
     ];
 
+    const handleRemoveAssign = (studentId: string, mentorId: string) => {
+        toast.promise(
+            removeAssign({
+                studentId: studentId,
+                mentorId: mentorId,
+            }).unwrap(),
+            {
+                loading: 'Removing mentor...',
+                success: (res: any) => {
+                    refetch();
+                    onCancel();
+                    return res?.message || 'Mentor removed successfully';
+                },
+                error: (err: any) => err?.data?.message || 'Failed to remove mentor',
+            },
+        );
+    };
     return (
         <Modal
             title={<span className="text-xl font-semibold text-[#18212d]">Mentor Details</span>}
@@ -116,7 +141,22 @@ const MentorDetailsModal: React.FC<MentorDetailsModalProps> = ({ open, onCancel,
                                         <td className="py-3 px-6 text-gray-700 font-medium">
                                             {`${student.firstName} ${student.lastName}`}
                                         </td>
-                                        <td className="py-3 px-6 text-gray-500 font-medium">{student.email}</td>
+                                        <td className="py-3 px-6 text-gray-500 font-medium">
+                                            <div className="flex justify-between items-center">
+                                                {student.email}
+                                                <Popconfirm
+                                                    title="Remove Student"
+                                                    description="Are you sure you want to remove this student from the mentor?"
+                                                    okText="Yes"
+                                                    cancelText="No"
+                                                    onConfirm={() => handleRemoveAssign(student._id, mentor._id)}
+                                                >
+                                                    <Button type="primary" danger>
+                                                        <X size={16} />
+                                                    </Button>
+                                                </Popconfirm>
+                                            </div>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

@@ -13,6 +13,8 @@ import EditTeacherModal from '../../../components/modals/admin/EditTeacherModal'
 import { Modal, message } from 'antd';
 import { toast } from 'sonner';
 import FilterMentorModal from '../../../components/modals/admin/FilterMentorModal';
+import { useGetUserGroupsQuery, useGetUserTracksQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
+import Spinner from '../../../components/shared/Spinner';
 
 const AdminTeachers = () => {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -31,7 +33,12 @@ const AdminTeachers = () => {
         userGroup: selectedGroup,
     });
     const { data: studentsApi } = useGetAllStudentsQuery({});
+    const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({});
+    const { data: userTracksApi, isLoading: isUserTracksLoading } = useGetUserTracksQuery({});
     const [deleteTeacher] = useDeleteTeacherMutation();
+
+    const userGroups = userGroupsApi?.data || [];
+    const userTracks = userTracksApi?.data || [];
     const teachers = teachersApi?.data || [];
     const students = studentsApi?.data?.data || [];
 
@@ -84,31 +91,24 @@ const AdminTeachers = () => {
             ),
         },
         {
-            title: 'GROUPS',
+            title: 'GROUP/TRACK',
             dataIndex: 'userGroup',
-            key: 'groups',
-            render: (userGroup: any[]) => (
-                <div className="flex flex-wrap gap-2">
-                    {userGroup && userGroup.length > 0 ? (
-                        userGroup.map((group: any) => (
-                            <Tag
-                                key={group._id}
-                                className="rounded-full px-4 py-0.5 bg-gray-50 border-gray-100 text-gray-500 font-medium"
-                            >
-                                {group.name}
-                            </Tag>
-                        ))
-                    ) : (
-                        <span className="text-gray-400 italic">No Group</span>
-                    )}
+            key: 'userGroup',
+            render: (userGroup: any[], record: any) => (
+                <div className="flex gap-2 flex-wrap w-[200px]">
+                    {userGroup?.map((group: any) => (
+                        <Tag
+                            key={group._id || group}
+                            className="rounded-full px-4 py-0.5 bg-[#f6ffed] border-none text-[#52c41a] font-medium"
+                        >
+                            {group?.name}
+                            {group?.name === 'Skill Path' && record?.userGroupTrack?.name
+                                ? ` (${record.userGroupTrack.name})`
+                                : ''}
+                        </Tag>
+                    ))}
                 </div>
             ),
-        },
-        {
-            title: 'TRACK',
-            dataIndex: 'userGroupTrack',
-            key: 'track',
-            render: (track: string) => <span className="text-gray-500">{track || 'N/A'}</span>,
         },
         {
             title: 'LOCATION',
@@ -171,6 +171,9 @@ const AdminTeachers = () => {
         },
     ];
 
+    if (isUserGroupsLoading || isUserTracksLoading) {
+        return <Spinner />;
+    }
     return (
         <div className="">
             <div className="flex justify-between items-center mb-8">
@@ -253,6 +256,10 @@ const AdminTeachers = () => {
                 onCancel={() => setIsEditModalOpen(false)}
                 teacher={selectedTeacher}
                 students={students}
+                userGroups={userGroups}
+                userTracks={userTracks}
+                isUserGroupsLoading={isUserGroupsLoading}
+                isUserTracksLoading={isUserTracksLoading}
             />
         </div>
     );

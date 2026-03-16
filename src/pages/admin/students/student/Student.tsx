@@ -282,6 +282,7 @@ const Student = () => {
                 open={isDetailsModalOpen}
                 onCancel={() => setIsDetailsModalOpen(false)}
                 student={selectedStudent}
+                refetch={refetch}
             />
             <EditStudentModal
                 open={isEditModalOpen}
