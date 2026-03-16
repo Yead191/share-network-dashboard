@@ -2,30 +2,31 @@ import { Modal, Input, Select, DatePicker, Form, Button, Spin } from 'antd';
 import { useEffect } from 'react';
 import { X } from 'lucide-react';
 import dayjs from 'dayjs';
-import { useGetAllUserGroupsQuery } from '../../../redux/apiSlices/userGroupSlice';
-import { useGetAllUserGroupTracksQuery } from '../../../redux/apiSlices/userGroupTrackSlice';
 import { useAddEventsMutation, useUpdateEventsMutation } from '../../../redux/apiSlices/admin/adminEventsApi';
 import { toast } from 'sonner';
-import { useGetAllStudentsQuery } from '../../../redux/apiSlices/admin/adminTeachersApi';
 
 interface AddEventModalProps {
     open: boolean;
     onCancel: () => void;
     refetch: () => void;
     selectedEvent?: any;
+    students?: any[];
+    userGroups?: any[];
+    isGroupsLoading?: boolean;
 }
 
-const AddEventModal = ({ open, onCancel, refetch, selectedEvent }: AddEventModalProps) => {
+const AddEventModal = ({
+    open,
+    onCancel,
+    refetch,
+    selectedEvent,
+    students,
+    userGroups,
+    isGroupsLoading,
+}: AddEventModalProps) => {
     const [form] = Form.useForm();
     const [addEvent, { isLoading: isAdding }] = useAddEventsMutation();
     const [updateEvent, { isLoading: isUpdating }] = useUpdateEventsMutation();
-    const {data:studentsQuery}=useGetAllStudentsQuery({page:1,limit:100,searchTerm:""},{skip:!open})
-    const students = studentsQuery?.data?.data
-
-    
-    
-    const { data: userGroups } = useGetAllUserGroupsQuery(undefined, { skip: !open });
-    const { data: userGroupTracks } = useGetAllUserGroupTracksQuery(undefined, { skip: !open });
 
     useEffect(() => {
         if (open && selectedEvent) {
@@ -37,9 +38,7 @@ const AddEventModal = ({ open, onCancel, refetch, selectedEvent }: AddEventModal
                 type: selectedEvent.type,
                 targetGroup: selectedEvent.targetGroup?._id || selectedEvent.targetGroup,
                 targetUser: selectedEvent.targetUser?._id || selectedEvent.targetUser,
-                students: selectedEvent.students
-                    ? selectedEvent.students.map((s: any) => s._id || s)
-                    : undefined,
+                students: selectedEvent.students ? selectedEvent.students.map((s: any) => s._id || s) : undefined,
             });
         } else if (open && !selectedEvent) {
             form.resetFields();
@@ -51,9 +50,8 @@ const AddEventModal = ({ open, onCancel, refetch, selectedEvent }: AddEventModal
             const finalData = {
                 ...values,
                 date: values.date ? dayjs(values.date).format('YYYY-MM-DD') : undefined,
-                studentAssigned:values.students
+                studentAssigned: values.students,
             };
-            
 
             const mutation = selectedEvent?._id
                 ? updateEvent({ id: selectedEvent._id, data: finalData }).unwrap()
@@ -75,9 +73,6 @@ const AddEventModal = ({ open, onCancel, refetch, selectedEvent }: AddEventModal
             toast.error(error?.data?.message || 'Something went wrong');
         }
     };
-
-
-    
 
     return (
         <Modal
@@ -168,35 +163,24 @@ const AddEventModal = ({ open, onCancel, refetch, selectedEvent }: AddEventModal
                         </Select>
                     </Form.Item>
                     <Form.Item
+                        label={<span className="font-bold text-gray-700">Select Group</span>}
                         name="targetGroup"
-                        label={<span className="text-sm font-semibold text-gray-700">Target Group</span>}
+                        rules={[{ required: false, message: 'Please select at least one group' }]}
                     >
                         <Select
-                            placeholder="Select group (optional)"
-                            className="w-full h-11"
-                            allowClear
-                            options={userGroups?.data?.map((group: any) => ({
-                                value: group._id,
-                                label: group.name,
+                            placeholder="Choose groups"
+                            className="h-11 rounded-md"
+                            variant="filled"
+                            style={{ backgroundColor: '#f9f9f9' }}
+                            loading={isGroupsLoading}
+                            options={userGroups?.map((g: any) => ({
+                                label: g.name,
+                                value: g._id,
                             }))}
+                            allowClear
                         />
                     </Form.Item>
                 </div>
-
-                <Form.Item
-                    name="targetUser"
-                    label={<span className="text-sm font-semibold text-gray-700">Target User (optional)</span>}
-                >
-                    <Select
-                        placeholder="Select specific user (optional)"
-                        className="w-full h-11"
-                        allowClear
-                        options={userGroupTracks?.data?.map((track: any) => ({
-                            value: track._id,
-                            label: track.name,
-                        }))}
-                    />
-                </Form.Item>
 
                 <Form.Item
                     name="students"
@@ -207,15 +191,14 @@ const AddEventModal = ({ open, onCancel, refetch, selectedEvent }: AddEventModal
                         placeholder="Choose students"
                         className="w-full"
                         style={{ height: 'auto', minHeight: '44px' }}
-                        options={students?.map((student: any) => ({
-                            value: student?._id,
-                            label: `${student?.firstName} ${student?.lastName} (${student?.email})`,
-                        }))||[]}
+                        options={
+                            students?.map((student: any) => ({
+                                value: student?._id,
+                                label: `${student?.firstName} ${student?.lastName} (${student?.email})`,
+                            })) || []
+                        }
                         filterOption={(input, option) =>
-                            (option?.label ?? '')
-                                .toString()
-                                .toLowerCase()
-                                .includes(input.toLowerCase())
+                            (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
                         }
                     />
                 </Form.Item>
