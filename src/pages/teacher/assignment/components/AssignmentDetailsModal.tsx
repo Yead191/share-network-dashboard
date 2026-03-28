@@ -30,14 +30,17 @@ const AssignmentDetailsModal: React.FC<AssignmentDetailsModalProps> = ({ open, o
                                 <span>{assignment.title}</span>
                                 {assignment.attachment && (
                                     <a
-                                        href={assignment.attachment.startsWith('http') 
-                                            ? assignment.attachment 
-                                            : `${imageUrl}${assignment.attachment.startsWith('/') ? assignment.attachment : `/${assignment.attachment}`}`}
+                                        href={
+                                            assignment.attachment.startsWith('http')
+                                                ? assignment.attachment
+                                                : `${imageUrl}${assignment.attachment.startsWith('/') ? assignment.attachment : `/${assignment.attachment}`}`
+                                        }
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center gap-1 text-[#3182CE] text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                        className="flex items-center gap-1 text-[#3182CE] text-xs transition-opacity"
                                     >
-                                        <DownloadOutlined /> {assignment.attachment.startsWith('http') ? 'View URL' : 'Download'}
+                                        <DownloadOutlined />{' '}
+                                        {assignment.attachment.startsWith('http') ? 'View URL' : 'Download'}
                                     </a>
                                 )}
                             </td>
@@ -53,7 +56,7 @@ const AssignmentDetailsModal: React.FC<AssignmentDetailsModalProps> = ({ open, o
                                     color="error"
                                     className="bg-red-50 text-red-500 border-red-100 rounded px-2 font-medium"
                                 >
-                                    {assignment?.type?.name || 'PDF'}
+                                    {assignment?.type?.name || 'N/A'}
                                 </Tag>
                             </td>
                         </tr>
@@ -61,7 +64,7 @@ const AssignmentDetailsModal: React.FC<AssignmentDetailsModalProps> = ({ open, o
                             <td className="p-4 font-semibold text-gray-500 text-sm">Groups</td>
                             <td className="p-4">
                                 <div className="flex flex-wrap gap-1">
-                                    {assignment.targets?.map((t: {_id: string; name: string}) => (
+                                    {assignment.targets?.map((t: { _id: string; name: string }) => (
                                         <Tag
                                             key={t._id}
                                             className="bg-gray-100 text-gray-600 border-none rounded-full px-4 font-medium uppercase text-[10px]"
@@ -74,19 +77,34 @@ const AssignmentDetailsModal: React.FC<AssignmentDetailsModalProps> = ({ open, o
                         </tr>
                         <tr className="border-b border-gray-100">
                             <td className="p-4 font-semibold text-gray-500 text-sm">Due Date</td>
-                            <td className="p-4 text-gray-700 font-medium">{new Date(assignment.dueDate).toDateString()}</td>
+                            <td className="p-4 text-gray-700 font-medium">
+                                {new Date(assignment?.dueDate).toLocaleString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: true,
+                                })}
+                            </td>
                         </tr>
                         <tr className="border-b-0">
                             <td className="p-4 font-semibold text-gray-500 text-sm">Status / Visibility</td>
                             <td className="p-4 flex gap-2">
-                                <Tag className={`rounded-full px-4 font-medium text-[10px] ${assignment.published ? 'bg-blue-50 text-blue-500 border-none' : 'bg-gray-100 text-gray-500 border-none'}`}>
+                                <Tag
+                                    className={`rounded-full px-4 font-medium text-[10px] ${assignment.published ? 'bg-blue-50 text-blue-500 border-none' : 'bg-gray-100 text-gray-500 border-none'}`}
+                                >
                                     {assignment.published ? 'PUBLISHED' : 'UNPUBLISHED'}
                                 </Tag>
-                                <Tag className={`rounded-full px-4 font-medium text-[10px] ${
-                                    assignment.status === 'COMPLETED' ? 'bg-green-50 text-green-500 border-none' :
-                                    assignment.status === 'IN_PROGRESS' ? 'bg-blue-50 text-blue-500 border-none' :
-                                    'bg-yellow-50 text-yellow-500 border-none'
-                                }`}>
+                                <Tag
+                                    className={`rounded-full px-4 font-medium text-[10px] ${
+                                        assignment.status === 'COMPLETED'
+                                            ? 'bg-green-50 text-green-500 border-none'
+                                            : assignment.status === 'IN_PROGRESS'
+                                              ? 'bg-blue-50 text-blue-500 border-none'
+                                              : 'bg-yellow-50 text-yellow-500 border-none'
+                                    }`}
+                                >
                                     {assignment.status}
                                 </Tag>
                             </td>

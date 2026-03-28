@@ -110,7 +110,16 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
             dataIndex: 'dueDate',
             key: 'dueDate',
             render: (date: string) => (
-                <span className="font-medium text-gray-700">{new Date(date).toDateString()}</span>
+                <span className="font-medium text-gray-700">
+                    {new Date(date).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true,
+                    })}
+                </span>
             ),
         },
         {
