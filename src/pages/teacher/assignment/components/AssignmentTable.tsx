@@ -1,8 +1,7 @@
 import React from 'react';
-import { Table, Tag, Select, Space, Button, Popconfirm, Switch } from 'antd';
+import { Table, Tag, Space, Button, Popconfirm, Switch } from 'antd';
 import {
     FilePdfOutlined,
-    FilterOutlined,
     EyeOutlined,
     EditOutlined,
     DeleteOutlined,
