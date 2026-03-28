@@ -1,42 +1,43 @@
 import { Button, Select, Input, Tag, Table, DatePicker, Avatar, Radio } from 'antd';
 import { Info, FileText, Save, Search, User, ClipboardList } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-    useGetAllClassesQuery,
     useGetAttendanceLogsQuery,
+    useGetStudentsQuery,
     useTakeAttendanceMutation,
     useUpdateIndividualAttendanceMutation,
 } from '../../../../redux/apiSlices/admin/adminStudentApi';
-import { useGetAllStudentsQuery } from '../../../../redux/apiSlices/admin/adminTeachersApi';
 import { toast } from 'sonner';
 import dayjs from 'dayjs';
 import { imageUrl } from '../../../../redux/api/baseApi';
 import Spinner from '../../../../components/shared/Spinner';
+import { useGetUserGroupsQuery } from '../../../../redux/apiSlices/teacher/resourceSlice';
 
 const TakeAttendance = () => {
     const [viewMode, setViewMode] = useState<'take' | 'logs'>('take');
-    const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedClass, setSelectedClass] = useState<string | null>(null);
     const [selectedDate, setSelectedDate] = useState<string>(dayjs().format('YYYY-MM-DD'));
-
-    // Attendance records state for Take mode: { [studentId]: { status, note } }
     const [attendanceRecords, setAttendanceRecords] = useState<Record<string, { status: string; note: string }>>({});
-
-    // Attendance records state for Logs mode: { [logId]: { status, note } }
     const [logEdits, setLogEdits] = useState<Record<string, { status: string; note: string }>>({});
 
-    // API calls
-    const { data: studentsApi, isLoading: studentsLoading } = useGetAllStudentsQuery({ page, searchTerm });
-    const { data: classesApi, isLoading: classesLoading } = useGetAllClassesQuery({});
+    const { data: studentsApi, isLoading: studentsLoading } = useGetStudentsQuery({
+        page: 0,
+        searchTerm,
+        limit: 0,
+        selectedGroup: selectedClass || '',
+    });
+    const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({});
     const [submitAttendance, { isLoading: isSubmitting }] = useTakeAttendanceMutation();
     const [updateIndividualAttendance] = useUpdateIndividualAttendanceMutation();
 
-    const allStudents = studentsApi?.data?.data || [];
-    const classOptions = classesApi?.data?.map((item: any) => ({
-        value: item._id,
-        label: item.title,
-    }));
+    const allStudents = useMemo(() => studentsApi?.data?.data || [], [studentsApi]);
+
+    const classOptions = useMemo(
+        () => userGroupsApi?.data?.map((item: any) => ({ value: item._id, label: item.name })),
+        [userGroupsApi],
+    );
+
     const {
         data: attendanceLogsApi,
         isLoading: attendanceLogsLoading,
@@ -45,103 +46,121 @@ const TakeAttendance = () => {
         classId: selectedClass || '',
         date: selectedDate,
     });
-    const attendanceLogs = attendanceLogsApi?.data?.[0]?.records || [];
-    // console.log(attendanceLogs);
 
-    // Initialize attendance records when students are loaded or search changes
+    const attendanceLogs = useMemo(() => attendanceLogsApi?.data?.[0]?.records || [], [attendanceLogsApi]);
+
+    // Initialize attendance records — only adds missing students, never overwrites existing edits
     useEffect(() => {
-        if (allStudents.length > 0) {
-            const initialRecords = { ...attendanceRecords };
+        if (allStudents.length === 0) return;
+        setAttendanceRecords((prev) => {
+            let changed = false;
+            const updated = { ...prev };
             allStudents.forEach((student: any) => {
-                if (!initialRecords[student._id]) {
-                    initialRecords[student._id] = { status: 'absent', note: '' };
+                if (!updated[student._id]) {
+                    updated[student._id] = { status: 'absent', note: '' };
+                    changed = true;
                 }
             });
-            setAttendanceRecords(initialRecords);
-        }
+            return changed ? updated : prev;
+        });
     }, [allStudents]);
 
-    // Initialize log edits when logs are loaded
+    // Sync log edits when logs load or change
     useEffect(() => {
-        if (attendanceLogs.length > 0) {
-            const initialLogEdits: Record<string, { status: string; note: string }> = {};
-            attendanceLogs.forEach((log: any) => {
-                initialLogEdits[log._id] = { status: log.status, note: log.note || '' };
-            });
-            setLogEdits(initialLogEdits);
-        } else {
-            setLogEdits({});
+        if (attendanceLogs.length === 0) {
+            setLogEdits((prev) => (Object.keys(prev).length === 0 ? prev : {}));
+            return;
         }
+        setLogEdits((prev) => {
+            const updated: Record<string, { status: string; note: string }> = {};
+            let changed = false;
+            attendanceLogs.forEach((log: any) => {
+                const incoming = { status: log.status, note: log.note || '' };
+                const existing = prev[log._id];
+                updated[log._id] = incoming;
+                if (!existing || existing.status !== incoming.status || existing.note !== incoming.note) {
+                    changed = true;
+                }
+            });
+            if (Object.keys(prev).length !== Object.keys(updated).length) changed = true;
+            return changed ? updated : prev;
+        });
     }, [attendanceLogs]);
 
-    const handleStatusChange = (studentId: string, status: string) => {
+    // ── Stable handlers ────────────────────────────────────────────────────────
+
+    const handleStatusChange = useCallback((studentId: string, status: string) => {
         setAttendanceRecords((prev) => ({
             ...prev,
             [studentId]: { ...prev[studentId], status },
         }));
-    };
+    }, []);
 
-    const handleNoteChange = (studentId: string, note: string) => {
+    const handleNoteChange = useCallback((studentId: string, note: string) => {
         setAttendanceRecords((prev) => ({
             ...prev,
             [studentId]: { ...prev[studentId], note },
         }));
-    };
+    }, []);
 
-    const handleLogStatusChange = (logId: string, status: string) => {
+    const handleLogStatusChange = useCallback((logId: string, status: string) => {
         setLogEdits((prev) => ({
             ...prev,
             [logId]: { ...prev[logId], status },
         }));
-    };
+    }, []);
 
-    const handleLogNoteChange = (logId: string, note: string) => {
+    const handleLogNoteChange = useCallback((logId: string, note: string) => {
         setLogEdits((prev) => ({
             ...prev,
             [logId]: { ...prev[logId], note },
         }));
-    };
+    }, []);
 
-    const handleUpdateIndividualLog = async (logRecord: any) => {
-        const edits = logEdits[logRecord._id];
-        if (!edits) return;
+    const handleUpdateIndividualLog = useCallback(
+        async (logRecord: any) => {
+            const edits = logEdits[logRecord._id];
+            if (!edits) return;
+            const payload = {
+                date: selectedDate,
+                classId: selectedClass,
+                studentId: logRecord._id,
+                status: edits.status,
+                note: edits.note,
+            };
+            toast.promise(
+                updateIndividualAttendance(payload)
+                    .unwrap()
+                    .then(() => refetch()),
+                {
+                    loading: 'Updating attendance...',
+                    success: 'Attendance updated successfully!',
+                    error: (err: any) => err?.data?.message || 'Failed to update attendance',
+                },
+            );
+        },
+        [logEdits, selectedDate, selectedClass, updateIndividualAttendance, refetch],
+    );
 
-        const payload = {
-            date: selectedDate,
-            classId: selectedClass,
-            // Per the provided example, the API expects the subdocument's _id in the studentId field
-            studentId: logRecord._id,
-            status: edits.status,
-            note: edits.note,
-        };
+    const setAllStatus = useCallback(
+        (status: string) => {
+            setAttendanceRecords((prev) => {
+                const updated = { ...prev };
+                allStudents.forEach((student: any) => {
+                    updated[student._id] = { ...updated[student._id], status };
+                });
+                return updated;
+            });
+            toast.success(`All students set to ${status}`);
+        },
+        [allStudents],
+    );
 
-        toast.promise(
-            updateIndividualAttendance(payload)
-                .unwrap()
-                .then(() => refetch()),
-            {
-                loading: 'Updating attendance...',
-                success: 'Attendance updated successfully!',
-                error: (err: any) => err?.data?.message || 'Failed to update attendance',
-            },
-        );
-    };
-
-    const setAllStatus = (status: string) => {
-        const newRecords = { ...attendanceRecords };
-        allStudents.forEach((student: any) => {
-            newRecords[student._id] = { ...newRecords[student._id], status };
-        });
-        setAttendanceRecords(newRecords);
-        toast.success(`All students set to ${status}`);
-    };
-
-    const handleSaveAttendance = async () => {
+    const handleSaveAttendance = useCallback(async () => {
         if (!selectedClass) {
             toast.error('Please select a class first');
             return;
         }
-
         const payload = {
             date: selectedDate,
             classId: selectedClass,
@@ -151,173 +170,189 @@ const TakeAttendance = () => {
                 note: attendanceRecords[student._id]?.note || '',
             })),
         };
-
         toast.promise(
             submitAttendance(payload)
                 .unwrap()
                 .then(() => refetch()),
             {
                 loading: 'Saving attendance...',
-                success: (res) => {
-                    return res?.data?.message || 'Attendance saved successfully!';
-                },
+                success: (res) => res?.data?.message || 'Attendance saved successfully!',
                 error: (err: any) => err?.data?.message || 'Failed to save attendance',
             },
         );
-    };
+    }, [selectedClass, selectedDate, allStudents, attendanceRecords, submitAttendance, refetch]);
 
-    const columns = [
-        {
-            title: 'STUDENT',
-            key: 'student',
-            render: (_: any, record: any) => (
-                <div className="flex items-center gap-3 py-1">
-                    <Avatar
-                        src={record.profile ? `${imageUrl}${record.profile}` : null}
-                        icon={<User size={16} />}
-                        className="bg-gray-100"
-                    />
-                    <div>
-                        <div className="font-semibold text-gray-700">
-                            {record.firstName} {record.lastName}
-                        </div>
-                        <div className="text-xs text-gray-400">{record.email}</div>
-                    </div>
-                </div>
-            ),
-        },
-        {
-            title: 'GROUP/TRACK',
-            key: 'groups',
-            render: (_: any, record: any) => (
-                <div className="flex flex-wrap gap-2">
-                    {record.userGroup?.map((group: any) => (
-                        <Tag
-                            key={group._id}
-                            className="bg-blue-50 border-blue-100 text-blue-500 rounded-full px-3 py-0.5 text-xs font-medium"
-                        >
-                            {group.name}
-                        </Tag>
-                    ))}
-                    {record.userGroupTrack && (
-                        <Tag className="bg-purple-50 border-purple-100 text-purple-500 rounded-full px-3 py-0.5 text-xs font-medium">
-                            {record.userGroupTrack.name}
-                        </Tag>
-                    )}
-                </div>
-            ),
-        },
-        {
-            title: 'STATUS',
-            key: 'status',
-            width: 180,
-            render: (_: any, record: any) => (
-                <Select
-                    value={attendanceRecords[record._id]?.status || 'absent'}
-                    onChange={(val) => handleStatusChange(record._id, val)}
-                    className="w-full h-10"
-                    options={[
-                        { label: 'Present', value: 'present' },
-                        { label: 'Absent', value: 'absent' },
-                        { label: 'Late', value: 'late' },
-                    ]}
-                    style={{ borderRadius: '8px' }}
-                />
-            ),
-        },
-        {
-            title: 'NOTES',
-            key: 'notes',
-            render: (_: any, record: any) => (
-                <Input
-                    placeholder="Optional"
-                    value={attendanceRecords[record._id]?.note || ''}
-                    onChange={(e) => handleNoteChange(record._id, e.target.value)}
-                    className="h-10 border-gray-100 bg-gray-50/50 rounded-lg"
-                />
-            ),
-        },
-    ];
+    const handleViewModeChange = useCallback((e: any) => setViewMode(e.target.value), []);
+    const handleSearchChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value),
+        [],
+    );
+    const handleClassChange = useCallback((val: string) => setSelectedClass(val), []);
+    const handleDateChange = useCallback((date: any) => setSelectedDate(date ? date.format('YYYY-MM-DD') : ''), []);
+    const handleReset = useCallback(() => {
+        setSearchTerm('');
+        setSelectedClass(null);
+    }, []);
 
-    const logColumns = [
-        {
-            title: 'STUDENT',
-            key: 'student',
-            render: (_: any, record: any) => {
-                const displayName =
-                    record.studentId?.name ||
-                    `${record.studentId?.firstName || ''} ${record.studentId?.lastName || ''}`.trim() ||
-                    'Unknown';
-                return (
+    // ── Memoized columns ───────────────────────────────────────────────────────
+
+    const columns = useMemo(
+        () => [
+            {
+                title: 'STUDENT',
+                key: 'student',
+                render: (_: any, record: any) => (
                     <div className="flex items-center gap-3 py-1">
                         <Avatar
-                            src={record.studentId?.profile ? `${imageUrl}${record.studentId.profile}` : null}
+                            src={record.profile ? `${imageUrl}${record.profile}` : null}
                             icon={<User size={16} />}
                             className="bg-gray-100"
                         />
                         <div>
-                            <div className="font-semibold text-gray-700">{displayName}</div>
-                            <div className="text-xs text-gray-400">{record.studentId?.email}</div>
+                            <div className="font-semibold text-gray-700">
+                                {record.firstName} {record.lastName}
+                            </div>
+                            <div className="text-xs text-gray-400">{record.email}</div>
                         </div>
                     </div>
-                );
+                ),
             },
-        },
-        {
-            title: 'STATUS',
-            key: 'status',
-            width: 180,
-            render: (_: any, record: any) => (
-                <Select
-                    value={logEdits[record._id]?.status || record.status}
-                    onChange={(val) => handleLogStatusChange(record._id, val)}
-                    className="w-full h-10"
-                    options={[
-                        { label: 'Present', value: 'present' },
-                        { label: 'Absent', value: 'absent' },
-                        { label: 'Late', value: 'late' },
-                    ]}
-                    style={{ borderRadius: '8px' }}
-                />
-            ),
-        },
-        {
-            title: 'NOTES',
-            key: 'notes',
-            render: (_: any, record: any) => (
-                <Input
-                    placeholder="Optional"
-                    value={logEdits[record._id]?.note !== undefined ? logEdits[record._id].note : record.note || ''}
-                    onChange={(e) => handleLogNoteChange(record._id, e.target.value)}
-                    className="h-10 border-gray-100 bg-gray-50/50 rounded-lg"
-                />
-            ),
-        },
-        {
-            title: 'ACTIONS',
-            key: 'actions',
-            width: 120,
-            render: (_: any, record: any) => {
-                const isChanged =
-                    logEdits[record._id]?.status !== record.status ||
-                    logEdits[record._id]?.note !== (record.note || '');
-                return (
-                    <Button
-                        type={isChanged ? 'primary' : 'default'}
-                        disabled={!isChanged}
-                        onClick={() => handleUpdateIndividualLog(record)}
-                        className={`rounded-lg ${isChanged ? 'bg-[#52c41a] border-none text-white hover:bg-[#45a016]' : 'text-gray-400'}`}
-                    >
-                        Update
-                    </Button>
-                );
+            {
+                title: 'GROUP/TRACK',
+                key: 'groups',
+                render: (_: any, record: any) => (
+                    <div className="flex flex-wrap gap-2">
+                        {record.userGroup?.map((group: any) => (
+                            <Tag
+                                key={group._id}
+                                className="bg-blue-50 border-blue-100 text-blue-500 rounded-full px-3 py-0.5 text-xs font-medium"
+                            >
+                                {group.name}
+                            </Tag>
+                        ))}
+                        {record.userGroupTrack && (
+                            <Tag className="bg-purple-50 border-purple-100 text-purple-500 rounded-full px-3 py-0.5 text-xs font-medium">
+                                {record.userGroupTrack.name}
+                            </Tag>
+                        )}
+                    </div>
+                ),
             },
-        },
-    ];
+            {
+                title: 'STATUS',
+                key: 'status',
+                width: 180,
+                render: (_: any, record: any) => (
+                    <Select
+                        value={attendanceRecords[record._id]?.status || 'absent'}
+                        onChange={(val) => handleStatusChange(record._id, val)}
+                        className="w-full h-10"
+                        options={[
+                            { label: 'Present', value: 'present' },
+                            { label: 'Absent', value: 'absent' },
+                            { label: 'Late', value: 'late' },
+                        ]}
+                        style={{ borderRadius: '8px' }}
+                    />
+                ),
+            },
+            {
+                title: 'NOTES',
+                key: 'notes',
+                render: (_: any, record: any) => (
+                    <Input
+                        placeholder="Optional"
+                        value={attendanceRecords[record._id]?.note || ''}
+                        onChange={(e) => handleNoteChange(record._id, e.target.value)}
+                        className="h-10 border-gray-100 bg-gray-50/50 rounded-lg"
+                    />
+                ),
+            },
+        ],
+        // Re-memoize only when records or stable handlers change
+        [attendanceRecords, handleStatusChange, handleNoteChange],
+    );
 
-    if (attendanceLogsLoading) {
-        return <Spinner />;
-    }
+    const logColumns = useMemo(
+        () => [
+            {
+                title: 'STUDENT',
+                key: 'student',
+                render: (_: any, record: any) => {
+                    const displayName =
+                        record.studentId?.name ||
+                        `${record.studentId?.firstName || ''} ${record.studentId?.lastName || ''}`.trim() ||
+                        'Unknown';
+                    return (
+                        <div className="flex items-center gap-3 py-1">
+                            <Avatar
+                                src={record.studentId?.profile ? `${imageUrl}${record.studentId.profile}` : null}
+                                icon={<User size={16} />}
+                                className="bg-gray-100"
+                            />
+                            <div>
+                                <div className="font-semibold text-gray-700">{displayName}</div>
+                                <div className="text-xs text-gray-400">{record.studentId?.email}</div>
+                            </div>
+                        </div>
+                    );
+                },
+            },
+            {
+                title: 'STATUS',
+                key: 'status',
+                width: 180,
+                render: (_: any, record: any) => (
+                    <Select
+                        value={logEdits[record._id]?.status || record.status}
+                        onChange={(val) => handleLogStatusChange(record._id, val)}
+                        className="w-full h-10"
+                        options={[
+                            { label: 'Present', value: 'present' },
+                            { label: 'Absent', value: 'absent' },
+                            { label: 'Late', value: 'late' },
+                        ]}
+                        style={{ borderRadius: '8px' }}
+                    />
+                ),
+            },
+            {
+                title: 'NOTES',
+                key: 'notes',
+                render: (_: any, record: any) => (
+                    <Input
+                        placeholder="Optional"
+                        value={logEdits[record._id]?.note !== undefined ? logEdits[record._id].note : record.note || ''}
+                        onChange={(e) => handleLogNoteChange(record._id, e.target.value)}
+                        className="h-10 border-gray-100 bg-gray-50/50 rounded-lg"
+                    />
+                ),
+            },
+            {
+                title: 'ACTIONS',
+                key: 'actions',
+                width: 120,
+                render: (_: any, record: any) => {
+                    const isChanged =
+                        logEdits[record._id]?.status !== record.status ||
+                        logEdits[record._id]?.note !== (record.note || '');
+                    return (
+                        <Button
+                            type={isChanged ? 'primary' : 'default'}
+                            disabled={!isChanged}
+                            onClick={() => handleUpdateIndividualLog(record)}
+                            className={`rounded-lg ${isChanged ? 'bg-[#52c41a] border-none text-white hover:bg-[#45a016]' : 'text-gray-400'}`}
+                        >
+                            Update
+                        </Button>
+                    );
+                },
+            },
+        ],
+        [logEdits, handleLogStatusChange, handleLogNoteChange, handleUpdateIndividualLog],
+    );
+
+    if (attendanceLogsLoading || isUserGroupsLoading) return <Spinner />;
 
     return (
         <div className="pb-10">
@@ -329,28 +364,24 @@ const TakeAttendance = () => {
                         value={searchTerm}
                         prefix={<Search size={18} className="text-gray-400" />}
                         className="w-64 h-11 rounded-lg border-gray-100"
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={handleSearchChange}
                     />
                     <Select
-                        placeholder="Select Class"
+                        placeholder="Select Group"
                         value={selectedClass}
-                        loading={classesLoading}
+                        loading={isUserGroupsLoading}
                         className="w-64 h-11"
                         options={classOptions}
-                        onChange={(val) => setSelectedClass(val)}
+                        onChange={handleClassChange}
                         allowClear
                     />
                     <DatePicker
                         className="h-11 w-44 rounded-lg border-gray-100"
                         value={selectedDate ? dayjs(selectedDate) : null}
-                        onChange={(date) => setSelectedDate(date ? date.format('YYYY-MM-DD') : '')}
+                        onChange={handleDateChange}
                     />
                     <Button
-                        onClick={() => {
-                            setSearchTerm('');
-                            setSelectedClass(null);
-                            setPage(1);
-                        }}
+                        onClick={handleReset}
                         className="h-11 px-6 border-gray-100 bg-gray-50 text-gray-600 font-medium rounded-lg hover:bg-gray-100"
                     >
                         Reset
@@ -359,15 +390,13 @@ const TakeAttendance = () => {
                 <div className="flex items-center gap-4">
                     <Radio.Group
                         value={viewMode}
-                        onChange={(e) => setViewMode(e.target.value)}
+                        onChange={handleViewModeChange}
                         className="h-11 flex items-center bg-gray-100 p-1 rounded-lg"
                         buttonStyle="solid"
                     >
                         <Radio.Button
                             value="take"
-                            className={`h-9 px-4 border-none rounded-md ${
-                                viewMode === 'take' ? 'bg-white shadow-sm text-primary' : 'bg-transparent text-gray-500'
-                            }`}
+                            className={`h-9 px-4 border-none rounded-md ${viewMode === 'take' ? 'bg-white shadow-sm text-primary' : 'bg-transparent text-gray-500'}`}
                         >
                             <span className="flex items-center gap-2">
                                 <FileText size={16} />
@@ -376,9 +405,7 @@ const TakeAttendance = () => {
                         </Radio.Button>
                         <Radio.Button
                             value="logs"
-                            className={`h-9 px-4 border-none rounded-md ${
-                                viewMode === 'logs' ? 'bg-white shadow-sm text-primary' : 'bg-transparent text-gray-500'
-                            }`}
+                            className={`h-9 px-4 border-none rounded-md ${viewMode === 'logs' ? 'bg-white shadow-sm text-primary' : 'bg-transparent text-gray-500'}`}
                         >
                             <span className="flex items-center gap-2">
                                 <ClipboardList size={16} />
@@ -407,7 +434,6 @@ const TakeAttendance = () => {
 
             {selectedClass && viewMode === 'take' && (
                 <>
-                    {/* Bulk Actions & Save Button */}
                     <div className="flex flex-wrap items-center justify-between gap-4 mb-6 animate-fadeIn">
                         <div className="flex items-center gap-3">
                             <Button
@@ -440,18 +466,12 @@ const TakeAttendance = () => {
                         </Button>
                     </div>
 
-                    {/* Attendance Table */}
                     <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm animate-fadeIn">
                         <Table
                             columns={columns}
                             dataSource={allStudents}
                             loading={studentsLoading}
-                            pagination={{
-                                current: page,
-                                total: studentsApi?.data?.pagination?.total,
-                                pageSize: 10,
-                                onChange: (page) => setPage(page),
-                            }}
+                            pagination={false}
                             rowKey="_id"
                             className="attendance-table"
                             rowClassName="hover:bg-gray-50/50 transition-colors"

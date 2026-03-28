@@ -16,7 +16,7 @@ const adminStudentApi = api.injectEndpoints({
                 selectedGroup?: string;
                 selectedStatus?: string;
             }) => {
-                console.log('Query hit', page, limit, searchTerm);
+                // console.log('Query hit', page, limit, searchTerm);
                 const params = new URLSearchParams();
                 if (searchTerm) params.append('searchTerm', searchTerm);
                 params.append('page', (page ?? 0).toString());
