@@ -61,6 +61,12 @@ export const adminSidebarItems: TSidebarItem[] = [
         icon: <LuBookOpen size={24} />,
     },
     {
+        key: 'assignment',
+        label: 'Assignment',
+        path: 'admin/assignment',
+        icon: <MdOutlineAssignment size={24} />,
+    },
+    {
         key: 'schedule',
         label: 'Schedule',
         path: 'admin/schedule',

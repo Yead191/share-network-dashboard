@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Input, ConfigProvider } from 'antd';
+import { Button, Input, ConfigProvider, Select } from 'antd';
 import { SearchOutlined, FilterOutlined, PlusOutlined } from '@ant-design/icons';
 
 // Modular Components
@@ -9,22 +9,35 @@ import SubmissionReviewModal from './components/SubmissionReviewModal';
 import AssignmentTable from './components/AssignmentTable';
 import SubmissionTable from './components/SubmissionTable';
 
-import { useCreateAssignmentMutation, useDeleteAssignmentMutation, useGetAllSubmissionOfAssignmentQuery, useGetAssignmentQuery, useGiveMarksOfSubmissionMutation, useUpdateAssignmentMutation } from '../../../redux/apiSlices/teacher/assignmentSlice';
+import {
+    useCreateAssignmentMutation,
+    useDeleteAssignmentMutation,
+    useGetAllSubmissionOfAssignmentQuery,
+    useGetAssignmentQuery,
+    useGiveMarksOfSubmissionMutation,
+    useUpdateAssignmentMutation,
+} from '../../../redux/apiSlices/teacher/assignmentSlice';
+import { useGetUserGroupsQuery } from '../../../redux/apiSlices/teacher/resourceSlice';
 import { toast } from 'sonner';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
 
-
-
 function Assignment() {
     const [page, setPage] = useState(1);
-    const [createAssignment]=useCreateAssignmentMutation()
-    const [updateAssignment]=useUpdateAssignmentMutation()
-    const [deleteAssignment]=useDeleteAssignmentMutation()
+    const [createAssignment] = useCreateAssignmentMutation();
+    const [updateAssignment] = useUpdateAssignmentMutation();
+    const [deleteAssignment] = useDeleteAssignmentMutation();
     const [activeTab, setActiveTab] = useState<'assignment' | 'submission'>('assignment');
     const [searchText, setSearchText] = useState('');
-    const {data:assignmentData, isLoading,isFetching} = useGetAssignmentQuery({page:page, limit:10,searchTerm:searchText});
-    const {data:submissionData} = useGetAllSubmissionOfAssignmentQuery({page:1, limit:10});
-    const [reviewSubmission]=useGiveMarksOfSubmissionMutation()
+    const [selectedGroup, setSelectedGroup] = useState<string | undefined>(undefined);
+    const {
+        data: assignmentData,
+        isLoading,
+        isFetching,
+        refetch,
+    } = useGetAssignmentQuery({ page: page, limit: 10, searchTerm: searchText, userGroup: selectedGroup });
+    const { data: submissionData } = useGetAllSubmissionOfAssignmentQuery({ page: 1, limit: 10 });
+    const { data: userGroups } = useGetUserGroupsQuery({ page: 1, limit: 100 });
+    const [reviewSubmission] = useGiveMarksOfSubmissionMutation();
     const [file, setFile] = useState<any | null>(null);
 
     // Modal States
@@ -39,53 +52,71 @@ function Assignment() {
 
     // --- Derived State (Search/Filter Logic) ---
 
-    const newData = assignmentData?.data?.map(item=>{
+    const newData = assignmentData?.data?.map((item) => {
         return {
             key: item._id,
             title: item.title,
             targets: item.userGroup,
             description: item.description,
             dueDate: item.dueDate,
-            status: item.published?"Active":"Inactive",
+            status: item.status,
+            published: item.published,
             points: item.totalPoint,
-            type:item.userGroupTrack,
-            attachment:item.attachment
+            type: item.userGroupTrack,
+            attachment: item.attachment,
+        };
+    });
 
-        }
-    })
-
-    const modifiedData = submissionData?.data?.data?.map(item=>{
+    const modifiedData = submissionData?.data?.data?.map((item) => {
         return {
             key: item._id,
-            avatar:item.studentId.profile,
+            avatar: item.studentId.profile,
             name: item.studentId.name,
             email: item.studentId.email,
             assignment: item.assignmentId,
             submissionDate: item.createdAt,
-            attachment:item.fileAssignment,
+            attachment: item.fileAssignment,
             grade: item.marks,
-            review: item.feedback
-        }
-    })
+            review: item.feedback,
+        };
+    });
 
     // --- Logic Handlers ---
 
     const handleCreateEditFinish = async (values: any) => {
-        if (modalMode === 'edit') {
-            console.log(file.file.originFileObj);
-            
-            const formData = new FormData();
-            formData.append('title', values.title);
-            formData.append('description', values.description);
-            formData.append('dueDate', values.dueDate);
-            formData.append('totalPoint', values.points);
-            formData.append('userGroupTrack', values.type);
-            if (file) {
-                formData.append('attachment', file.file.originFileObj);
-            }
+        const formData = new FormData();
 
-            
-            const { error } = await updateAssignment({ id: selectedAssignment?.key, data: formData }).unwrap();
+        formData.append('title', values.title);
+        formData.append('description', values.description);
+        formData.append('dueDate', values.dueDate);
+        formData.append('totalPoint', values.totalPoint);
+        formData.append('published', values.published);
+        formData.append('status', values.status);
+
+        if (values.userGroup) {
+            if (Array.isArray(values.userGroup)) {
+                values.userGroup.forEach((groupId: string) => {
+                    formData.append('userGroup[]', groupId);
+                });
+            } else {
+                formData.append('userGroup[]', values.userGroup);
+            }
+        }
+
+        if (values.userGroupTrack) {
+            formData.append('userGroupTrack', values.userGroupTrack);
+        }
+
+        if (values.attachmentType === 'file') {
+            if (file) {
+                formData.append('attachment', file);
+            }
+        } else if (values.attachmentType === 'url' && values.attachmentUrl) {
+            formData.append('attachment', values.attachmentUrl);
+        }
+
+        if (modalMode === 'edit') {
+            const { error }: any = await updateAssignment({ id: selectedAssignment?.key, data: formData }).unwrap();
             if (!error) {
                 toast.success('Assignment updated successfully');
                 setIsCreateModalOpen(false);
@@ -93,55 +124,36 @@ function Assignment() {
             }
             toast.error(error?.data?.message || 'Failed to update assignment');
         } else {
-
-        const formData = new FormData();
-        
-        
-        if (file.file.originFileObj) {
-            formData.append('attachment', file.file.originFileObj);
-        }
-
-        formData.append('title', values.title);
-        formData.append('description', values.description);
-        if(values.targets){
-            for(let i=0; i<values.targets.length; i++){
-                formData.append('userGroup[]', values.targets[i]);
-            }
-        }
-
-        
-
-
-        formData.append('dueDate', values.dueDate);
-        formData.append('totalPoint', values.points);
-        formData.append('userGroupTrack', values.type);
-
-      const {error} =  await createAssignment(formData).unwrap();
-      if(!error){
-        toast.success('Assignment created successfully');
-        setIsCreateModalOpen(false);
-        return
-      }
-      toast.error(error?.data?.message || 'Failed to create assignment');
-
-
+            toast.promise(createAssignment(formData).unwrap(), {
+                loading: 'Creating assignment...',
+                success: (res: any) => {
+                    if (!res.error) {
+                        setIsCreateModalOpen(false);
+                    }
+                    refetch();
+                    return res.message;
+                },
+                error: (err: any) => {
+                    return err.data.message;
+                },
+            });
         }
     };
 
-
     const handleChangeStatus = async (key: string, status: string) => {
-        const { error }: any = await updateAssignment({ id: key, data: { published: status === 'Active' ? true : false } });
+        const { error }: any = await updateAssignment({
+            id: key,
+            data: { published: status === 'Active' ? true : false },
+        });
         if (!error) {
             toast.success('Assignment updated successfully');
             return;
         }
         toast.error(error?.data?.message || 'Failed to update assignment');
-    }
+    };
 
     const handleDelete = async (key: string) => {
-   
-        
-       const { error }: any = await deleteAssignment({id: key});
+        const { error }: any = await deleteAssignment({ id: key });
         if (!error) {
             toast.success('Assignment deleted successfully');
             return;
@@ -151,8 +163,8 @@ function Assignment() {
 
     const handleReviewFinish = (key: string, grade: string, review: string) => {
         console.log(review);
-        
-        const { error }: any = reviewSubmission({id: key, data: {marks: grade, feedback: review}});
+
+        const { error }: any = reviewSubmission({ id: key, data: { marks: grade, feedback: review } });
         if (!error) {
             toast.success('Review submitted successfully');
             setIsReviewModalOpen(false);
@@ -175,12 +187,19 @@ function Assignment() {
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
                     />
-                    <Button
-                        icon={<FilterOutlined />}
-                        className="h-10 px-4 rounded-lg flex items-center gap-2 text-gray-600 bg-white border-gray-100 shadow-sm"
+                    <Select
+                        placeholder="Filter by Group"
+                        className="w-full md:w-48 h-10 rounded-lg"
+                        allowClear
+                        onChange={setSelectedGroup}
+                        suffixIcon={<FilterOutlined className="text-gray-400" />}
                     >
-                        Filter
-                    </Button>
+                        {userGroups?.data?.map((group: any) => (
+                            <Select.Option key={group._id} value={group._id}>
+                                {group.name}
+                            </Select.Option>
+                        ))}
+                    </Select>
                     <Button
                         type="primary"
                         icon={<PlusOutlined />}
@@ -260,7 +279,7 @@ function Assignment() {
                         />
                     ) : (
                         <SubmissionTable
-                            data={modifiedData||[]}
+                            data={modifiedData || []}
                             onView={(record) => {
                                 setSelectedSubmission(record);
                                 setIsReviewModalOpen(true);

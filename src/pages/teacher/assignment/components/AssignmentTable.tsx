@@ -1,23 +1,38 @@
 import React from 'react';
-import { Table, Tag, Select, Space, Button, Popconfirm } from 'antd';
-import { FilePdfOutlined, FilterOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import FileViewerButton from '../../../../components/shared/FileViewButton';
+import { Table, Tag, Select, Space, Button, Popconfirm, Switch } from 'antd';
+import {
+    FilePdfOutlined,
+    FilterOutlined,
+    EyeOutlined,
+    EditOutlined,
+    DeleteOutlined,
+    DownloadOutlined,
+    LinkOutlined,
+} from '@ant-design/icons';
 import { IPagination } from '../../../../types/teacher/home/class.type';
+import { imageUrl } from '../../../../redux/api/baseApi';
 
 interface AssignmentTableProps {
     data: any[];
     onView: (record: any) => void;
     onEdit: (record: any) => void;
     onDelete: (key: string) => void;
-    isLoading: boolean,
-    pagination:IPagination,
-    setPage:(page:number)=>void
-    handleChangeStatus:(key: string, status: string) => void
+    isLoading: boolean;
+    pagination: IPagination;
+    setPage: (page: number) => void;
+    handleChangeStatus: (key: string, status: string) => void;
 }
 
-const AssignmentTable: React.FC<AssignmentTableProps> = ({ data, onView, onEdit, onDelete,isLoading, pagination,setPage,handleChangeStatus}) => {
-  
-    
+const AssignmentTable: React.FC<AssignmentTableProps> = ({
+    data,
+    onView,
+    onEdit,
+    onDelete,
+    isLoading,
+    pagination,
+    setPage,
+    handleChangeStatus,
+}) => {
     const columns = [
         {
             title: 'TITLE',
@@ -39,15 +54,46 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({ data, onView, onEdit,
             title: 'ATTACHMENT',
             dataIndex: 'attachment',
             key: 'attachment',
-            render: (text: string) => (
-                text ?<FileViewerButton fileUrl={text} fileName="File Preview" /> : <span className="font-medium text-gray-700">No File</span>
-            ),
+            render: (text: any) => {
+                if (!text || typeof text !== 'string') {
+                    return <span className="font-medium text-gray-400 italic">No Attachment</span>;
+                }
+                const isUrl = text.startsWith('http');
+                return (
+                    <div className="flex items-center gap-2">
+                        {isUrl ? (
+                            <Button
+                                icon={<LinkOutlined />}
+                                size="small"
+                                className="flex items-center gap-1 text-blue-500 border-blue-100 bg-blue-50 hover:bg-blue-100"
+                                onClick={() => window.open(text, '_blank')}
+                            >
+                                Open URL
+                            </Button>
+                        ) : (
+                            <Button
+                                icon={<DownloadOutlined />}
+                                size="small"
+                                className="flex items-center gap-1 text-green-500 border-green-100 bg-green-50 hover:bg-green-100"
+                                onClick={() => {
+                                    const fileUrl = text.startsWith('http')
+                                        ? text
+                                        : `${imageUrl}${text.startsWith('/') ? text : `/${text}`}`;
+                                    window.open(fileUrl, '_blank');
+                                }}
+                            >
+                                Download
+                            </Button>
+                        )}
+                    </div>
+                );
+            },
         },
         {
             title: 'TARGET',
             dataIndex: 'targets',
             key: 'targets',
-            render: (targets: {name: string,_id: string}[]) => (
+            render: (targets: { name: string; _id: string }[]) => (
                 <div className="flex flex-col gap-1">
                     {targets?.map((t) => (
                         <Tag
@@ -64,23 +110,37 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({ data, onView, onEdit,
             title: 'DUE DATE',
             dataIndex: 'dueDate',
             key: 'dueDate',
-            render: (date: string) => <span className="font-medium text-gray-700">{new Date(date).toDateString()}</span>,
+            render: (date: string) => (
+                <span className="font-medium text-gray-700">{new Date(date).toDateString()}</span>
+            ),
         },
         {
-            title: 'STATUS',
-            dataIndex: 'status',
-            key: 'status',
-            render: (status: string,record:any) => (
-                <Select
-                    defaultValue={status}
-                    className="w-24 custom-select-green"
-                    bordered={true}
-                    suffixIcon={<FilterOutlined className="text-[10px]" />}
-                    onChange={(v)=>handleChangeStatus(record.key,v)}
-                >
-                    <Select.Option value="Active">Active</Select.Option>
-                    <Select.Option value="Inactive">Inactive</Select.Option>
-                </Select>
+            title: 'VISIBILITY / STATUS',
+            dataIndex: 'published',
+            key: 'published',
+            render: (published: boolean, record: any) => (
+                <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                        <Switch
+                            checked={published}
+                            onChange={(checked) => handleChangeStatus(record.key, checked ? 'Active' : 'Inactive')}
+                            checkedChildren="Active"
+                            unCheckedChildren="Inactive"
+                            className={published ? 'bg-green-500' : 'bg-gray-300'}
+                        />
+                    </div>
+                    <Tag
+                        className={`w-fit rounded-lg text-[10px] px-2 py-0.5 font-bold ${
+                            record.status === 'COMPLETED'
+                                ? 'bg-green-50 text-green-500 border-green-100'
+                                : record.status === 'IN_PROGRESS'
+                                  ? 'bg-blue-50 text-blue-500 border-blue-100'
+                                  : 'bg-yellow-50 text-yellow-500 border-yellow-100'
+                        }`}
+                    >
+                        {record.status}
+                    </Tag>
+                </div>
             ),
         },
         {
@@ -121,7 +181,18 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({ data, onView, onEdit,
     ];
 
     return (
-        <Table loading={isLoading} columns={columns} dataSource={data} pagination={{ pageSize: 10,current:pagination?.page,total:pagination?.total,onChange:(page)=>setPage(page)}} className="custom-dashboard-table" />
+        <Table
+            loading={isLoading}
+            columns={columns}
+            dataSource={data}
+            pagination={{
+                pageSize: 10,
+                current: pagination?.page,
+                total: pagination?.total,
+                onChange: (page) => setPage(page),
+            }}
+            className="custom-dashboard-table"
+        />
     );
 };
 

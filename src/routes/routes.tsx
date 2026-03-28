@@ -118,6 +118,14 @@ const router = createBrowserRouter([
                 ),
             },
             {
+                path: '/admin/assignment',
+                element: (
+                    <PrivateRoute role={['admin', 'super_admin']}>
+                        <Assignment />
+                    </PrivateRoute>
+                ),
+            },
+            {
                 path: '/admin/schedule',
                 element: (
                     <PrivateRoute role={['admin', 'super_admin']}>

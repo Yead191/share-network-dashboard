@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, Select, DatePicker, Upload, Button } from 'antd';
+import { Modal, Form, Input, Select, DatePicker, Upload, Button, Switch, Radio } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useGetUserGroupsQuery, useGetUserGroupsTrackQuery } from '../../../../redux/apiSlices/teacher/resourceSlice';
@@ -21,20 +21,23 @@ const CreateAssignmentModal: React.FC<CreateAssignmentModalProps> = ({
     mode,
     setFile,
 }) => {
-    const {data:userGroups}=useGetUserGroupsQuery({page:1,limit:10});
-    const {data:userGroupsTrack}=useGetUserGroupsTrackQuery({page:1,limit:10});
+    const { data: userGroups } = useGetUserGroupsQuery({ page: 1, limit: 10 });
+    const { data: userGroupsTrack } = useGetUserGroupsTrackQuery({ page: 1, limit: 10 });
     const [form] = Form.useForm();
 
     useEffect(() => {
         if (open) {
             if (mode === 'edit' && initialValues) {
-
-                
+                const isUrl = initialValues.attachment?.startsWith('http');
                 form.setFieldsValue({
                     ...initialValues,
-                    dueDate: initialValues.dueDate ? dayjs(initialValues.dueDate, 'YYYY-MM-DD') : null,
-                    targets: initialValues.targets?.map((t: any) => t._id),
-                    type: initialValues.type._id,
+                    dueDate: initialValues.dueDate ? dayjs(initialValues.dueDate) : null,
+                    userGroup: initialValues.targets?.map((t: any) => t._id),
+                    userGroupTrack: initialValues?.type?._id,
+                    totalPoint: initialValues.points,
+                    published: initialValues.published,
+                    attachmentType: isUrl ? 'url' : 'file',
+                    attachmentUrl: isUrl ? initialValues.attachment : undefined,
                 });
             } else {
                 form.resetFields();
@@ -47,8 +50,8 @@ const CreateAssignmentModal: React.FC<CreateAssignmentModalProps> = ({
             .then((values) => {
                 onFinish({
                     ...values,
-                    dueDate: values.dueDate ? values.dueDate.format('YYYY-MM-DD') : null,
-                    key: mode === 'edit' ? initialValues.key : undefined,
+                    dueDate: values.dueDate ? values.dueDate.format('YYYY-MM-DD HH:mm') : null,
+                    id: mode === 'edit' ? initialValues.key : undefined,
                 });
                 onCancel();
             })
@@ -98,12 +101,34 @@ const CreateAssignmentModal: React.FC<CreateAssignmentModalProps> = ({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Form.Item
-                        label={<span className="font-semibold text-gray-700 text-base">Target Track</span>}
-                        name="type"
-                        rules={[{ required: true, message: 'Please select a type' }]}
+                        label={<span className="font-semibold text-gray-700 text-base">Published</span>}
+                        name="published"
+                        valuePropName="checked"
+                        initialValue={true}
                     >
-                        <Select placeholder="Select" className="h-11 custom-select-full rounded-lg">
-                            {userGroupsTrack?.data?.map((group) => (
+                        <Switch />
+                    </Form.Item>
+                    <Form.Item
+                        label={<span className="font-semibold text-gray-700 text-base">Status</span>}
+                        name="status"
+                        initialValue="PENDING"
+                    >
+                        <Select className="h-11 custom-select-full rounded-lg">
+                            <Select.Option value="PENDING">Pending</Select.Option>
+                            <Select.Option value="IN_PROGRESS">In Progress</Select.Option>
+                            <Select.Option value="COMPLETED">Completed</Select.Option>
+                        </Select>
+                    </Form.Item>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <Form.Item
+                        label={<span className="font-semibold text-gray-700 text-base">Targeted Groups</span>}
+                        name="userGroup"
+                        rules={[{ required: true, message: 'Please select a group' }]}
+                    >
+                        <Select placeholder="Select groups" className="custom-select-full rounded-lg min-h-[44px]">
+                            {userGroups?.data?.map((group: any) => (
                                 <Select.Option key={group._id} value={group._id}>
                                     {group.name}
                                 </Select.Option>
@@ -111,21 +136,32 @@ const CreateAssignmentModal: React.FC<CreateAssignmentModalProps> = ({
                         </Select>
                     </Form.Item>
                     <Form.Item
-                        label={<span className="font-semibold text-gray-700 text-base">Groups</span>}
-                        name="targets"
-                        rules={[{ required: true, message: 'Please select at least one track' }]}
+                        noStyle
+                        shouldUpdate={(prevValues, currentValues) => prevValues.userGroup !== currentValues.userGroup}
                     >
-                        <Select
-                            mode="multiple"
-                            placeholder="Select"
-                            className="custom-select-full rounded-lg min-h-[44px]"
-                        >
-                            {userGroups?.data?.map((group) => (
-                                <Select.Option key={group._id} value={group._id}>
-                                    {group.name}
-                                </Select.Option>
-                            ))}
-                        </Select>
+                        {({ getFieldValue }) => {
+                            const selectedGroupId = getFieldValue('userGroup');
+                            const skillPathGroup = userGroups?.data?.find((g: any) => g.name === 'Skill Path');
+                            const isSkillPathSelected = selectedGroupId === skillPathGroup?._id;
+                            return (
+                                <Form.Item
+                                    label={<span className="font-semibold text-gray-700 text-base">Target Track</span>}
+                                    name="userGroupTrack"
+                                >
+                                    <Select
+                                        placeholder="Select track"
+                                        disabled={!isSkillPathSelected}
+                                        className="h-11 custom-select-full rounded-lg"
+                                    >
+                                        {userGroupsTrack?.data?.map((track: any) => (
+                                            <Select.Option key={track._id} value={track._id}>
+                                                {track.name}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
+                            );
+                        }}
                     </Form.Item>
                 </div>
 
@@ -136,31 +172,83 @@ const CreateAssignmentModal: React.FC<CreateAssignmentModalProps> = ({
                         rules={[{ required: true, message: 'Please select a due date' }]}
                     >
                         <DatePicker
-                            placeholder="YYYY-MM-DD"
+                            placeholder="YYYY-MM-DD HH:mm"
                             className="w-full h-11 rounded-lg bg-gray-50 border-gray-100"
-                            format="YYYY-MM-DD"
+                            format="YYYY-MM-DD HH:mm"
+                            showTime={{ format: 'HH:mm' }}
                         />
                     </Form.Item>
                     <Form.Item
                         label={<span className="font-semibold text-gray-700 text-base">Total Points</span>}
-                        name="points"
-                        initialValue="100"
+                        name="totalPoint"
+                        initialValue={100}
                     >
-                        <Input placeholder="100" className="h-11 rounded-lg bg-gray-50 border-gray-100" />
+                        <Input type="number" placeholder="100" className="h-11 rounded-lg bg-gray-50 border-gray-100" />
                     </Form.Item>
                 </div>
 
-                <Form.Item
-                    label={<span className="font-semibold text-gray-700 text-base">Attachments (PDF/HTML/CSS/JS)</span>}
-                    name="attachments"
-                >
-                    <Upload.Dragger onChange={setFile} className="rounded-xl border-dashed border-2 border-gray-200 bg-gray-50 py-6">
-                        <p className="ant-upload-text text-gray-400 font-medium">Choose files</p>
-                    </Upload.Dragger>
-                    <div className="text-xs text-gray-400 mt-2">
-                        You can select multiple files. Max size - 15 MB per file.
-                    </div>
-                </Form.Item>
+                <div className="mt-4">
+                    <Form.Item
+                        label={<span className="font-semibold text-gray-700 text-base">Attachment Type</span>}
+                        name="attachmentType"
+                        initialValue="file"
+                    >
+                        <Radio.Group className="flex gap-4">
+                            <Radio value="file">File Upload</Radio>
+                            <Radio value="url">Assignment URL</Radio>
+                        </Radio.Group>
+                    </Form.Item>
+
+                    <Form.Item
+                        noStyle
+                        shouldUpdate={(prevValues, currentValues) =>
+                            prevValues.attachmentType !== currentValues.attachmentType
+                        }
+                    >
+                        {({ getFieldValue }) =>
+                            getFieldValue('attachmentType') === 'file' ? (
+                                <Form.Item
+                                    label={<span className="font-semibold text-gray-700 text-base">Upload File</span>}
+                                    name="attachment"
+                                >
+                                    <Upload.Dragger
+                                        maxCount={1}
+                                        beforeUpload={() => false}
+                                        onChange={(info) => {
+                                            if (info.file.status === 'removed') {
+                                                setFile(null);
+                                            } else if (info.fileList.length > 0) {
+                                                setFile(
+                                                    info.fileList[0].originFileObj ||
+                                                        info.file.originFileObj ||
+                                                        info.file,
+                                                );
+                                            }
+                                        }}
+                                        className="rounded-xl border-dashed border-2 border-gray-200 bg-gray-50 py-4"
+                                    >
+                                        <p className="ant-upload-text text-gray-400 font-medium text-sm">
+                                            Choose file (PDF/Images/Docs)
+                                        </p>
+                                    </Upload.Dragger>
+                                </Form.Item>
+                            ) : (
+                                <Form.Item
+                                    label={
+                                        <span className="font-semibold text-gray-700 text-base">Assignment URL</span>
+                                    }
+                                    name="attachmentUrl"
+                                    rules={[{ type: 'url', message: 'Please enter a valid URL' }]}
+                                >
+                                    <Input
+                                        placeholder="https://example.com/assignment"
+                                        className="h-11 rounded-lg bg-gray-50 border-gray-100"
+                                    />
+                                </Form.Item>
+                            )
+                        }
+                    </Form.Item>
+                </div>
 
                 <div className="flex justify-end mt-8">
                     <Button
@@ -168,7 +256,7 @@ const CreateAssignmentModal: React.FC<CreateAssignmentModalProps> = ({
                         className="bg-[#21C35D] hover:bg-[#1da950] h-12 px-10 rounded-xl font-bold text-lg border-none"
                         onClick={handleSubmit}
                     >
-                        {mode === 'edit' ? 'Update Assignment' : 'Create Event'}
+                        {mode === 'edit' ? 'Update Assignment' : 'Create Assignment'}
                     </Button>
                 </div>
             </Form>

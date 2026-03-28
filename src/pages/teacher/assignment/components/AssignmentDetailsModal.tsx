@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Tag, Button } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
+import { imageUrl } from '../../../../redux/api/baseApi';
 
 interface AssignmentDetailsModalProps {
     open: boolean;
@@ -27,12 +28,18 @@ const AssignmentDetailsModal: React.FC<AssignmentDetailsModalProps> = ({ open, o
                             <td className="p-4 font-semibold text-gray-500 w-1/3 text-sm">Title</td>
                             <td className="p-4 text-gray-700 font-medium flex items-center justify-between group">
                                 <span>{assignment.title}</span>
-                                <a
-                                    href="#"
-                                    className="flex items-center gap-1 text-[#3182CE] text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                    <DownloadOutlined /> Download
-                                </a>
+                                {assignment.attachment && (
+                                    <a
+                                        href={assignment.attachment.startsWith('http') 
+                                            ? assignment.attachment 
+                                            : `${imageUrl}${assignment.attachment.startsWith('/') ? assignment.attachment : `/${assignment.attachment}`}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-1 text-[#3182CE] text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        <DownloadOutlined /> {assignment.attachment.startsWith('http') ? 'View URL' : 'Download'}
+                                    </a>
+                                )}
                             </td>
                         </tr>
                         <tr className="border-b border-gray-100">
@@ -70,9 +77,16 @@ const AssignmentDetailsModal: React.FC<AssignmentDetailsModalProps> = ({ open, o
                             <td className="p-4 text-gray-700 font-medium">{new Date(assignment.dueDate).toDateString()}</td>
                         </tr>
                         <tr className="border-b-0">
-                            <td className="p-4 font-semibold text-gray-500 text-sm">Status</td>
-                            <td className="p-4">
-                                <Tag className="bg-green-50 text-green-500 border-none rounded-full px-4 font-medium text-[10px]">
+                            <td className="p-4 font-semibold text-gray-500 text-sm">Status / Visibility</td>
+                            <td className="p-4 flex gap-2">
+                                <Tag className={`rounded-full px-4 font-medium text-[10px] ${assignment.published ? 'bg-blue-50 text-blue-500 border-none' : 'bg-gray-100 text-gray-500 border-none'}`}>
+                                    {assignment.published ? 'PUBLISHED' : 'UNPUBLISHED'}
+                                </Tag>
+                                <Tag className={`rounded-full px-4 font-medium text-[10px] ${
+                                    assignment.status === 'COMPLETED' ? 'bg-green-50 text-green-500 border-none' :
+                                    assignment.status === 'IN_PROGRESS' ? 'bg-blue-50 text-blue-500 border-none' :
+                                    'bg-yellow-50 text-yellow-500 border-none'
+                                }`}>
                                     {assignment.status}
                                 </Tag>
                             </td>
