@@ -1,11 +1,10 @@
-import { Button, Select, Input, Tag, Table, DatePicker, Avatar, Radio } from 'antd';
-import { Info, FileText, Save, Search, User, ClipboardList } from 'lucide-react';
+import { Button, Select, Input, Tag, Table, DatePicker, Avatar } from 'antd';
+import { Info, Save, Search, User } from 'lucide-react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
     useGetAttendanceLogsQuery,
     useGetStudentsQuery,
     useTakeAttendanceMutation,
-    useUpdateIndividualAttendanceMutation,
 } from '../../../../redux/apiSlices/admin/adminStudentApi';
 import { toast } from 'sonner';
 import dayjs from 'dayjs';
@@ -14,12 +13,11 @@ import Spinner from '../../../../components/shared/Spinner';
 import { useGetUserGroupsQuery } from '../../../../redux/apiSlices/teacher/resourceSlice';
 
 const TakeAttendance = () => {
-    const [viewMode, setViewMode] = useState<'take' | 'logs'>('take');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedClass, setSelectedClass] = useState<string | null>(null);
     const [selectedDate, setSelectedDate] = useState<string>(dayjs().format('YYYY-MM-DD'));
     const [attendanceRecords, setAttendanceRecords] = useState<Record<string, { status: string; note: string }>>({});
-    const [logEdits, setLogEdits] = useState<Record<string, { status: string; note: string }>>({});
+    // const [logEdits, setLogEdits] = useState<Record<string, { status: string; note: string }>>({});
 
     const { data: studentsApi, isLoading: studentsLoading } = useGetStudentsQuery({
         page: 0,
@@ -29,7 +27,7 @@ const TakeAttendance = () => {
     });
     const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({});
     const [submitAttendance, { isLoading: isSubmitting }] = useTakeAttendanceMutation();
-    const [updateIndividualAttendance] = useUpdateIndividualAttendanceMutation();
+    // const [updateIndividualAttendance] = useUpdateIndividualAttendanceMutation();
 
     const allStudents = useMemo(() => studentsApi?.data?.data || [], [studentsApi]);
 
@@ -74,28 +72,6 @@ const TakeAttendance = () => {
         setAttendanceRecords(newRecords);
     }, [allStudents, attendanceLogs, studentsLoading, attendanceLogsLoading]);
 
-    // Sync log edits when logs load or change
-    useEffect(() => {
-        if (attendanceLogs.length === 0) {
-            setLogEdits((prev) => (Object.keys(prev).length === 0 ? prev : {}));
-            return;
-        }
-        setLogEdits((prev) => {
-            const updated: Record<string, { status: string; note: string }> = {};
-            let changed = false;
-            attendanceLogs.forEach((log: any) => {
-                const incoming = { status: log.status, note: log.note || '' };
-                const existing = prev[log._id];
-                updated[log._id] = incoming;
-                if (!existing || existing.status !== incoming.status || existing.note !== incoming.note) {
-                    changed = true;
-                }
-            });
-            if (Object.keys(prev).length !== Object.keys(updated).length) changed = true;
-            return changed ? updated : prev;
-        });
-    }, [attendanceLogs]);
-
     // ── Stable handlers ────────────────────────────────────────────────────────
 
     const handleStatusChange = useCallback((studentId: string, status: string) => {
@@ -112,44 +88,44 @@ const TakeAttendance = () => {
         }));
     }, []);
 
-    const handleLogStatusChange = useCallback((logId: string, status: string) => {
-        setLogEdits((prev) => ({
-            ...prev,
-            [logId]: { ...prev[logId], status },
-        }));
-    }, []);
+    // const handleLogStatusChange = useCallback((logId: string, status: string) => {
+    //     setLogEdits((prev) => ({
+    //         ...prev,
+    //         [logId]: { ...prev[logId], status },
+    //     }));
+    // }, []);
 
-    const handleLogNoteChange = useCallback((logId: string, note: string) => {
-        setLogEdits((prev) => ({
-            ...prev,
-            [logId]: { ...prev[logId], note },
-        }));
-    }, []);
+    // const handleLogNoteChange = useCallback((logId: string, note: string) => {
+    //     setLogEdits((prev) => ({
+    //         ...prev,
+    //         [logId]: { ...prev[logId], note },
+    //     }));
+    // }, []);
 
-    const handleUpdateIndividualLog = useCallback(
-        async (logRecord: any) => {
-            const edits = logEdits[logRecord._id];
-            if (!edits) return;
-            const payload = {
-                date: selectedDate,
-                groupId: selectedClass,
-                studentId: logRecord._id,
-                status: edits.status,
-                note: edits.note,
-            };
-            toast.promise(
-                updateIndividualAttendance(payload)
-                    .unwrap()
-                    .then(() => refetch()),
-                {
-                    loading: 'Updating attendance...',
-                    success: 'Attendance updated successfully!',
-                    error: (err: any) => err?.data?.message || 'Failed to update attendance',
-                },
-            );
-        },
-        [logEdits, selectedDate, selectedClass, updateIndividualAttendance, refetch],
-    );
+    // const handleUpdateIndividualLog = useCallback(
+    //     async (logRecord: any) => {
+    //         const edits = logEdits[logRecord._id];
+    //         if (!edits) return;
+    //         const payload = {
+    //             date: selectedDate,
+    //             groupId: selectedClass,
+    //             studentId: logRecord._id,
+    //             status: edits.status,
+    //             note: edits.note,
+    //         };
+    //         toast.promise(
+    //             updateIndividualAttendance(payload)
+    //                 .unwrap()
+    //                 .then(() => refetch()),
+    //             {
+    //                 loading: 'Updating attendance...',
+    //                 success: 'Attendance updated successfully!',
+    //                 error: (err: any) => err?.data?.message || 'Failed to update attendance',
+    //             },
+    //         );
+    //     },
+    //     [logEdits, selectedDate, selectedClass, updateIndividualAttendance, refetch],
+    // );
 
     const setAllStatus = useCallback(
         (status: string) => {
@@ -191,7 +167,7 @@ const TakeAttendance = () => {
         );
     }, [selectedClass, selectedDate, allStudents, attendanceRecords, submitAttendance, refetch]);
 
-    const handleViewModeChange = useCallback((e: any) => setViewMode(e.target.value), []);
+    // const handleViewModeChange = useCallback((e: any) => setViewMode(e.target.value), []);
     const handleSearchChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value),
         [],
@@ -282,84 +258,84 @@ const TakeAttendance = () => {
         [attendanceRecords, handleStatusChange, handleNoteChange],
     );
 
-    const logColumns = useMemo(
-        () => [
-            {
-                title: 'STUDENT',
-                key: 'student',
-                render: (_: any, record: any) => {
-                    const displayName =
-                        record.studentId?.name ||
-                        `${record.studentId?.firstName || ''} ${record.studentId?.lastName || ''}`.trim() ||
-                        'Unknown';
-                    return (
-                        <div className="flex items-center gap-3 py-1">
-                            <Avatar
-                                src={record.studentId?.profile ? `${imageUrl}${record.studentId.profile}` : null}
-                                icon={<User size={16} />}
-                                className="bg-gray-100"
-                            />
-                            <div>
-                                <div className="font-semibold text-gray-700">{displayName}</div>
-                                <div className="text-xs text-gray-400">{record.studentId?.email}</div>
-                            </div>
-                        </div>
-                    );
-                },
-            },
-            {
-                title: 'STATUS',
-                key: 'status',
-                width: 180,
-                render: (_: any, record: any) => (
-                    <Select
-                        value={logEdits[record._id]?.status || record.status}
-                        onChange={(val) => handleLogStatusChange(record._id, val)}
-                        className="w-full h-10"
-                        options={[
-                            { label: 'Present', value: 'present' },
-                            { label: 'Absent', value: 'absent' },
-                            { label: 'Late', value: 'late' },
-                        ]}
-                        style={{ borderRadius: '8px' }}
-                    />
-                ),
-            },
-            {
-                title: 'NOTES',
-                key: 'notes',
-                render: (_: any, record: any) => (
-                    <Input
-                        placeholder="Optional"
-                        value={logEdits[record._id]?.note !== undefined ? logEdits[record._id].note : record.note || ''}
-                        onChange={(e) => handleLogNoteChange(record._id, e.target.value)}
-                        className="h-10 border-gray-100 bg-gray-50/50 rounded-lg"
-                    />
-                ),
-            },
-            {
-                title: 'ACTIONS',
-                key: 'actions',
-                width: 120,
-                render: (_: any, record: any) => {
-                    const isChanged =
-                        logEdits[record._id]?.status !== record.status ||
-                        logEdits[record._id]?.note !== (record.note || '');
-                    return (
-                        <Button
-                            type={isChanged ? 'primary' : 'default'}
-                            disabled={!isChanged}
-                            onClick={() => handleUpdateIndividualLog(record)}
-                            className={`rounded-lg ${isChanged ? 'bg-[#52c41a] border-none text-white hover:bg-[#45a016]' : 'text-gray-400'}`}
-                        >
-                            Update
-                        </Button>
-                    );
-                },
-            },
-        ],
-        [logEdits, handleLogStatusChange, handleLogNoteChange, handleUpdateIndividualLog],
-    );
+    // const logColumns = useMemo(
+    //     () => [
+    //         {
+    //             title: 'STUDENT',
+    //             key: 'student',
+    //             render: (_: any, record: any) => {
+    //                 const displayName =
+    //                     record.studentId?.name ||
+    //                     `${record.studentId?.firstName || ''} ${record.studentId?.lastName || ''}`.trim() ||
+    //                     'Unknown';
+    //                 return (
+    //                     <div className="flex items-center gap-3 py-1">
+    //                         <Avatar
+    //                             src={record.studentId?.profile ? `${imageUrl}${record.studentId.profile}` : null}
+    //                             icon={<User size={16} />}
+    //                             className="bg-gray-100"
+    //                         />
+    //                         <div>
+    //                             <div className="font-semibold text-gray-700">{displayName}</div>
+    //                             <div className="text-xs text-gray-400">{record.studentId?.email}</div>
+    //                         </div>
+    //                     </div>
+    //                 );
+    //             },
+    //         },
+    //         {
+    //             title: 'STATUS',
+    //             key: 'status',
+    //             width: 180,
+    //             render: (_: any, record: any) => (
+    //                 <Select
+    //                     value={logEdits[record._id]?.status || record.status}
+    //                     onChange={(val) => handleLogStatusChange(record._id, val)}
+    //                     className="w-full h-10"
+    //                     options={[
+    //                         { label: 'Present', value: 'present' },
+    //                         { label: 'Absent', value: 'absent' },
+    //                         { label: 'Late', value: 'late' },
+    //                     ]}
+    //                     style={{ borderRadius: '8px' }}
+    //                 />
+    //             ),
+    //         },
+    //         {
+    //             title: 'NOTES',
+    //             key: 'notes',
+    //             render: (_: any, record: any) => (
+    //                 <Input
+    //                     placeholder="Optional"
+    //                     value={logEdits[record._id]?.note !== undefined ? logEdits[record._id].note : record.note || ''}
+    //                     onChange={(e) => handleLogNoteChange(record._id, e.target.value)}
+    //                     className="h-10 border-gray-100 bg-gray-50/50 rounded-lg"
+    //                 />
+    //             ),
+    //         },
+    //         {
+    //             title: 'ACTIONS',
+    //             key: 'actions',
+    //             width: 120,
+    //             render: (_: any, record: any) => {
+    //                 const isChanged =
+    //                     logEdits[record._id]?.status !== record.status ||
+    //                     logEdits[record._id]?.note !== (record.note || '');
+    //                 return (
+    //                     <Button
+    //                         type={isChanged ? 'primary' : 'default'}
+    //                         disabled={!isChanged}
+    //                         onClick={() => handleUpdateIndividualLog(record)}
+    //                         className={`rounded-lg ${isChanged ? 'bg-[#52c41a] border-none text-white hover:bg-[#45a016]' : 'text-gray-400'}`}
+    //                     >
+    //                         Update
+    //                     </Button>
+    //                 );
+    //             },
+    //         },
+    //     ],
+    //     [logEdits, handleLogStatusChange, handleLogNoteChange, handleUpdateIndividualLog],
+    // );
 
     if (attendanceLogsLoading || isUserGroupsLoading) return <Spinner />;
 
@@ -396,33 +372,6 @@ const TakeAttendance = () => {
                         Reset
                     </Button>
                 </div>
-                {/* <div className="flex items-center gap-4">
-                    <Radio.Group
-                        value={viewMode}
-                        onChange={handleViewModeChange}
-                        className="h-11 flex items-center bg-gray-100 p-1 rounded-lg"
-                        buttonStyle="solid"
-                    >
-                        <Radio.Button
-                            value="take"
-                            className={`h-9 px-4 border-none rounded-md ${viewMode === 'take' ? 'bg-white shadow-sm text-primary' : 'bg-transparent text-gray-500'}`}
-                        >
-                            <span className="flex items-center gap-2">
-                                <FileText size={16} />
-                                Take Attendance
-                            </span>
-                        </Radio.Button>
-                        <Radio.Button
-                            value="logs"
-                            className={`h-9 px-4 border-none rounded-md ${viewMode === 'logs' ? 'bg-white shadow-sm text-primary' : 'bg-transparent text-gray-500'}`}
-                        >
-                            <span className="flex items-center gap-2">
-                                <ClipboardList size={16} />
-                                View Logs
-                            </span>
-                        </Radio.Button>
-                    </Radio.Group>
-                </div> */}
             </div>
 
             {/* Info Alert */}
@@ -435,13 +384,12 @@ const TakeAttendance = () => {
                     </div>
                     <p className="text-[#856404] text-[15px] leading-relaxed">
                         Please select a <span className="font-bold">Class</span> and{' '}
-                        <span className="font-bold">Date</span> before{' '}
-                        {viewMode === 'take' ? 'taking attendance' : 'viewing logs'}.
+                        <span className="font-bold">Date</span> before taking attendance
                     </p>
                 </div>
             )}
 
-            {selectedClass && viewMode === 'take' && (
+            {selectedClass && (
                 <>
                     <div className="flex flex-wrap items-center justify-between gap-4 mb-6 animate-fadeIn">
                         <div className="flex items-center gap-3">
@@ -487,39 +435,6 @@ const TakeAttendance = () => {
                         />
                     </div>
                 </>
-            )}
-
-            {selectedClass && viewMode === 'logs' && (
-                <div className="animate-fadeIn">
-                    <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                        <h3 className="text-lg font-bold text-gray-800">
-                            Attendance Logs for {dayjs(selectedDate).format('MMMM D, YYYY')}
-                        </h3>
-                    </div>
-
-                    {attendanceLogs.length > 0 ? (
-                        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-                            <Table
-                                columns={logColumns}
-                                dataSource={attendanceLogs}
-                                pagination={{ pageSize: 10 }}
-                                rowKey="_id"
-                                className="attendance-table"
-                                rowClassName="hover:bg-gray-50/50 transition-colors"
-                            />
-                        </div>
-                    ) : (
-                        <div className="bg-white border border-gray-100 rounded-2xl p-12 text-center shadow-sm">
-                            <div className="mx-auto w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                                <ClipboardList size={24} className="text-gray-400" />
-                            </div>
-                            <h3 className="text-lg font-bold text-gray-800 mb-2">No logs found</h3>
-                            <p className="text-gray-500">
-                                There are no attendance logs saved for the selected class and date.
-                            </p>
-                        </div>
-                    )}
-                </div>
             )}
         </div>
     );
