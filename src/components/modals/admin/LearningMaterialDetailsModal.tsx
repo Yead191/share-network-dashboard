@@ -21,7 +21,7 @@ const LearningMaterialDetailsModal = ({ open, onCancel, data }: LearningMaterial
             styles={{
                 content: {
                     padding: '24px',
-                    borderRadius: '16px',
+                    borderRadius: '18px',
                 },
             }}
         >
