@@ -43,7 +43,7 @@ const TakeAttendance = () => {
         isLoading: attendanceLogsLoading,
         refetch,
     } = useGetAttendanceLogsQuery({
-        classId: selectedClass || '',
+        groupId: selectedClass || '',
         date: selectedDate,
     });
 
@@ -123,7 +123,7 @@ const TakeAttendance = () => {
             if (!edits) return;
             const payload = {
                 date: selectedDate,
-                classId: selectedClass,
+                groupId: selectedClass,
                 studentId: logRecord._id,
                 status: edits.status,
                 note: edits.note,
@@ -163,7 +163,7 @@ const TakeAttendance = () => {
         }
         const payload = {
             date: selectedDate,
-            classId: selectedClass,
+            groupId: selectedClass,
             records: allStudents.map((student: any) => ({
                 studentId: student._id,
                 status: (attendanceRecords[student._id]?.status || 'absent').toLowerCase(),

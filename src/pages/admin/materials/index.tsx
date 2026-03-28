@@ -72,7 +72,11 @@ const AdminLearningMaterials = () => {
                     </div>
                     <div>
                         <p className="font-semibold text-gray-800 text-[13px]">{record.title}</p>
-                        <p className="text-xs text-gray-400">{record.description}</p>
+                        <p className="text-xs text-gray-400">
+                            {record.description?.length > 50
+                                ? `${record.description.slice(0, 50)}...`
+                                : record.description}
+                        </p>
                     </div>
                 </div>
             ),
@@ -212,7 +216,7 @@ const AdminLearningMaterials = () => {
                     pagination={{
                         current: page,
                         pageSize: 10,
-                        total: materialApi?.data?.total,
+                        total: materialApi?.data?.pagination?.total,
                         showSizeChanger: false,
                         onChange: (page) => setPage(page),
                     }}

@@ -107,11 +107,11 @@ const adminStudentApi = api.injectEndpoints({
             }),
         }),
         getAttendanceLogs: build.query({
-            query: ({ classId, date }: { classId: string; date: string }) => ({
+            query: ({ groupId, date }: { groupId: string; date: string }) => ({
                 url: `/student-attendance`,
                 method: 'GET',
                 params: {
-                    classId,
+                    groupId,
                     date,
                 },
             }),

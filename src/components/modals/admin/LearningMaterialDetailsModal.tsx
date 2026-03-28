@@ -15,7 +15,7 @@ const LearningMaterialDetailsModal = ({ open, onCancel, data }: LearningMaterial
             open={open}
             onCancel={onCancel}
             footer={null}
-            width={600}
+            width={800}
             closeIcon={null}
             centered
             styles={{
@@ -47,7 +47,7 @@ const LearningMaterialDetailsModal = ({ open, onCancel, data }: LearningMaterial
                             <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">
                                 Description
                             </td>
-                            <td className="px-5 py-4 text-gray-800 text-[13px] leading-relaxed">
+                            <td className="px-5 py-4 text-gray-800 text-[12px] leading-relaxed">
                                 {data?.description || 'This is for beginners'}
                             </td>
                         </tr>
@@ -75,25 +75,23 @@ const LearningMaterialDetailsModal = ({ open, onCancel, data }: LearningMaterial
                                 {data?.url || 'https://example'}
                             </td>
                         </tr>
-                    <tr>
-                        <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">
-                            PDF
-                        </td>
-                        <td className="px-5 py-4 text-gray-800 text-[13px]">
-                            {data?.pdf ? (
-                                <a
-                                    href={`${imageUrl}${data.pdf}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-500 underline"
-                                >
-                                    View PDF
-                                </a>
-                            ) : (
-                                'No PDF available'
-                            )}
-                        </td>
-                    </tr>
+                        <tr>
+                            <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">PDF</td>
+                            <td className="px-5 py-4 text-gray-800 text-[13px]">
+                                {data?.pdf ? (
+                                    <a
+                                        href={`${imageUrl}${data.pdf}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-500 underline"
+                                    >
+                                        View PDF
+                                    </a>
+                                ) : (
+                                    'No PDF available'
+                                )}
+                            </td>
+                        </tr>
                         <tr>
                             <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">
                                 Target Audience
