@@ -49,21 +49,30 @@ const TakeAttendance = () => {
 
     const attendanceLogs = useMemo(() => attendanceLogsApi?.data?.[0]?.records || [], [attendanceLogsApi]);
 
-    // Initialize attendance records — only adds missing students, never overwrites existing edits
+    // Initialize attendance records when students or logs change
     useEffect(() => {
-        if (allStudents.length === 0) return;
-        setAttendanceRecords((prev) => {
-            let changed = false;
-            const updated = { ...prev };
-            allStudents.forEach((student: any) => {
-                if (!updated[student._id]) {
-                    updated[student._id] = { status: 'absent', note: '' };
-                    changed = true;
-                }
-            });
-            return changed ? updated : prev;
+        if (studentsLoading || attendanceLogsLoading) return;
+
+        const newRecords: Record<string, { status: string; note: string }> = {};
+
+        // 1. Initialize with default 'absent' status for all current students
+        allStudents.forEach((student: any) => {
+            newRecords[student._id] = { status: 'absent', note: '' };
         });
-    }, [allStudents]);
+
+        // 2. Overwrite with existing logs if found for current students
+        attendanceLogs.forEach((log: any) => {
+            const studentId = log.studentId?._id;
+            if (studentId && newRecords[studentId]) {
+                newRecords[studentId] = {
+                    status: log.status || 'absent',
+                    note: log.note || '',
+                };
+            }
+        });
+
+        setAttendanceRecords(newRecords);
+    }, [allStudents, attendanceLogs, studentsLoading, attendanceLogsLoading]);
 
     // Sync log edits when logs load or change
     useEffect(() => {
@@ -387,7 +396,7 @@ const TakeAttendance = () => {
                         Reset
                     </Button>
                 </div>
-                <div className="flex items-center gap-4">
+                {/* <div className="flex items-center gap-4">
                     <Radio.Group
                         value={viewMode}
                         onChange={handleViewModeChange}
@@ -413,7 +422,7 @@ const TakeAttendance = () => {
                             </span>
                         </Radio.Button>
                     </Radio.Group>
-                </div>
+                </div> */}
             </div>
 
             {/* Info Alert */}
