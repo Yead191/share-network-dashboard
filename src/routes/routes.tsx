@@ -44,6 +44,7 @@ import StudentSchedule from '../pages/student/schdule';
 import PrivateRoute from '../provider/PrivateRoutes';
 import HomeRedirect from '../provider/HomeRedirect';
 import AdminCoordinator from '../pages/admin/coordinator';
+import TakeAttendance from '../pages/admin/students/take-attendance/TakeAttendance';
 
 const router = createBrowserRouter([
     {
@@ -195,7 +196,7 @@ const router = createBrowserRouter([
                 path: '/teacher/attendance',
                 element: (
                     <PrivateRoute role="teacher">
-                        <AttendanceTeacher />
+                        <TakeAttendance />
                     </PrivateRoute>
                 ),
             },

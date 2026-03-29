@@ -3,10 +3,33 @@ import { api } from '../../api/baseApi';
 const adminMaterialsApi = api.injectEndpoints({
     endpoints: (build) => ({
         getMaterials: build.query({
-            query: ({ page, limit, searchTerm }: { page: number; limit: number; searchTerm: string }) => ({
-                url: `/learning?page=${page}&limit=${limit}&searchTerm=${searchTerm}`,
-                method: 'GET',
-            }),
+            query: ({
+                page,
+                limit,
+                searchTerm,
+                targeteAudience,
+                targertGroup,
+            }: {
+                page: number;
+                limit: number;
+                searchTerm: string;
+                targeteAudience?: string;
+                targertGroup?: string;
+            }) => {
+                const params = new URLSearchParams({
+                    page: String(page),
+                    limit: String(limit),
+                    searchTerm: searchTerm || '',
+                });
+
+                if (targeteAudience) params.append('targeteAudience', targeteAudience);
+                if (targertGroup) params.append('targertGroup', targertGroup);
+
+                return {
+                    url: `/learning?${params.toString()}`,
+                    method: 'GET',
+                };
+            },
         }),
         addMaterials: build.mutation({
             query: ( data: any ) => { 

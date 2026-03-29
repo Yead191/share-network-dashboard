@@ -116,13 +116,19 @@ function Assignment() {
         }
 
         if (modalMode === 'edit') {
-            const { error }: any = await updateAssignment({ id: selectedAssignment?.key, data: formData }).unwrap();
-            if (!error) {
-                toast.success('Assignment updated successfully');
-                setIsCreateModalOpen(false);
-                return;
-            }
-            toast.error(error?.data?.message || 'Failed to update assignment');
+            toast.promise(updateAssignment({ id: selectedAssignment?.key, data: formData }).unwrap(), {
+                loading: 'Updating assignment...',
+                success: (res: any) => {
+                    refetch();
+                    if (!res.error) {
+                        setIsCreateModalOpen(false);
+                    }
+                    return res.message;
+                },
+                error: (err: any) => {
+                    return err.data.message;
+                },
+            });
         } else {
             toast.promise(createAssignment(formData).unwrap(), {
                 loading: 'Creating assignment...',

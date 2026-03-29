@@ -5,21 +5,24 @@ import { useAddMaterialsMutation, useUpdateMaterialsMutation } from '../../../re
 import { toast } from 'sonner';
 import Dragger from 'antd/es/upload/Dragger';
 import { InboxOutlined } from '@ant-design/icons';
-import { useGetUserGroupsQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
 interface AddLearningMaterialModalProps {
     open: boolean;
     onCancel: () => void;
     refetch: () => void;
     selectedMaterial: any;
+    userGroups: any;
 }
 
-const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }: AddLearningMaterialModalProps) => {
+const AddLearningMaterialModal = ({
+    open,
+    onCancel,
+    refetch,
+    selectedMaterial,
+    userGroups,
+}: AddLearningMaterialModalProps) => {
     const [form] = Form.useForm();
     const [addMaterial, { isLoading }] = useAddMaterialsMutation();
     const [editMaterial, { isLoading: isEditLoading }] = useUpdateMaterialsMutation();
-    const { data: userGroupsApi } = useGetUserGroupsQuery({});
-
-    const userGroups = userGroupsApi?.data;
 
     const [file, setFile] = useState<any | null>(null);
     useEffect(() => {
