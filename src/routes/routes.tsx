@@ -11,7 +11,6 @@ import MentorCoordinatorProfile from '../pages/mentor-coordinator/profile';
 import Mentors from '../pages/mentor-coordinator/mentors';
 import GroupSchedule from '../pages/mentor-coordinator/group-schedule';
 import CoordinatorResources from '../pages/mentor-coordinator/resources';
-import AttendanceTeacher from '../pages/teacher/attendance';
 import TeacherOverview from '../pages/teacher/overview';
 import MyStudent from '../pages/teacher/my-student';
 import ClassSchedule from '../pages/teacher/class-schedule';

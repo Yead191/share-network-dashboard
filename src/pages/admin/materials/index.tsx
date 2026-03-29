@@ -115,7 +115,7 @@ const AdminLearningMaterials = () => {
         },
         {
             title: 'FILE',
-            key: 'file',
+            key: 'pdf',
             render: (_: any, record: any) => {
                 const downloadUrl = record.file ? `${imageUrl}${record.file?.replace('/uploads', '')}` : null;
                 return (
