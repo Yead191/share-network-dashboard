@@ -50,6 +50,7 @@ export interface IStudent {
 export interface IMyStudentsResponse {
   success: boolean;
   message: string;
-  pagination: IPagination;
+  pagination: IPagination; 
+  userGroup:string;
   data: IStudent[];
 }

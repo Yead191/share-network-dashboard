@@ -1,6 +1,6 @@
 import TeacherStats from './components/TeacherStats';
 import UpcomingClasses from './components/UpcomingClasses';
-import PendingReviews from './components/PendingReviews';
+// import PendingReviews from './components/PendingReviews';
 import RecentActivity from './components/RecentActivity';
 
 function TeacherOverview() {
@@ -12,13 +12,14 @@ function TeacherOverview() {
                 <div className="h-full">
                     <UpcomingClasses />
                 </div>
-                <div className="h-full">
-                    <PendingReviews />
+                <div className="h-full bg-white  p-4 rounded-2xl shadow-sm border border-gray-50 ">
+                    {/* <PendingReviews />  */} 
+                        <RecentActivity />
                 </div>
             </div>
 
             <div>
-                <RecentActivity />
+                {/* <RecentActivity />  */}
             </div>
         </div>
     );

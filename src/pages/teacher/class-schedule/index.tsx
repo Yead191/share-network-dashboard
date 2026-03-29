@@ -14,6 +14,7 @@ import {
 } from '../../../redux/apiSlices/teacher/homeSlice';
 import { toast } from 'sonner';
 import Swal from 'sweetalert2';
+import { useGetUserGroupsQuery } from '../../../redux/apiSlices/teacher/resourceSlice';
 
 export interface ClassScheduleItem {
     key: string;
@@ -37,10 +38,12 @@ export interface ClassData {
 const ClassSchedule = () => {
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedGroup, setSelectedGroup] = useState<string | undefined>(undefined);
     const { data, isLoading, isFetching } = useGetTeacherClassesQuery({
         page: page,
         limit: 10,
         searchTerm: searchTerm,
+        userGroup: selectedGroup
     });
     const [addClassTeacher, { isLoading: isAddingClass }] = useAddClassTeacherMutation();
     const [updateClassTeacher, { isLoading: isUpdatingClass }] = useUpdateClassTeacherMutation();
@@ -48,7 +51,7 @@ const ClassSchedule = () => {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [selectedClass, setSelectedClass] = useState<ClassScheduleItem | null>(null);
-
+    const { data: userGroups } = useGetUserGroupsQuery({ page: 1, limit: 100 });
     const modifiedData: ClassScheduleItem[] =
         data?.data.map((item) => ({
             key: item._id,
@@ -267,12 +270,19 @@ const ClassSchedule = () => {
                         onChange={(v) => setSearchTerm(v.target.value)}
                         className="w-72 h-[42px] rounded-lg border-gray-200"
                     />
-                    <Button
-                        icon={<FilterOutlined />}
-                        className="h-[42px] px-6 rounded-lg border-gray-200 flex items-center gap-2 text-gray-600 font-medium"
+                    <Select
+                        placeholder="Filter by Group"
+                        className="w-full md:w-48 h-10 rounded-lg"
+                        allowClear
+                        onChange={setSelectedGroup}
+                        suffixIcon={<FilterOutlined className="text-gray-400" />}
                     >
-                        Filter
-                    </Button>
+                        {userGroups?.data?.map((group: any) => (
+                            <Select.Option key={group._id} value={group._id}>
+                                {group.name}
+                            </Select.Option>
+                        ))}
+                    </Select>
                     <button
                         onClick={handleAdd}
                         className="h-[42px] bg-[#22C55E] text-white text-sm border-none px-6 rounded-lg font-medium"

@@ -39,4 +39,5 @@ export interface IResourcesResponse {
   success: boolean;
   message: string;
   data: ResourcesData;
+  targertGroup: string;
 }

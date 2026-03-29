@@ -20,13 +20,13 @@ export const teacherStatsData = [
         iconType: 'book',
         bgColor: 'bg-purple-50',
     },
-    {
-        id: 4,
-        title: 'Progress',
-        count: '2%',
-        iconType: 'chart',
-        bgColor: 'bg-red-50',
-    },
+    // {
+    //     id: 4,
+    //     title: 'Progress',
+    //     count: '2%',
+    //     iconType: 'chart',
+    //     bgColor: 'bg-red-50',
+    // },
 ];
 
 export const upcomingClassesData = [

@@ -3,9 +3,6 @@ import { teacherStatsData } from '../../../../constants/teacher-data';
 import { useGetOverViewTeacherQuery } from '../../../../redux/apiSlices/teacher/homeSlice';
 ;
 
-
-
-
 const iconMap: Record<string, React.ReactNode> = {
     users: <FaUsers className="text-blue-500 text-2xl" />,
     calendar: <FaCalendarAlt className="text-orange-500 text-2xl" />,
@@ -30,8 +27,8 @@ const TeacherStats = () => {
   // 🔹 Skeleton UI
   if (isLoading || isFetching) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        {[...Array(4)].map((_, index) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        {[...Array(3)].map((_, index) => (
           <div
             key={index}
             className="bg-white p-4 rounded-xl shadow-sm border border-gray-50 flex items-center space-x-4 animate-pulse"
@@ -48,7 +45,7 @@ const TeacherStats = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
       {newData.map((stat) => (
         <div
           key={stat.id}

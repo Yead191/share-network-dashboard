@@ -23,7 +23,7 @@ const RecentActivity = () => {
         })) || [];
 
     return (
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-50 mt-4">
+        <div className="">
             <h2 className="text-lg font-semibold text-gray-600 mb-2 font-heading">Recent Activity</h2>
             <div className="space-y-2">
                 {isLoading || isFetching
@@ -41,7 +41,7 @@ const RecentActivity = () => {
                               <div className="flex-1 flex justify-between items-center">
                                   <div>
                                       <h3 className="font-medium text-gray-800 text-sm">{activity.title}</h3>
-                                      <p className="text-gray-400 text-xs mt-0.5">{activity.subTitle}</p>
+                                      <p className="text-gray-400 text-xs mt-0.5">{activity.subTitle.split('.')[0]}..</p>
                                   </div>
                                   <div>
                                       <p className="text-gray-400 text-xs mt-0.5">
