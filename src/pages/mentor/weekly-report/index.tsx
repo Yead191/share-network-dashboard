@@ -19,10 +19,10 @@ const WeeklyReport = () => {
     const [selectedReport, setSelectedReport] = useState<any>(null);
     const { data: profileData } = useProfileQuery(undefined);
     const assignedStudent = profileData?.data?.assignedStudents;
-    const { data, refetch } = useGetWeeklyReportsQuery({ id: profileData?.data?._id }, { skip: !profileData?.data?._id });
+    const { data, refetch } = useGetWeeklyReportsQuery({ id: profileData?.data?._id });
     const weeklyReportsData = data?.data?.reports || [];
     const [deleteReport] = useDeleteWeeklyReportMutation();
-    console.log("SDASD", data);
+    console.log('SDASD', data);
 
     const handleDelete = async (id: string) => {
         try {
@@ -177,6 +177,7 @@ const WeeklyReport = () => {
                 data={selectedReport}
                 assignedStudent={assignedStudent}
                 refetch={refetch}
+                isMentor={true}
             />
         </section>
     );

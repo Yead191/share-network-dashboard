@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Modal, Form, Select, DatePicker, Checkbox, Input, Slider, Radio } from 'antd';
+import { Modal, Form, DatePicker, Checkbox, Input, Slider, Radio, Select } from 'antd';
 import { useUpdateWeeklyReportMutation } from '../../../redux/apiSlices/mentor/weeklyReportApi';
 import { toast } from 'sonner';
 import dayjs from 'dayjs';
@@ -10,9 +10,17 @@ interface EditReportModalProps {
     data: any;
     assignedStudent: any;
     refetch: () => void;
+    isMentor?: boolean;
 }
 
-const EditReportModal = ({ open, onCancel, data, assignedStudent, refetch }: EditReportModalProps) => {
+const EditReportModal = ({
+    open,
+    onCancel,
+    data,
+    assignedStudent,
+    refetch,
+    isMentor = false,
+}: EditReportModalProps) => {
     const [updateWeeklyReport] = useUpdateWeeklyReportMutation();
     const [form] = Form.useForm();
 
@@ -81,7 +89,22 @@ const EditReportModal = ({ open, onCancel, data, assignedStudent, refetch }: Edi
         >
             <Form form={form} layout="vertical" onFinish={onFinish} className="space-y-4">
                 <Form.Item name="studentName" label={<span className="font-semibold">Student</span>}>
-                    <Input placeholder="Student Name" disabled />
+                    {!isMentor ? (
+                        <Input placeholder="Student Name" disabled />
+                    ) : (
+                        <Select
+                            showSearch
+                            placeholder="Select student"
+                            optionFilterProp="children"
+                            className="w-full h-11 rounded-md"
+                            variant="filled"
+                            style={{ backgroundColor: '#f9f9f9' }}
+                            options={assignedStudent?.map((s: any) => ({
+                                value: s._id,
+                                label: `${s.firstName} ${s.lastName}`,
+                            }))}
+                        />
+                    )}
                 </Form.Item>
 
                 <div className="grid grid-cols-2 gap-4">
