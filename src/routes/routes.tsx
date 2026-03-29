@@ -11,7 +11,6 @@ import MentorCoordinatorProfile from '../pages/mentor-coordinator/profile';
 import Mentors from '../pages/mentor-coordinator/mentors';
 import GroupSchedule from '../pages/mentor-coordinator/group-schedule';
 import CoordinatorResources from '../pages/mentor-coordinator/resources';
-import AttendanceTeacher from '../pages/teacher/attendance';
 import TeacherOverview from '../pages/teacher/overview';
 import MyStudent from '../pages/teacher/my-student';
 import ClassSchedule from '../pages/teacher/class-schedule';
@@ -44,6 +43,7 @@ import StudentSchedule from '../pages/student/schdule';
 import PrivateRoute from '../provider/PrivateRoutes';
 import HomeRedirect from '../provider/HomeRedirect';
 import AdminCoordinator from '../pages/admin/coordinator';
+import TakeAttendance from '../pages/admin/students/take-attendance/TakeAttendance';
 
 const router = createBrowserRouter([
     {
@@ -195,7 +195,7 @@ const router = createBrowserRouter([
                 path: '/teacher/attendance',
                 element: (
                     <PrivateRoute role="teacher">
-                        <AttendanceTeacher />
+                        <TakeAttendance />
                     </PrivateRoute>
                 ),
             },

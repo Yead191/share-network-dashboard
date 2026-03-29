@@ -5,21 +5,24 @@ import { useAddMaterialsMutation, useUpdateMaterialsMutation } from '../../../re
 import { toast } from 'sonner';
 import Dragger from 'antd/es/upload/Dragger';
 import { InboxOutlined } from '@ant-design/icons';
-import { useGetUserGroupsQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
 interface AddLearningMaterialModalProps {
     open: boolean;
     onCancel: () => void;
     refetch: () => void;
     selectedMaterial: any;
+    userGroups: any;
 }
 
-const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }: AddLearningMaterialModalProps) => {
+const AddLearningMaterialModal = ({
+    open,
+    onCancel,
+    refetch,
+    selectedMaterial,
+    userGroups,
+}: AddLearningMaterialModalProps) => {
     const [form] = Form.useForm();
     const [addMaterial, { isLoading }] = useAddMaterialsMutation();
     const [editMaterial, { isLoading: isEditLoading }] = useUpdateMaterialsMutation();
-    const { data: userGroupsApi } = useGetUserGroupsQuery({});
-
-    const userGroups = userGroupsApi?.data;
 
     const [file, setFile] = useState<any | null>(null);
     useEffect(() => {
@@ -30,31 +33,39 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
                 type: selectedMaterial?.type,
                 pdf: selectedMaterial?.pdf,
                 contentUrl: selectedMaterial?.url,
-                targetAudience: selectedMaterial?.targetAudience,
+                targeteAudience: selectedMaterial?.targetAudience, // Corrected to match backend
                 targertGroup: selectedMaterial?.target?._id || selectedMaterial?.target,
                 markAsAssigned: selectedMaterial?.status === 'Active',
             });
         } else if (open && !selectedMaterial) {
             form.resetFields();
+            setFile(null); // Clear file on new material
         }
     }, [open, selectedMaterial, form]);
 
     const onFinish = async (values: Record<string, any>) => {
         try {
-            const finalData = {
-                ...values,
-                markAsAssigned: !!values.markAsAssigned,
-            };
             const formdata = new FormData();
-            for (const key in finalData) {
-                formdata.append(key, String(finalData[key as keyof typeof finalData]));
-            }
+            
+            // Append all fields except 'pdf' (old path) and handle undefined/null correctly
+            Object.entries(values).forEach(([key, value]) => {
+                if (key !== 'pdf' && key !== 'file' && value !== undefined && value !== null) {
+                    if (key === 'markAsAssigned') {
+                        formdata.append(key, String(!!value));
+                    } else {
+                        formdata.append(key, String(value));
+                    }
+                }
+            });
+
             if (file) {
-                formdata.append('file', file.file.originFileObj);
+                formdata.append('file', file);
             }
+
             const mutation = selectedMaterial?._id
                 ? editMaterial({ id: selectedMaterial._id, data: formdata }).unwrap()
                 : addMaterial(formdata).unwrap();
+
             toast.promise(mutation, {
                 loading: selectedMaterial?._id ? 'Updating material...' : 'Creating material...',
                 success: (res: any) => {
@@ -154,7 +165,17 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
                             className="border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:border-indigo-400 transition-colors"
                             height={180}
                             accept=".pdf"
-                            onChange={(v) => setFile(v)}
+                            beforeUpload={(file) => {
+                                const isLt10M = file.size / 1024 / 1024 < 10;
+                                if (!isLt10M) {
+                                    toast.error('File must be smaller than 10MB!');
+                                    return false;
+                                }
+                                setFile(file); // Set raw file directamente
+                                return false; // Stop automatic upload
+                            }}
+                            onRemove={() => setFile(null)}
+                            maxCount={1}
                         >
                             <div className="flex flex-col items-center justify-center py-5 px-4 text-center">
                                 <InboxOutlined className="text-5xl text-indigo-500 mb-4" />
@@ -167,7 +188,7 @@ const AddLearningMaterialModal = ({ open, onCancel, refetch, selectedMaterial }:
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Form.Item
-                        name="targetAudience"
+                        name="targeteAudience" // Corrected to match backend
                         label={<span className="text-sm font-semibold text-gray-700">Target Audience</span>}
                     >
                         <Select placeholder="Select" className="w-full h-11">

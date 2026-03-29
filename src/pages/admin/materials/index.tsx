@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Table, Button, Input, Modal, message } from 'antd';
-import { Search, Filter, Plus, Eye, Edit, Trash2, FileText, BookOpen } from 'lucide-react';
+import { Table, Button, Input, Modal, message, Popover, Select } from 'antd';
+import { Search, Filter, Plus, Eye, Edit, Trash2, BookOpen, ExternalLink, Download } from 'lucide-react';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
 import AddLearningMaterialModal from '../../../components/modals/admin/AddLearningMaterialModal';
 import LearningMaterialDetailsModal from '../../../components/modals/admin/LearningMaterialDetailsModal';
@@ -8,7 +8,8 @@ import { toast } from 'sonner';
 import { useGetMaterialsQuery } from '../../../redux/apiSlices/admin/adminMaterialsApi';
 import { useDeleteMaterialsMutation } from '../../../redux/apiSlices/mentor/learningApi';
 import moment from 'moment';
-import FileViewerButton from '../../../components/shared/FileViewButton';
+import { imageUrl } from '../../../redux/api/baseApi';
+import { useGetUserGroupsQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
 
 const AdminLearningMaterials = () => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -16,9 +17,19 @@ const AdminLearningMaterials = () => {
     const [selectedMaterial, setSelectedMaterial] = useState<any>(null);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+    const [filterAudience, setFilterAudience] = useState<string | undefined>(undefined);
+    const [filterGroup, setFilterGroup] = useState<string | undefined>(undefined);
     // API CALLS
-    const { data: materialApi, refetch } = useGetMaterialsQuery({ page: page, limit: 10, searchTerm: searchTerm });
+    const { data: materialApi, refetch } = useGetMaterialsQuery({
+        page: page,
+        limit: 10,
+        searchTerm: searchTerm,
+        targeteAudience: filterAudience,
+        targertGroup: filterGroup,
+    });
+    const { data: userGroupsApi } = useGetUserGroupsQuery({});
     const [deleteMaterials] = useDeleteMaterialsMutation();
+    const userGroups = userGroupsApi?.data;
 
     const materialsData = materialApi?.data?.resources?.map((item: any) => ({
         _id: item?._id,
@@ -82,42 +93,60 @@ const AdminLearningMaterials = () => {
             ),
         },
         {
-            title: 'TYPE',
-            key: 'type',
+            title: 'CONTENT URL',
+            key: 'url',
             render: (_: any, record: any) => (
                 <div>
-                    {record.type === 'PDF' ? (
-                        <a
+                    {record.url ? (
+                        <Button
                             href={record.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-green-50 w-8 h-8 rounded flex items-center justify-center text-green-500 shadow-sm border border-green-100"
+                            icon={<ExternalLink size={14} />}
+                            className="flex items-center gap-1.5 text-xs text-blue-600 hover:!text-blue-700 border-blue-100 bg-blue-50 px-3 py-1.5 h-auto font-medium shadow-none"
                         >
-                            <FileText size={18} />
-                        </a>
+                            Open URL
+                        </Button>
                     ) : (
-                        <a
-                            href={record.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-gray-400 text-xs flex items-center gap-1.5 hover:text-blue-500 transition-colors"
-                        >
-                            {record.url}
-                        </a>
+                        <span className="text-gray-400 text-xs">No URL</span>
                     )}
                 </div>
             ),
         },
         {
             title: 'FILE',
-            key: 'file',
-            render: (_: any, record: any) => (
-                <div>
-                    {record.file ? (
-                        <FileViewerButton fileUrl={record.file} fileName={record.title} />
-                    ) : (
-                        <span className="font-medium text-gray-700">No File</span>
-                    )}
+            key: 'pdf',
+            render: (_: any, record: any) => {
+                const downloadUrl = record.file ? `${imageUrl}${record.file?.replace('/uploads', '')}` : null;
+                return (
+                    <div>
+                        {downloadUrl ? (
+                            <Button
+                                href={downloadUrl}
+                                download
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                icon={<Download size={14} />}
+                                className="flex items-center gap-1.5 text-xs text-green-600 hover:!text-green-700 border-green-100 bg-green-50 px-3 py-1.5 h-auto font-medium shadow-none"
+                            >
+                                Download
+                            </Button>
+                        ) : (
+                            <span className="font-medium text-gray-700">No File</span>
+                        )}
+                    </div>
+                );
+            },
+        },
+        {
+            title: 'AUDIENCE',
+            dataIndex: 'targetAudience',
+            key: 'targetAudience',
+            render: (text: string) => (
+                <div className="flex gap-2">
+                    <span className="px-3 py-1 bg-blue-50 text-blue-500 text-[10px] rounded-full border border-blue-100 uppercase tracking-tight font-medium">
+                        {text || 'N/A'}
+                    </span>
                 </div>
             ),
         },
@@ -194,12 +223,74 @@ const AdminLearningMaterials = () => {
                             className="h-10 pl-10 bg-white border border-gray-200 shadow-sm w-72 rounded-lg"
                         />
                     </div>
-                    <Button
-                        icon={<Filter className="w-4 h-4" />}
-                        className="h-10 px-6 border-gray-200 text-gray-600 font-semibold flex items-center gap-2 rounded-lg shadow-sm"
+                    <Popover
+                        content={
+                            <div className="w-64 space-y-4 p-2">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                        Target Audience
+                                    </label>
+                                    <Select
+                                        placeholder="Select Audience"
+                                        className="w-full h-10"
+                                        value={filterAudience}
+                                        onChange={(v) => setFilterAudience(v)}
+                                        allowClear
+                                        options={[
+                                            { value: 'STUDENT', label: 'STUDENT' },
+                                            { value: 'MENTOR', label: 'MENTOR' },
+                                            { value: 'TEACHER', label: 'TEACHER' },
+                                            { value: 'COORDINATOR', label: 'COORDINATOR' },
+                                        ]}
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                        Target Group
+                                    </label>
+                                    <Select
+                                        placeholder="Select Group"
+                                        className="w-full h-10"
+                                        value={filterGroup}
+                                        onChange={(v) => setFilterGroup(v)}
+                                        allowClear
+                                        options={userGroups?.map((group: any) => ({
+                                            value: group._id,
+                                            label: group.name,
+                                        }))}
+                                    />
+                                </div>
+                                <div className="pt-2 flex justify-between gap-3">
+                                    <Button
+                                        className="flex-1 h-9 rounded-lg text-xs font-medium border-gray-200"
+                                        onClick={() => {
+                                            setFilterAudience(undefined);
+                                            setFilterGroup(undefined);
+                                        }}
+                                    >
+                                        Reset
+                                    </Button>
+                                </div>
+                            </div>
+                        }
+                        title={
+                            <div className="px-2 py-1.5 border-b border-gray-100 mb-2">
+                                <span className="font-bold text-gray-800">Filter Materials</span>
+                            </div>
+                        }
+                        trigger="click"
+                        placement="bottomRight"
+                        overlayClassName="filter-popover"
                     >
-                        Filter
-                    </Button>
+                        <Button
+                            icon={<Filter className="w-4 h-4" />}
+                            className={`h-10 px-6 border-gray-200 text-gray-600 font-semibold flex items-center gap-2 rounded-lg shadow-sm transition-all ${
+                                filterAudience || filterGroup ? 'bg-blue-50 border-blue-200 text-blue-600' : ''
+                            }`}
+                        >
+                            Filter
+                        </Button>
+                    </Popover>
                     <Button
                         icon={<Plus className="w-4 h-4" />}
                         className="h-10 px-6 bg-[#22C55E] text-white hover:!bg-[#1ea34d] border-none font-semibold flex items-center gap-2 rounded-lg shadow-sm"
@@ -233,6 +324,7 @@ const AdminLearningMaterials = () => {
                 }}
                 selectedMaterial={selectedMaterial}
                 refetch={refetch}
+                userGroups={userGroups}
             />
 
             <LearningMaterialDetailsModal

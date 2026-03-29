@@ -72,11 +72,7 @@ const CreateAssignmentModal: React.FC<CreateAssignmentModalProps> = ({
             footer={null}
             width={700}
             centered
-            closeIcon={
-                <div className="bg-gray-100 p-1.5 rounded-full hover:bg-gray-200 transition-colors">
-                    <PlusOutlined className="rotate-45" />
-                </div>
-            }
+            closeIcon={<PlusOutlined className="rotate-45" />}
         >
             <Form form={form} layout="vertical" className="mt-6">
                 <Form.Item
@@ -127,7 +123,11 @@ const CreateAssignmentModal: React.FC<CreateAssignmentModalProps> = ({
                         name="userGroup"
                         rules={[{ required: true, message: 'Please select a group' }]}
                     >
-                        <Select placeholder="Select groups" className="custom-select-full rounded-lg min-h-[44px]">
+                        <Select
+                            mode="multiple"
+                            placeholder="Select groups"
+                            className="custom-select-full rounded-lg !h-[44px]"
+                        >
                             {userGroups?.data?.map((group: any) => (
                                 <Select.Option key={group._id} value={group._id}>
                                     {group.name}
