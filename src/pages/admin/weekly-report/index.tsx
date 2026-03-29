@@ -1,29 +1,61 @@
 import { useState } from 'react';
-import { Table, Button, Input } from 'antd';
-import { Eye, Search, Filter } from 'lucide-react';
+import { Table, Button, Input, Popconfirm } from 'antd';
+import { Eye, Search, Edit, Trash2 } from 'lucide-react';
 import WeeklyReportDetailsModal from '../../../components/modals/admin/WeeklyReportDetailsModal';
+import EditReportModal from '../../../components/modals/mentor/EditReportModal';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
-import { useGetWeeklyReportQuery } from '../../../redux/apiSlices/admin/adminWeeklyReport';
+import {
+    useGetWeeklyReportQuery,
+    useDeleteWeeklyReportMutation,
+} from '../../../redux/apiSlices/admin/adminWeeklyReport';
+import { useGetStudentsQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
 import moment from 'moment';
+import Spinner from '../../../components/shared/Spinner';
+import { toast } from 'sonner';
 
 const AdminWeeklyReport = () => {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedReport, setSelectedReport] = useState<any>(null);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+
     // API CALLS
-    const { data: weeklyReportApi } = useGetWeeklyReportQuery({ page: page, limit: 10, searchTerm: searchTerm });
+    const {
+        data: weeklyReportApi,
+        isLoading,
+        refetch,
+    } = useGetWeeklyReportQuery({ page: page, limit: 10, searchTerm: searchTerm });
+
+    const [deleteReport] = useDeleteWeeklyReportMutation();
+    const { data: studentsApi } = useGetStudentsQuery({ page: 1, limit: 1000 });
+    const allStudents = studentsApi?.data?.students || [];
+
+    const handleDelete = async (id: string) => {
+        try {
+            toast.promise(deleteReport({ id }).unwrap(), {
+                loading: 'Deleting report...',
+                success: (res) => {
+                    refetch();
+                    return res.message || 'Report deleted successfully';
+                },
+                error: (err) => {
+                    return err?.data?.message || 'Failed to delete report';
+                },
+            });
+        } catch (error) {
+            console.error('Failed to delete report', error);
+        }
+    };
 
     const reportsData = weeklyReportApi?.data?.reports?.map((item: any) => ({
+        ...item,
         key: item?._id,
-        studentName: `${item?.studentId?.firstName} ${item?.studentId?.lastName}`,
-        duration: `${moment(item?.weekStartDate).format('DD/MM/YYYY')} - ${moment(item?.weekEndDate).format('DD/MM/YYYY')}`,
-        attendance: `${item?.isPresent ? 'Present' : 'Absent'}`,
-        hardOutcomes: item?.achievedHardOutcomes?.length,
-        improvements: item?.softSkillImprovements?.length,
-        skillsTracked: item?.studentId?.userGroup?.length,
-        goalSheet: item?.goalSheet,
-        comments: item?.comments,
+        studentName: `${item?.studentId?.firstName || 'N/A'} ${item?.studentId?.lastName || ''}`,
+        attendance: item?.isPresent ? 'Present' : 'Absent',
+        hardOutcomesCount: item?.achievedHardOutcomes?.length || 0,
+        improvementsCount: item?.softSkillImprovements?.length || 0,
+        summaryDuration: `${moment(item?.weekStartDate).format('DD/MM/YYYY')} - ${moment(item?.weekEndDate).format('DD/MM/YYYY')}`,
     }));
 
     const columns = [
@@ -35,7 +67,7 @@ const AdminWeeklyReport = () => {
         },
         {
             title: 'Duration',
-            dataIndex: 'duration',
+            dataIndex: 'summaryDuration',
             key: 'duration',
             render: (text: string) => <span className="text-[#666]">{text}</span>,
         },
@@ -47,43 +79,70 @@ const AdminWeeklyReport = () => {
         },
         {
             title: 'Hard Outcomes',
-            dataIndex: 'hardOutcomes',
+            dataIndex: 'hardOutcomesCount',
             key: 'hardOutcomes',
             align: 'center' as const,
             render: (val: number) => <span className="text-[#666] font-semibold">{val}</span>,
         },
         {
             title: 'Improvements',
-            dataIndex: 'improvements',
+            dataIndex: 'improvementsCount',
             key: 'improvements',
             align: 'center' as const,
             render: (val: number) => <span className="text-[#666] font-semibold">{val}</span>,
         },
         {
             title: 'Skills Tracked',
-            dataIndex: 'skillsTracked',
             key: 'skillsTracked',
             align: 'center' as const,
-            render: (val: number) => <span className="text-[#666] font-semibold">{val}</span>,
+            render: (_: any, record: any) => (
+                <span className="text-[#666] font-semibold">
+                    {record.goalSheet?.skillName || 'N/A'}
+                </span>
+            ),
         },
         {
             title: 'Action',
             key: 'action',
             render: (_: any, record: any) => (
-                <Button
-                    icon={<Eye className="w-4 h-4 mr-1 text-[#666]" />}
-                    onClick={() => {
-                        setSelectedReport(record);
-                        setIsDetailsModalOpen(true);
-                    }}
-                    className="flex items-center text-[#666] border-[#d9d9d9] hover:text-[#4ADE80] hover:border-[#4ADE80] transition-colors h-9 px-4 rounded-lg bg-white shadow-sm"
-                >
-                    View
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button
+                        icon={<Eye className="w-4 h-4 text-[#666]" />}
+                        onClick={() => {
+                            setSelectedReport(record);
+                            setIsDetailsModalOpen(true);
+                        }}
+                        className="flex items-center justify-center text-gray-400 border-gray-200 hover:text-primary hover:border-primary transition-colors h-9 w-9 rounded-lg"
+                    />
+                    <Button
+                        icon={<Edit className="w-4 h-4 text-[#666]" />}
+                        onClick={() => {
+                            setSelectedReport(record);
+                            setIsEditModalOpen(true);
+                        }}
+                        className="flex items-center justify-center text-gray-400 border-gray-200 hover:text-blue-500 hover:border-blue-500 transition-colors h-9 w-9 rounded-lg"
+                    />
+                    <Popconfirm
+                        title="Delete the report"
+                        description="Are you sure to delete this report?"
+                        onConfirm={() => handleDelete(record.key)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button
+                            icon={<Trash2 className="w-4 h-4" />}
+                            danger
+                            className="flex items-center justify-center h-9 w-9 rounded-lg"
+                        />
+                    </Popconfirm>
+                </div>
             ),
         },
     ];
 
+    if (isLoading) {
+        return <Spinner />;
+    }
     return (
         <section className="space-y-6">
             <div className="flex justify-between items-center">
@@ -92,18 +151,12 @@ const AdminWeeklyReport = () => {
                     <div className="relative flex-1 md:w-64">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
                         <Input
-                            placeholder="Search materials"
+                            placeholder="Search reports..."
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="h-11 pl-10 border-none shadow-none"
                             style={{ backgroundColor: '#fff' }}
                         />
                     </div>
-                    <Button
-                        icon={<Filter className="w-4 h-4 text-[#4ADE80]" />}
-                        className="h-11 px-6 border-[#4ADE80] text-[#4ADE80] font-medium flex items-center gap-2 rounded-lg"
-                    >
-                        Filter
-                    </Button>
                 </div>
             </div>
 
@@ -127,6 +180,14 @@ const AdminWeeklyReport = () => {
                 open={isDetailsModalOpen}
                 onCancel={() => setIsDetailsModalOpen(false)}
                 data={selectedReport}
+            />
+
+            <EditReportModal
+                open={isEditModalOpen}
+                onCancel={() => setIsEditModalOpen(false)}
+                data={selectedReport}
+                assignedStudent={allStudents}
+                refetch={refetch}
             />
         </section>
     );

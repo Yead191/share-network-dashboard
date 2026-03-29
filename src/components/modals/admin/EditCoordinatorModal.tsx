@@ -10,6 +10,8 @@ interface EditCoordinatorModalProps {
     refetch: () => void;
     coordinator: any | null;
     mentors: any[] | null;
+    userGroups: any[] | null;
+    isUserGroupsLoading: boolean;
 }
 
 const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
@@ -18,6 +20,8 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
     refetch,
     coordinator,
     mentors,
+    userGroups,
+    isUserGroupsLoading,
 }) => {
     const [form] = Form.useForm();
     const [updateCoordinator, { isLoading }] = useUpdateCoordinatorMutation();
@@ -32,6 +36,7 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
                 gender: coordinator.gender,
                 status: coordinator.status,
                 assignedMentors: coordinator.assignedMentors?.map((m: any) => m._id) || [],
+                userGroup: coordinator.userGroup?.map((g: any) => g._id) || [],
             });
         }
     }, [open, coordinator, form]);
@@ -76,6 +81,7 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
             closeIcon={null}
             width={600}
             className="custom-modal"
+            centered
         >
             <Form form={form} layout="vertical" onFinish={handleSubmit} className="mt-6">
                 <div className="grid grid-cols-2 gap-4">
@@ -127,7 +133,25 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
                         </Select>
                     </Form.Item>
                 </div>
-
+                <Form.Item
+                    label={<span className="font-bold text-gray-700">Select Group</span>}
+                    name="userGroup"
+                    rules={[{ required: false, message: 'Please select at least one group' }]}
+                >
+                    <Select
+                        placeholder="Choose groups"
+                        className="h-11 rounded-md"
+                        variant="filled"
+                        mode="multiple"
+                        style={{ backgroundColor: '#f9f9f9' }}
+                        loading={isUserGroupsLoading}
+                        options={userGroups?.map((g: any) => ({
+                            label: g.name,
+                            value: g._id,
+                        }))}
+                        allowClear
+                    />
+                </Form.Item>
                 <div className="w-full">
                     <Form.Item name="assignedMentors" label="Assign Mentors">
                         <Select

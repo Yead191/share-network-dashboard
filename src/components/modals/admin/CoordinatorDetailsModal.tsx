@@ -152,6 +152,32 @@ const CoordinatorDetailsModal: React.FC<CoordinatorDetailsModalProps> = ({ open,
                     </div>
                 )}
             </div>
+
+            <Divider className="my-6" />
+
+            {/* Assigned Groups Section */}
+            <div>
+                <h3 className="text-sm font-semibold text-gray-800 uppercase tracking-wider mb-4">
+                    Assigned Groups ({coordinator.userGroup?.length || 0})
+                </h3>
+
+                {coordinator.userGroup?.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                        {coordinator.userGroup.map((group: any) => (
+                            <Tag
+                                key={group._id}
+                                className="bg-[#e6f7ff] text-[#1890ff] border-none rounded-full px-4 py-1 font-medium"
+                            >
+                                {group.name}
+                            </Tag>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="p-4 bg-gray-50 rounded-lg text-center text-gray-500 italic text-sm border border-gray-100">
+                        No groups assigned to this coordinator yet.
+                    </div>
+                )}
+            </div>
         </Modal>
     );
 };

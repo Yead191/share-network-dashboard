@@ -8,7 +8,32 @@ const adminWeeklyReportApi = api.injectEndpoints({
                 method: 'GET',
             }),
         }),
+        createWeeklyReport: build.mutation({
+            query: (data: any) => ({
+                url: `/mentor/report`,
+                method: 'POST',
+                body: data,
+            }),
+        }),
+        updateWeeklyReport: build.mutation({
+            query: ({ id, data }: { id: string; data: any }) => ({
+                url: `/mentor/report/${id}`,
+                method: 'PATCH',
+                body: data,
+            }),
+        }),
+        deleteWeeklyReport: build.mutation({
+            query: ({ id }: { id: string }) => ({
+                url: `/mentor/report/${id}`,
+                method: 'DELETE',
+            }),
+        }),
     }),
 });
 
-export const { useGetWeeklyReportQuery } = adminWeeklyReportApi;
+export const {
+    useGetWeeklyReportQuery,
+    useUpdateWeeklyReportMutation,
+    useDeleteWeeklyReportMutation,
+    useCreateWeeklyReportMutation,
+} = adminWeeklyReportApi;

@@ -1,5 +1,6 @@
 import { Input, Modal, Progress } from 'antd';
 import { X } from 'lucide-react';
+import moment from 'moment';
 
 interface WeeklyReportDetailsModalProps {
     open: boolean;
@@ -42,20 +43,20 @@ const WeeklyReportDetailsModal = ({ open, onCancel, data }: WeeklyReportDetailsM
                                         Student Name
                                     </td>
                                     <td className="px-5 py-3.5 text-gray-800 font-medium">
-                                        {data?.studentName || 'Labeeb Ahmad Tahir'}
+                                        {data?.studentName || 'N/A'}
                                     </td>
                                 </tr>
                                 <tr>
                                     <td className="px-5 py-3.5 bg-gray-50/50 font-medium text-gray-600">Duration</td>
                                     <td className="px-5 py-3.5 text-gray-800">
-                                        {data?.duration || '20/12/2025 - 20/12/2025'}
+                                        {data?.summaryDuration || (data?.weekStartDate ? `${moment(data.weekStartDate).format('DD/MM/YYYY')} - ${moment(data.weekEndDate).format('DD/MM/YYYY')}` : 'N/A')}
                                     </td>
                                 </tr>
                                 <tr>
                                     <td className="px-5 py-3.5 bg-gray-50/50 font-medium text-gray-600">Attendance</td>
                                     <td className="px-5 py-3.5">
-                                        <span className="text-green-500 font-semibold">
-                                            {data?.attendance || 'Present'}
+                                        <span className={`${data?.isPresent ? 'text-green-500' : 'text-red-500'} font-semibold`}>
+                                            {data?.attendance}
                                         </span>
                                     </td>
                                 </tr>
@@ -63,17 +64,23 @@ const WeeklyReportDetailsModal = ({ open, onCancel, data }: WeeklyReportDetailsM
                                     <td className="px-5 py-3.5 bg-gray-50/50 font-medium text-gray-600">
                                         Hard Outcomes
                                     </td>
-                                    <td className="px-5 py-3.5 text-gray-800">{data?.hardOutcomes || 2}</td>
+                                    <td className="px-5 py-3.5 text-gray-800">
+                                        {data?.achievedHardOutcomes?.join(', ') || 'N/A'}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td className="px-5 py-3.5 bg-gray-50/50 font-medium text-gray-600">Improvement</td>
-                                    <td className="px-5 py-3.5 text-gray-800">{data?.improvements || 3}</td>
+                                    <td className="px-5 py-3.5 text-gray-800">
+                                        {data?.softSkillImprovements?.join(', ') || 'N/A'}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td className="px-5 py-3.5 bg-gray-50/50 font-medium text-gray-600">
                                         Skill Tracked
                                     </td>
-                                    <td className="px-5 py-3.5 text-gray-800">{data?.skillsTracked}</td>
+                                    <td className="px-5 py-3.5 text-gray-800">
+                                        {data?.goalSheet?.skillName || 'N/A'}
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

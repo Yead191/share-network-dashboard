@@ -12,6 +12,8 @@ import CoordinatorDetailsModal from '../../../components/modals/admin/Coordinato
 import EditCoordinatorModal from '../../../components/modals/admin/EditCoordinatorModal';
 import { toast } from 'sonner';
 import { imageUrl } from '../../../redux/api/baseApi';
+import { useGetUserGroupsQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
+import Spinner from '../../../components/shared/Spinner';
 
 export default function AdminCoordinator() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -24,13 +26,13 @@ export default function AdminCoordinator() {
     // API CALLS
     const { data: coordinatorApi, isLoading, refetch } = useGetCoordinatorQuery({ page, searchTerm });
     const { data: mentorsApi } = useGetMentorsQuery({});
+    const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({});
     const [deleteCoordinator] = useDeleteCoordinatorMutation();
+    const userGroups = userGroupsApi?.data;
 
     const coordinators = coordinatorApi?.data?.data || [];
     const pagination = coordinatorApi?.data?.pagination;
     const allMentors = mentorsApi?.data?.mentors || [];
-
-    console.log('coordinatorApi', coordinators);
 
     const columns = [
         {
@@ -70,6 +72,24 @@ export default function AdminCoordinator() {
             dataIndex: 'role',
             key: 'role',
             render: (role: string) => <span className="text-gray-500 font-medium">{role || 'N/A'}</span>,
+        },
+        {
+            title: 'GROUP',
+            dataIndex: 'userGroup',
+            key: 'userGroup',
+            render: (groups: any[]) => (
+                <div className="flex flex-wrap gap-1">
+                    {groups?.map((group) => (
+                        <Tag
+                            key={group._id}
+                            className="bg-[#e6f7ff] text-[#1890ff] border-none rounded-full px-3 py-0 scale-90 origin-left"
+                        >
+                            {group.name}
+                        </Tag>
+                    ))}
+                    {(!groups || groups.length === 0) && <span className="text-gray-400">N/A</span>}
+                </div>
+            ),
         },
         {
             title: 'Status',
@@ -152,6 +172,9 @@ export default function AdminCoordinator() {
         });
     };
 
+    if (isLoading || isUserGroupsLoading) {
+        return <Spinner />;
+    }
     return (
         <div className="">
             {/* Management Section Header */}
@@ -185,9 +208,9 @@ export default function AdminCoordinator() {
                     dataSource={coordinators}
                     loading={isLoading}
                     pagination={{
-                        total: pagination?.totalItems,
-                        current: pagination?.currentPage,
-                        pageSize: 10,
+                        total: pagination?.total,
+                        current: pagination?.page,
+                        pageSize: pagination?.limit,
                         onChange: (page) => {
                             setPage(page);
                         },
@@ -217,6 +240,8 @@ export default function AdminCoordinator() {
                 refetch={refetch}
                 coordinator={selectedCoordinator}
                 mentors={allMentors}
+                userGroups={userGroups}
+                isUserGroupsLoading={isUserGroupsLoading}
             />
         </div>
     );

@@ -3,7 +3,7 @@ import { api } from '../../api/baseApi';
 const weeklyReportsApi = api.injectEndpoints({
     endpoints: (build) => ({
         getWeeklyReports: build.query({
-            query: ({id}) => ({
+            query: ({ id }) => ({
                 url: `/mentor/report/student/${id}`,
                 method: 'GET',
             }),
@@ -16,8 +16,8 @@ const weeklyReportsApi = api.injectEndpoints({
             }),
         }),
         updateWeeklyReport: build.mutation({
-            query: (data: any) => ({
-                url: `/mentor/report/${data.id}`,
+            query: ({ id, data }: { id: string; data: any }) => ({
+                url: `/mentor/report/${id}`,
                 method: 'PATCH',
                 body: data,
             }),

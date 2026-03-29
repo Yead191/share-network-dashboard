@@ -33,6 +33,7 @@ const EditReportModal = ({ open, onCancel, data, assignedStudent, refetch }: Edi
                 plannedProgress: data.goalSheet?.plannedProgress,
                 actualProgress: data.goalSheet?.actualProgress,
                 comments: data.comments,
+                studentName: data.studentId?.firstName + ' ' + data.studentId?.lastName,
             });
         }
     }, [open, data, form]);
@@ -40,7 +41,6 @@ const EditReportModal = ({ open, onCancel, data, assignedStudent, refetch }: Edi
     const onFinish = async (values: any) => {
         try {
             const formattedValues = {
-                id: data?._id,
                 ...values,
                 weekStartDate: values.startDate?.toISOString(),
                 weekEndDate: values.endDate?.toISOString(),
@@ -52,8 +52,8 @@ const EditReportModal = ({ open, onCancel, data, assignedStudent, refetch }: Edi
                 },
                 studentId: values.student,
             };
-
-            toast.promise(updateWeeklyReport(formattedValues).unwrap(), {
+            // console.log(formattedValues);
+            toast.promise(updateWeeklyReport({ id: data?._id, data: formattedValues }).unwrap(), {
                 loading: 'Updating report...',
                 success: (res) => {
                     refetch();
@@ -80,14 +80,8 @@ const EditReportModal = ({ open, onCancel, data, assignedStudent, refetch }: Edi
             centered
         >
             <Form form={form} layout="vertical" onFinish={onFinish} className="space-y-4">
-                <Form.Item name="student" label={<span className="font-semibold">Student</span>}>
-                    <Select placeholder="Select Student">
-                        {assignedStudent?.map((student: any) => (
-                            <Select.Option key={student.id || student._id} value={student.id || student._id}>
-                                {student?.firstName + ' ' + student?.lastName}
-                            </Select.Option>
-                        )) || <Select.Option value="">No student assigned</Select.Option>}
-                    </Select>
+                <Form.Item name="studentName" label={<span className="font-semibold">Student</span>}>
+                    <Input placeholder="Student Name" disabled />
                 </Form.Item>
 
                 <div className="grid grid-cols-2 gap-4">
