@@ -15,7 +15,8 @@ const CreateResourceModal: React.FC<CreateResourceModalProps> = ({ visible, onCl
     const [form] = Form.useForm();
     const { data: userGroups } = useGetUserGroupsQuery({ page: 1, limit: 10 });
     const { data: userGroupsTrack } = useGetUserGroupsTrackQuery({ page: 1, limit: 10 }); 
-      const [file, setFile] = useState<any | null>(null);
+      const [file, setFile] = useState<any | null>(null); 
+      console.log(file);
     const handleOk = () => {
         form.validateFields().then((values) => {
             onSave(values);
@@ -27,7 +28,7 @@ const CreateResourceModal: React.FC<CreateResourceModalProps> = ({ visible, onCl
     if (visible && initialValues) {
         form.setFieldsValue(initialValues);
     }
-
+// sf
     return (
         <Modal
             open={visible}
