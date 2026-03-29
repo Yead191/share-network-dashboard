@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Table, Button, Input, Space, Tag } from 'antd';
+import { Table, Button, Input, Space, Tag, Select } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { SearchOutlined, FilterOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { HiOutlineDocumentText } from 'react-icons/hi';
@@ -7,7 +7,7 @@ import HeaderTitle from '../../../components/shared/HeaderTitle';
 
 import ResourceDetailsModal from '../../../components/modals/teacher/ResourceDetailsModal';
 import CreateResourceModal from '../../../components/modals/teacher/CreateResourceModal';
-import { useCreateResourseMutation, useDeleteResourseMutation, useGetResourcesQuery, useUpdateResourseMutation } from '../../../redux/apiSlices/teacher/resourceSlice';
+import { useDeleteResourseMutation, useGetResourcesQuery, useGetUserGroupsQuery } from '../../../redux/apiSlices/teacher/resourceSlice';
 import { toast } from 'sonner';
 import Swal from 'sweetalert2';
 
@@ -30,17 +30,18 @@ const Resources = () => {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [selectedResource, setSelectedResource] = useState<ResourceItem | null>(null);
-    const {data: resources, isLoading, isFetching,refetch}= useGetResourcesQuery({page: page, limit: 10, searchTerm: searchText});
-    const [createResourse] = useCreateResourseMutation();
-    const [updateResource] = useUpdateResourseMutation();
+    const [selectedGroup, setSelectedGroup] = useState<string | undefined>(undefined);
+    const { data: resources, isLoading, isFetching, refetch } = useGetResourcesQuery({ page: page, limit: 10, searchTerm: searchText, targertGroup: selectedGroup });
     const [deleteResource] = useDeleteResourseMutation();
-    
-    const newData = resources?.data?.resources?.map((item)=>{
+    const { data: userGroups } = useGetUserGroupsQuery({ page: 1, limit: 100 }); 
+    console.log(selectedGroup); 
+
+    const newData = resources?.data?.resources?.map((item) => {
         return {
             key: item._id,
             title: item.title,
             type: item.type,
-            targets: item?.targertGroup?.name? [item?.targertGroup?.name]: [],
+            targets: item?.targertGroup?.name ? [item?.targertGroup?.name] : [],
             targetAudience: item.targeteAudience,
             uploadDate: item.createdAt,
             status: item.markAsAssigned ? 'Active' : 'Inactive',
@@ -65,8 +66,8 @@ const Resources = () => {
     };
 
     const handleDelete = async (key: string) => {
-    
-        
+
+
         await Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -77,7 +78,7 @@ const Resources = () => {
             confirmButtonText: 'Yes, delete it!',
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const { error }: any = await deleteResource({id: key});
+                const { error }: any = await deleteResource({ id: key });
                 if (!error) {
                     toast.success('Resource deleted successfully');
                     refetch()
@@ -86,38 +87,6 @@ const Resources = () => {
                 toast.error(error?.data?.message || 'Failed to delete resource');
             }
         });
-    };
-
-    const handleSave = async (values: any) => {
-        if (selectedResource) {
-            const { error, data }: any = await updateResource({
-                id: selectedResource.key,
-                data: {
-                    ...values,
-                },
-            });
-
-            if (!error) {
-                setIsCreateModalOpen(false);
-                toast.success(data?.message || 'Resource updated successfully');
-                refetch()
-                return;
-            }
-            toast.error(error?.data?.message || 'Failed to update resource');
-        } else {
-            
-            const { error, data }: any = await createResourse({
-                ...values,
-                markAsAssigned: true
-            });
-            if (!error) {
-                setIsCreateModalOpen(false);
-                toast.success(data?.message || 'Resource created successfully');
-                refetch()
-                return;
-            }
-            toast.error(error?.data?.message || 'Failed to create resource');
-        }
     };
 
     const columns: ColumnsType<any> = [
@@ -222,14 +191,21 @@ const Resources = () => {
                         placeholder="Search student"
                         prefix={<SearchOutlined className="text-gray-400" />}
                         className="w-72 h-[42px] rounded-lg border-gray-200"
-                        onChange={(e)=>setSearchText(e.target.value)}
+                        onChange={(e) => setSearchText(e.target.value)}
                     />
-                    <Button
-                        icon={<FilterOutlined />}
-                        className="h-[42px] px-6 rounded-lg border-gray-200 flex items-center gap-2 text-gray-600 font-medium"
+                    <Select
+                        placeholder="Filter by Group"
+                        className="w-full md:w-48 h-10 rounded-lg"
+                        allowClear
+                        onChange={setSelectedGroup}
+                        suffixIcon={<FilterOutlined className="text-gray-400" />}
                     >
-                        Filter
-                    </Button>
+                        {userGroups?.data?.map((group: any) => (
+                            <Select.Option key={group._id} value={group._id}>
+                                {group.name}
+                            </Select.Option>
+                        ))}
+                    </Select>
                     <button
                         onClick={handleAdd}
                         className="h-[42px] bg-[#22C55E] text-white text-sm border-none px-6 rounded-lg font-medium"
@@ -240,7 +216,7 @@ const Resources = () => {
             </div>
 
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                <Table columns={columns} loading={isLoading || isFetching} dataSource={newData} pagination={{ pageSize: 10,current:page,onChange:(page)=>setPage(page),total:resources?.data?.pagination?.total }} className="" />
+                <Table columns={columns} loading={isLoading || isFetching} dataSource={newData} pagination={{ pageSize: 10, current: page, onChange: (page) => setPage(page), total: resources?.data?.pagination?.total }} className="" />
             </div>
 
             <ResourceDetailsModal
@@ -252,8 +228,8 @@ const Resources = () => {
             <CreateResourceModal
                 visible={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
-                onSave={handleSave}
                 initialValues={selectedResource}
+                refetch={refetch}
             />
         </div>
     );

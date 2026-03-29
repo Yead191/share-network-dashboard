@@ -17,8 +17,7 @@ const CreateClassModal: React.FC<CreateClassModalProps> = ({ visible, onClose, o
     const { data: userGroups } = useGetUserGroupsQuery({ page: 1, limit: 10 });
     const { data: userGroupsTrack } = useGetUserGroupsTrackQuery({ page: 1, limit: 10 });
     const { data: studentsApi } = useGetStudentsQuery({ page: 0, limit: 0 });
-    const students = studentsApi?.data?.data 
-    console.log(studentsApi);
+    const students = studentsApi?.data?.data
     const handleOk = () => {
         form.validateFields().then((values) => {
             const processedValues = {
@@ -32,13 +31,11 @@ const CreateClassModal: React.FC<CreateClassModalProps> = ({ visible, onClose, o
         });
     };
 
-    // Set initial values when modal opens
     if (visible && initialValues) {
         const selectionType = (initialValues.studentId?.length > 0 || initialValues.students?.length > 0) ? 'student' : 'group';
-        
-        // If userGroup comes as an array, take the first element for the single-select UI
-        const userGroupValue = Array.isArray(initialValues.userGroup) 
-            ? initialValues.userGroup[0] 
+
+        const userGroupValue = Array.isArray(initialValues.userGroup)
+            ? initialValues.userGroup[0]
             : initialValues.userGroup;
 
         form.setFieldsValue({

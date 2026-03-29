@@ -1,34 +1,74 @@
 "use client"
-import { Modal, Button, Input, Select, Form, Upload } from 'antd';
+import { Modal, Button, Input, Select, Form } from 'antd';
 import { IoCloseOutline } from 'react-icons/io5';
-import { useGetUserGroupsQuery, useGetUserGroupsTrackQuery } from '../../../redux/apiSlices/teacher/resourceSlice';
-import { useState } from 'react';
+import { useCreateResourseMutation, useGetUserGroupsQuery, useGetUserGroupsTrackQuery, useUpdateResourseMutation } from '../../../redux/apiSlices/teacher/resourceSlice';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import Dragger from 'antd/es/upload/Dragger';
+import { InboxOutlined } from '@ant-design/icons';
 
 interface CreateResourceModalProps {
     visible: boolean;
     onClose: () => void;
-    onSave: (values: any) => void;
     initialValues?: any;
+    refetch: () => void;
 }
 
-const CreateResourceModal: React.FC<CreateResourceModalProps> = ({ visible, onClose, onSave, initialValues }) => {
+const CreateResourceModal: React.FC<CreateResourceModalProps> = ({ visible, onClose, initialValues, refetch }) => {
     const [form] = Form.useForm();
     const { data: userGroups } = useGetUserGroupsQuery({ page: 1, limit: 10 });
-    const { data: userGroupsTrack } = useGetUserGroupsTrackQuery({ page: 1, limit: 10 }); 
-      const [file, setFile] = useState<any | null>(null); 
-      console.log(file);
-    const handleOk = () => {
-        form.validateFields().then((values) => {
-            onSave(values);
-            form.resetFields();
-            onClose();
-        });
-    };
+    const { data: userGroupsTrack } = useGetUserGroupsTrackQuery({ page: 1, limit: 10 });
+    const [file, setFile] = useState<any | null>(null);
+    const [createResourse] = useCreateResourseMutation();
+    const [updateResource] = useUpdateResourseMutation();
+    console.log(file); 
 
+useEffect(() => {
     if (visible && initialValues) {
         form.setFieldsValue(initialValues);
     }
-// sf
+}, [visible, initialValues, form]);
+
+    const onFinish = async (values: Record<string, any>) => {
+        try {
+            const formdata = new FormData();
+            Object.entries(values).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    if (key === 'markAsAssigned') {
+                        formdata.append(key, String(!!value));
+                    } else {
+                        formdata.append(key, String(value));
+                    }
+                }
+            });
+
+            if (file) {
+                formdata.append('file', file);
+            }
+
+            const mutation = initialValues?._id
+                ? updateResource({ id: initialValues._id, data: formdata }).unwrap()
+                : createResourse(formdata).unwrap();
+
+            toast.promise(mutation, {
+                loading: initialValues?._id ? 'Updating material...' : 'Creating material...',
+                success: (res: any) => {
+                    console.log(res);
+                    if (res?.success) {
+                        refetch();
+                        form.resetFields();
+                        setFile(null);
+                        onClose();
+                    }
+                    return res?.message || 'Material saved successfully';
+                },
+                error: (err: any) => err?.message || 'Failed to save material',
+            });
+        } catch (error: any) {
+            toast.error(error?.data?.message || 'Something went wrong');
+        }
+    };
+    // sf
     return (
         <Modal
             open={visible}
@@ -47,7 +87,7 @@ const CreateResourceModal: React.FC<CreateResourceModalProps> = ({ visible, onCl
             }
             className="create-resource-modal"
         >
-            <Form form={form} layout="vertical" className="mt-6">
+            <Form form={form} layout="vertical" className="mt-6" onFinish={onFinish}>
                 <Form.Item
                     name="title"
                     label={<span className="font-semibold text-gray-700">Title</span>}
@@ -89,16 +129,16 @@ const CreateResourceModal: React.FC<CreateResourceModalProps> = ({ visible, onCl
                         </Select>
                     </Form.Item>
 
-                    
+
                 </div>
                 <Form.Item
-                        name="contentUrl"
-                        label={<span className="font-semibold text-gray-700">Content URL</span>}
-                        className="flex-1"
-                    >
-                        <Input placeholder="https://..." className="h-[42px] rounded-lg border-gray-200" />
-                    </Form.Item>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    name="contentUrl"
+                    label={<span className="font-semibold text-gray-700">Content URL</span>}
+                    className="flex-1"
+                >
+                    <Input placeholder="https://..." className="h-[42px] rounded-lg border-gray-200" />
+                </Form.Item>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <Form.Item
                         label={<span className="font-semibold text-gray-700 text-base">Targeted Groups</span>}
                         name="userGroup"
@@ -140,37 +180,39 @@ const CreateResourceModal: React.FC<CreateResourceModalProps> = ({ visible, onCl
                             );
                         }}
                     </Form.Item>
-                </div> 
-                               <Form.Item
-                                                    label={<span className="font-semibold text-gray-700 text-base">Upload File</span>}
-                                                    name="attachment"
-                                                >
-                                                    <Upload.Dragger
-                                                        maxCount={1}
-                                                        beforeUpload={() => false}
-                                                        onChange={(info) => {
-                                                            if (info.file.status === 'removed') {
-                                                                setFile(null);
-                                                            } else if (info.fileList.length > 0) {
-                                                                setFile(
-                                                                    info.fileList[0].originFileObj ||
-                                                                        info.file.originFileObj ||
-                                                                        info.file,
-                                                                );
-                                                            }
-                                                        }}
-                                                        className="rounded-xl border-dashed border-2 border-gray-200 bg-gray-50 py-4"
-                                                    >
-                                                        <p className="ant-upload-text text-gray-400 font-medium text-sm">
-                                                            Choose file (PDF/Images/Docs)
-                                                        </p>
-                                                    </Upload.Dragger>
-                                                </Form.Item>
+                </div>
+                <Form.Item
+                    name="file"
+                    label={<span className="text-sm font-semibold text-gray-700">Upload PDF</span>}
+                >
+                    <Dragger
+                        className="border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:border-indigo-400 transition-colors"
+                        height={180}
+                        accept=".pdf"
+                        beforeUpload={(file) => {
+                            const isLt10M = file.size / 1024 / 1024 < 10;
+                            if (!isLt10M) {
+                                toast.error('File must be smaller than 10MB!');
+                                return false;
+                            }
+                            setFile(file); // Set raw file directamente
+                            return false; // Stop automatic upload
+                        }}
+                        onRemove={() => setFile(null)}
+                        maxCount={1}
+                    >
+                        <div className="flex flex-col items-center justify-center py-5 px-4 text-center">
+                            <InboxOutlined className="text-5xl text-indigo-500 mb-4" />
+                            <p className="text-lg font-medium text-gray-700 mb-1">Click or drag PDF file here</p>
+                            <p className="text-sm text-gray-500">Only PDF files are supported • Max 10 MB</p>
+                        </div>
+                    </Dragger>
+                </Form.Item>
 
                 <div className="flex justify-end mt-4">
                     <Button
-                        type="primary"
-                        onClick={handleOk}
+                        type="primary" 
+                         htmlType="submit"
                         className="bg-[#22C55E] hover:bg-[#16a34a] border-none px-8 h-[42px] rounded-lg font-semibold"
                     >
                         {initialValues ? 'Save Changes' : 'Create Event'}
