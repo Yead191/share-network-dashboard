@@ -1,6 +1,8 @@
-import { Modal, Button, Input, Select, Form } from 'antd';
+"use client"
+import { Modal, Button, Input, Select, Form, Upload } from 'antd';
 import { IoCloseOutline } from 'react-icons/io5';
-import { useGetUserGroupsTrackQuery } from '../../../redux/apiSlices/teacher/resourceSlice';
+import { useGetUserGroupsQuery, useGetUserGroupsTrackQuery } from '../../../redux/apiSlices/teacher/resourceSlice';
+import { useState } from 'react';
 
 interface CreateResourceModalProps {
     visible: boolean;
@@ -11,8 +13,9 @@ interface CreateResourceModalProps {
 
 const CreateResourceModal: React.FC<CreateResourceModalProps> = ({ visible, onClose, onSave, initialValues }) => {
     const [form] = Form.useForm();
-    const {data:userGroups} = useGetUserGroupsTrackQuery({page:1,limit:10});
-
+    const { data: userGroups } = useGetUserGroupsQuery({ page: 1, limit: 10 });
+    const { data: userGroupsTrack } = useGetUserGroupsTrackQuery({ page: 1, limit: 10 }); 
+      const [file, setFile] = useState<any | null>(null);
     const handleOk = () => {
         form.validateFields().then((values) => {
             onSave(values);
@@ -94,19 +97,74 @@ const CreateResourceModal: React.FC<CreateResourceModalProps> = ({ visible, onCl
                     >
                         <Input placeholder="https://..." className="h-[42px] rounded-lg border-gray-200" />
                     </Form.Item>
-                <Form.Item
-                    name="targertGroup"
-                    label={<span className="font-semibold text-gray-700">User Group</span>}
-                    rules={[{ required: true, message: 'Please select a material type' }]}
-                >
-                    <Select placeholder="Select" className="h-[42px] rounded-lg border-gray-200">
-                        {userGroups?.data?.map((group) => (
-                            <Select.Option  key={group._id} value={group._id}>
-                                {group.name}
-                            </Select.Option>
-                        ))}
-                    </Select>
-                </Form.Item>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <Form.Item
+                        label={<span className="font-semibold text-gray-700 text-base">Targeted Groups</span>}
+                        name="userGroup"
+                        rules={[{ required: true, message: 'Please select a group' }]}
+                    >
+                        <Select placeholder="Select groups" className="custom-select-full rounded-lg min-h-[44px]">
+                            {userGroups?.data?.map((group: any) => (
+                                <Select.Option key={group._id} value={group._id}>
+                                    {group.name}
+                                </Select.Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                    <Form.Item
+                        noStyle
+                        shouldUpdate={(prevValues, currentValues) => prevValues.userGroup !== currentValues.userGroup}
+                    >
+                        {({ getFieldValue }) => {
+                            const selectedGroupId = getFieldValue('userGroup');
+                            const skillPathGroup = userGroups?.data?.find((g: any) => g.name === 'Skill Path');
+                            const isSkillPathSelected = selectedGroupId === skillPathGroup?._id;
+                            return (
+                                <Form.Item
+                                    label={<span className="font-semibold text-gray-700 text-base">Target Track</span>}
+                                    name="userGroupTrack"
+                                >
+                                    <Select
+                                        placeholder="Select track"
+                                        disabled={!isSkillPathSelected}
+                                        className="h-11 custom-select-full rounded-lg"
+                                    >
+                                        {userGroupsTrack?.data?.map((track: any) => (
+                                            <Select.Option key={track._id} value={track._id}>
+                                                {track.name}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
+                            );
+                        }}
+                    </Form.Item>
+                </div> 
+                               <Form.Item
+                                                    label={<span className="font-semibold text-gray-700 text-base">Upload File</span>}
+                                                    name="attachment"
+                                                >
+                                                    <Upload.Dragger
+                                                        maxCount={1}
+                                                        beforeUpload={() => false}
+                                                        onChange={(info) => {
+                                                            if (info.file.status === 'removed') {
+                                                                setFile(null);
+                                                            } else if (info.fileList.length > 0) {
+                                                                setFile(
+                                                                    info.fileList[0].originFileObj ||
+                                                                        info.file.originFileObj ||
+                                                                        info.file,
+                                                                );
+                                                            }
+                                                        }}
+                                                        className="rounded-xl border-dashed border-2 border-gray-200 bg-gray-50 py-4"
+                                                    >
+                                                        <p className="ant-upload-text text-gray-400 font-medium text-sm">
+                                                            Choose file (PDF/Images/Docs)
+                                                        </p>
+                                                    </Upload.Dragger>
+                                                </Form.Item>
 
                 <div className="flex justify-end mt-4">
                     <Button

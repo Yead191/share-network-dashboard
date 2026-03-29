@@ -1,6 +1,8 @@
-import { Modal, Button, Input, DatePicker, Checkbox, Form } from 'antd';
+import { Modal, Button, Input, DatePicker, Checkbox, Form, Select, Radio } from 'antd';
 import { IoCloseOutline } from 'react-icons/io5';
 import dayjs from 'dayjs';
+import { useGetUserGroupsQuery, useGetUserGroupsTrackQuery } from '../../../redux/apiSlices/teacher/resourceSlice';
+import { useGetStudentsQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
 
 interface CreateClassModalProps {
     visible: boolean;
@@ -10,12 +12,21 @@ interface CreateClassModalProps {
     isLoading: boolean;
 }
 
-const CreateClassModal: React.FC<CreateClassModalProps> = ({ visible, onClose, onSave, initialValues,isLoading }) => {
+const CreateClassModal: React.FC<CreateClassModalProps> = ({ visible, onClose, onSave, initialValues, isLoading }) => {
     const [form] = Form.useForm();
-
+    const { data: userGroups } = useGetUserGroupsQuery({ page: 1, limit: 10 });
+    const { data: userGroupsTrack } = useGetUserGroupsTrackQuery({ page: 1, limit: 10 });
+    const { data: studentsApi } = useGetStudentsQuery({ page: 0, limit: 0 });
+    const students = studentsApi?.data?.data 
+    console.log(studentsApi);
     const handleOk = () => {
         form.validateFields().then((values) => {
-            onSave(values);
+            const processedValues = {
+                ...values,
+                userGroup: values.userGroup ? [values.userGroup] : [],
+            };
+            console.log(processedValues);
+            onSave(processedValues);
             form.resetFields();
             onClose();
         });
@@ -23,8 +34,17 @@ const CreateClassModal: React.FC<CreateClassModalProps> = ({ visible, onClose, o
 
     // Set initial values when modal opens
     if (visible && initialValues) {
+        const selectionType = (initialValues.studentId?.length > 0 || initialValues.students?.length > 0) ? 'student' : 'group';
+        
+        // If userGroup comes as an array, take the first element for the single-select UI
+        const userGroupValue = Array.isArray(initialValues.userGroup) 
+            ? initialValues.userGroup[0] 
+            : initialValues.userGroup;
+
         form.setFieldsValue({
             ...initialValues,
+            userGroup: userGroupValue,
+            selectionType,
             date: initialValues.date ? dayjs(new Date(initialValues.date)) : null,
         });
     }
@@ -47,7 +67,7 @@ const CreateClassModal: React.FC<CreateClassModalProps> = ({ visible, onClose, o
             }
             className="create-class-modal"
         >
-            <Form form={form} layout="vertical" className="mt-6" initialValues={{ virtualClass: false }}>
+            <Form form={form} layout="vertical" className="mt-6" initialValues={{ virtualClass: false, selectionType: 'group' }}>
                 <Form.Item
                     name="title"
                     label={<span className="font-semibold text-gray-700">Title</span>}
@@ -82,6 +102,101 @@ const CreateClassModal: React.FC<CreateClassModalProps> = ({ visible, onClose, o
                         <Input placeholder="Enter Location" className="h-[42px] rounded-lg border-gray-200" />
                     </Form.Item>
                 </div>
+
+                <Form.Item name="selectionType" label={<span className="font-semibold text-gray-700">Select Type</span>}>
+                    <Radio.Group>
+                        <Radio value="group">Group</Radio>
+                        <Radio value="student">Student</Radio>
+                    </Radio.Group>
+                </Form.Item>
+
+                <Form.Item
+                    noStyle
+                    shouldUpdate={(prevValues, currentValues) => prevValues.selectionType !== currentValues.selectionType}
+                >
+                    {({ getFieldValue }) => {
+                        const selectionType = getFieldValue('selectionType');
+
+                        if (selectionType === 'group') {
+                            return (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <Form.Item
+                                        label={<span className="font-semibold text-gray-700 text-base">Targeted Groups</span>}
+                                        name="userGroup"
+                                        rules={[{ required: true, message: 'Please select a group' }]}
+                                    >
+                                        <Select
+                                            placeholder="Select groups"
+                                            className="custom-select-full rounded-lg min-h-[44px]"
+                                        >
+                                            {userGroups?.data?.map((group: any) => (
+                                                <Select.Option key={group._id} value={group._id}>
+                                                    {group.name}
+                                                </Select.Option>
+                                            ))}
+                                        </Select>
+                                    </Form.Item>
+                                    <Form.Item
+                                        noStyle
+                                        shouldUpdate={(prevValues, currentValues) => prevValues.userGroup !== currentValues.userGroup}
+                                    >
+                                        {({ getFieldValue }) => {
+                                            const selectedGroupId = getFieldValue('userGroup');
+                                            const skillPathGroup = userGroups?.data?.find((g: any) => g.name === 'Skill Path');
+                                            const isSkillPathSelected = selectedGroupId === skillPathGroup?._id;
+                                            return (
+                                                <Form.Item
+                                                    label={<span className="font-semibold text-gray-700 text-base">Target Track</span>}
+                                                    name="userGroupTrack"
+                                                >
+                                                    <Select
+                                                        placeholder="Select track"
+                                                        disabled={!isSkillPathSelected}
+                                                        className="h-11 custom-select-full rounded-lg"
+                                                    >
+                                                        {userGroupsTrack?.data?.map((track: any) => (
+                                                            <Select.Option key={track._id} value={track._id}>
+                                                                {track.name}
+                                                            </Select.Option>
+                                                        ))}
+                                                    </Select>
+                                                </Form.Item>
+                                            );
+                                        }}
+                                    </Form.Item>
+                                </div>
+                            );
+                        }
+
+                        if (selectionType === 'student') {
+                            return (
+                                <Form.Item
+                                    name="studentId"
+                                    label={<span className="text-sm font-semibold text-gray-700">Select individual Students</span>}
+                                >
+                                    <Select
+                                        showSearch
+                                        mode="multiple"
+                                        placeholder="Choose students"
+                                        className="h-11 custom-select-full rounded-lg"
+                                        style={{ height: 'auto', minHeight: '44px' }}
+                                        options={
+                                            students?.map((student: any) => ({
+                                                value: student?._id,
+                                                label: `${student?.firstName} ${student?.lastName} (${student?.email})`,
+                                            })) || []
+                                        }
+                                        filterOption={(input, option) =>
+                                            (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+                                        }
+                                    />
+                                </Form.Item>
+                            );
+                        }
+
+                        return null;
+                    }}
+                </Form.Item>
 
                 <div className="flex justify-between items-center mt-4">
                     <Form.Item name="virtualClass" valuePropName="checked" noStyle>
