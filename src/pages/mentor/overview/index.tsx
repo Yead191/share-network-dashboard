@@ -50,7 +50,7 @@ function MentorOverview() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 <StudentGoalsSnapshot snapshots={snapshots} />
-                <MentorOverviewResources />
+                <MentorOverviewResources mentor={mentor} />
             </div>
 
             <div>

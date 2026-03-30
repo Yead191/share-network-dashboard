@@ -16,9 +16,9 @@ const mentorOverviewApi = api.injectEndpoints({
             }),
         }),
         // mentor overview resources
-        getMentorOverviewResources: build.query<any, { targetedAudience: string }>({
-            query: ({ targetedAudience }) => ({
-                url: `/learning?targeteAudience=${targetedAudience}`,
+        getMentorOverviewResources: build.query<any, { targetedAudience: string; targertGroup: string }>({
+            query: ({ targetedAudience, targertGroup }) => ({
+                url: `/learning?targeteAudience=${targetedAudience}&targertGroup=${targertGroup}`,
                 method: 'GET',
             }),
         }),

@@ -20,7 +20,7 @@ const LearningMaterials = () => {
     const { data: userProfile, isLoading } = useGetprofileQuery({});
 
     const user = userProfile?.data?.data ?? userProfile?.data ?? userProfile;
-    console.log(user);
+    // console.log(user);
     const {
         data,
         isLoading: materialsLoading,
