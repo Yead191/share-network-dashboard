@@ -3,6 +3,7 @@ import { Modal, Input, Button, Upload, message } from 'antd';
 import { LuCalendar, LuUploadCloud, LuCheckCircle2, LuDownload } from 'react-icons/lu';
 import { Assignment } from '../../../../constants/student/assignments';
 import { useUplloadAssignmentMutation } from '../../../../redux/apiSlices/students/assignmentsSlice';
+import { imageUrl } from '../../../../redux/api/baseApi';
 
 const { Dragger } = Upload;
 
@@ -30,7 +31,7 @@ export const AssignmentDetailsModal = ({
 
     // Only find THIS user's submission
     const submittedFile = assignment.submitAssignment?.find(
-        (s) => s.studentId === currentUserId && s.status === 'COMPLETED'
+        (s) => s.studentId === currentUserId && s.status === 'COMPLETED',
     );
     const isCompleted = !!submittedFile;
 
@@ -64,23 +65,23 @@ export const AssignmentDetailsModal = ({
             footer={null}
             width={850}
             centered
-            title={
-                <span className="text-2xl font-bold text-[#1E293B]">
-                    Assignments Details
-                </span>
-            }
+            title={<span className="text-2xl font-bold text-[#1E293B]">Assignments Details</span>}
             className="assignment-details-modal overflow-hidden [&>.ant-modal-content]:p-8 [&>.ant-modal-content]:rounded-[24px]"
         >
             <div className="mt-4 space-y-8 h-[80vh] overflow-y-auto">
-
                 {/* Tags */}
-                <div className="flex gap-2">
+                <div className="flex gap-2 mb-4">
                     <span className="bg-[#F1F5F9] text-[#64748B] text-xs font-semibold px-4 py-1.5 rounded-full">
                         {isCompleted ? 'COMPLETED' : 'PENDING'}
                     </span>
                     {assignment.subject && (
                         <span className="bg-[#E6FFFA] text-[#3BB77E] text-xs font-semibold px-4 py-1.5 rounded-full uppercase">
                             {assignment.subject}
+                        </span>
+                    )}
+                    {assignment.userGroup && assignment.userGroup.length > 0 && (
+                        <span className="bg-[#EFF6FF] text-[#3B82F6] text-xs font-semibold px-4 py-1.5 rounded-full uppercase">
+                            Group: {assignment.userGroup.map((g) => g.name).join(', ')}
                         </span>
                     )}
                 </div>
@@ -93,25 +94,60 @@ export const AssignmentDetailsModal = ({
                     {assignment.openDate && (
                         <div className="bg-white border border-gray-100 p-5 rounded-2xl flex flex-col gap-2">
                             <span className="text-sm font-medium text-[#64748B]">Open Date</span>
-                            <div className="flex items-center gap-2 text-[#8B5CF6] font-semibold">
-                                <LuCalendar size={18} />
-                                <span>{new Date(assignment.openDate).toLocaleDateString()}</span>
+                            <div className="flex flex-col gap-1 text-[#8B5CF6] font-semibold">
+                                <div className="flex items-center gap-2">
+                                    <LuCalendar size={18} />
+                                    <span>{new Date(assignment.openDate).toLocaleDateString()}</span>
+                                </div>
+                                <span className="text-xs opacity-80 ml-6">
+                                    {new Date(assignment.openDate).toLocaleTimeString([], {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                    })}
+                                </span>
                             </div>
                         </div>
                     )}
                     <div className="bg-[#F0FFF4] border border-[#DCFCE7] p-5 rounded-2xl flex flex-col gap-2">
                         <span className="text-sm font-medium text-[#64748B]">Submission Date</span>
-                        <div className="flex items-center gap-2 text-[#3BB77E] font-semibold">
-                            <LuCalendar size={18} />
-                            <span>{new Date(assignment.dueDate).toLocaleDateString()}</span>
+                        <div className="flex flex-col gap-1 text-[#3BB77E] font-semibold">
+                            <div className="flex items-center gap-2">
+                                <LuCalendar size={18} />
+                                <span>{new Date(assignment.dueDate).toLocaleDateString()}</span>
+                            </div>
+                            <span className="text-xs opacity-80 ml-6">
+                                {new Date(assignment.dueDate).toLocaleTimeString([], {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                })}
+                            </span>
                         </div>
                     </div>
                 </div>
 
+                {/* Material Link / Download (if attachment exists) */}
+                {assignment.attachment && (
+                    <div className="bg-[#F0FDF4] border border-[#DCFCE7] p-5 rounded-2xl flex items-center justify-between">
+                        <div className="flex flex-col gap-1">
+                            <span className="text-sm font-bold text-[#1E293B]">Assignment Material</span>
+                            <span className="text-xs text-[#64748B]">Download the attached file for instructions.</span>
+                        </div>
+                        <Button
+                            type="primary"
+                            href={`${imageUrl + assignment.attachment}`}
+                            target="_blank"
+                            icon={<LuDownload size={18} />}
+                            className="bg-[#3BB77E] hover:bg-[#34a873] border-none flex items-center gap-2 rounded-xl h-10 px-5 font-semibold shadow-sm"
+                        >
+                            Download
+                        </Button>
+                    </div>
+                )}
+
                 {/* Description */}
                 <div>
                     <h3 className="text-lg font-bold text-[#64748B] mb-3">Assignment Descriptions</h3>
-                    <p className="text-[#64748B] leading-relaxed">{assignment.description}</p>
+                    <p className="text-[#64748B] leading-relaxed whitespace-pre-wrap">{assignment.description}</p>
                 </div>
 
                 {/* Submission Area */}
@@ -124,9 +160,7 @@ export const AssignmentDetailsModal = ({
                     {/* Completed State */}
                     {isCompleted ? (
                         <div className="space-y-4">
-                            <p className="text-sm text-[#94A3B8]">
-                                Your assignment has been successfully submitted.
-                            </p>
+                            <p className="text-sm text-[#94A3B8]">Your assignment has been successfully submitted.</p>
                             {submittedFile && (
                                 <div className="bg-[#F8FAFC] border border-gray-100 p-4 rounded-xl flex items-center justify-between">
                                     <div className="flex items-center gap-3">

@@ -1,4 +1,4 @@
-import { Modal } from 'antd';
+import { Modal, Tag } from 'antd';
 import { X } from 'lucide-react';
 
 interface ClassScheduleDetailsModalProps {
@@ -48,7 +48,13 @@ const ClassScheduleDetailsModal = ({ open, onCancel, data }: ClassScheduleDetail
                             <td className="px-5 py-3.5 bg-gray-50/50 font-medium text-gray-600">Target Group</td>
                             <td className="px-5 py-3.5 flex items-center gap-2">
                                 <span className="text-gray-800">
-                                    {data?.userGroup?.map((item: any) => item?.name).join(', ') || 'Full Stack'}
+                                    {data?.userGroup?.length > 0
+                                        ? data?.userGroup?.map((group: any) => (
+                                              <Tag key={group._id} color="blue">
+                                                  {group.name}
+                                              </Tag>
+                                          ))
+                                        : 'No Group'}
                                 </span>
                             </td>
                         </tr>

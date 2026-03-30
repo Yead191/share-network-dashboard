@@ -1,15 +1,12 @@
 import { useState } from 'react';
-import { Table, Button, Select, Input, message } from 'antd';
+import { Table, Button, Input } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { FilterOutlined, EyeOutlined, SearchOutlined, DesktopOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { EyeOutlined, SearchOutlined, DesktopOutlined, EnvironmentOutlined } from '@ant-design/icons';
 
 import GroupScheduleModal from '../../../components/modals/mentor-coordinator/GroupScheduleModal';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
 
-import {
-    useGetClassesScheduleQuery,
-    useUpdateStatusMutation,
-} from '../../../redux/apiSlices/coordinator/groupSchedsuleSlice';
+import { useGetClassesScheduleQuery } from '../../../redux/apiSlices/coordinator/groupSchedsuleSlice';
 
 interface GroupSchedule {
     key: string;
@@ -38,8 +35,6 @@ const formatDate = (isoDate: string) => {
 
 const GroupSchedulePage = () => {
     const { data, isLoading } = useGetClassesScheduleQuery(undefined);
-
-    const [updateStatus] = useUpdateStatusMutation();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);

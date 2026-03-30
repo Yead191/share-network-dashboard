@@ -22,7 +22,6 @@ import StudentEvents from '../pages/student/events';
 import Mentor from '../pages/student/mentor';
 import StudentAssignment from '../pages/student/assignment';
 import StudentResources from '../pages/student/resources';
-import Goal from '../pages/student/goal';
 import MentorOverview from '../pages/mentor/overview';
 import Students from '../pages/mentor/students';
 import MentorSetting from '../pages/mentor/setting';
@@ -44,6 +43,7 @@ import PrivateRoute from '../provider/PrivateRoutes';
 import HomeRedirect from '../provider/HomeRedirect';
 import AdminCoordinator from '../pages/admin/coordinator';
 import TakeAttendance from '../pages/admin/students/take-attendance/TakeAttendance';
+import GoalIndex from '../pages/student/goal/GoalIndex';
 
 const router = createBrowserRouter([
     {
@@ -255,7 +255,7 @@ const router = createBrowserRouter([
                 path: '/student/goal',
                 element: (
                     <PrivateRoute role="student">
-                        <Goal />
+                        <GoalIndex />
                     </PrivateRoute>
                 ),
             },

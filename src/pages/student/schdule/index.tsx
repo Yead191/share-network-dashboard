@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { Table, Button, Input } from 'antd';
-import { Search, Calendar, MapPin, Eye, Filter as FilterIcon } from 'lucide-react';
+import { Table, Button, Input, Tag } from 'antd';
+import { Search, Calendar, MapPin, Eye } from 'lucide-react';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
 import ClassScheduleDetailsModal from '../../../components/modals/admin/ClassScheduleDetailsModal';
 import moment from 'moment';
 import { useGetStudentClassScheduleQuery } from '../../../redux/apiSlices/students/classSlice';
 import { imageUrl } from '../../../redux/api/baseApi';
 import { useGetprofileQuery } from '../../../redux/apiSlices/students/overview.slice';
+import Spinner from '../../../components/shared/Spinner';
 
 const StudentSchedule = () => {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -14,9 +15,15 @@ const StudentSchedule = () => {
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const { data } = useGetprofileQuery({});
-    const user = data?.data?.data ?? data?.data ?? data;  
-    const userGroup = user?.userGroup?.[0]?._id; 
-    const { data: scheduleApi, isLoading } = useGetStudentClassScheduleQuery({ page: page, limit: 10, searchTerm: searchTerm , userGroup: userGroup });
+    const user = data?.data?.data ?? data?.data ?? data;
+    const userGroup = user?.userGroup?.[0]?._id;
+    // console.log(userGroup);
+    const { data: scheduleApi, isLoading } = useGetStudentClassScheduleQuery({
+        page: page,
+        limit: 10,
+        searchTerm: searchTerm,
+        userGroup: userGroup,
+    });
     const pagination = scheduleApi?.pagination;
 
     const scheduleData = scheduleApi?.data?.map((item: any) => ({
@@ -50,10 +57,9 @@ const StudentSchedule = () => {
 
                         <p className="text-xs text-gray-400">
                             {record.description?.length > 50
-                                ? record.description.slice(0, 50) + "..."
+                                ? record.description.slice(0, 50) + '...'
                                 : record.description}
                         </p>
-
                     </div>
                 </div>
             ),
@@ -105,6 +111,20 @@ const StudentSchedule = () => {
             ),
         },
         {
+            title: 'Target Group',
+            dataIndex: 'userGroup',
+            key: 'userGroup',
+            render: (userGroup: { _id: string; name: string }[]) => (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                    {userGroup?.map((group) => (
+                        <Tag key={group._id} color="blue">
+                            {group.name}
+                        </Tag>
+                    ))}
+                </div>
+            ),
+        },
+        {
             title: 'STATUS',
             dataIndex: 'status',
             key: 'status',
@@ -134,6 +154,10 @@ const StudentSchedule = () => {
         },
     ];
 
+    if (isLoading) {
+        return <Spinner />;
+    }
+
     return (
         <section className="space-y-6">
             <div className="flex justify-between items-center">
@@ -148,12 +172,12 @@ const StudentSchedule = () => {
                             style={{ backgroundColor: 'white' }}
                         />
                     </div>
-                    <Button
+                    {/* <Button
                         icon={<FilterIcon className="w-4 h-4" />}
                         className="h-10 px-6 border-gray-200 text-gray-600 font-medium flex items-center gap-2 rounded-lg"
                     >
                         Filter
-                    </Button>
+                    </Button> */}
                 </div>
             </div>
 

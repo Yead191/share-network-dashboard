@@ -3,7 +3,7 @@ import { Tabs, Spin } from 'antd';
 import { AssignmentCard } from './components/AssignmentCard';
 import { AssignmentDetailsModal } from './components/AssignmentDetailsModal';
 import { useGetAssignmentsStudentQuery } from '../../../redux/apiSlices/students/assignmentsSlice';
-import { useProfileQuery } from '../../../redux/apiSlices/authSlice'; 
+import { useProfileQuery } from '../../../redux/apiSlices/authSlice';
 import { Assignment, AssignmentStatus } from '../../../constants/student/assignments';
 
 export default function StudentAssignment() {
@@ -15,47 +15,52 @@ export default function StudentAssignment() {
     const { data: profileData } = useProfileQuery(undefined);
     const currentUserId = profileData?.data?._id;
 
-    const { data, isLoading, isError, refetch } = useGetAssignmentsStudentQuery(undefined);
+    const { data, isLoading, isError, refetch } = useGetAssignmentsStudentQuery(
+        { userGroup: profileData?.data?.userGroup?.[0]?._id },
+        {
+            skip: !profileData?.data?.userGroup?.[0]?._id,
+        },
+    );
 
     const handleCardClick = (assignment: Assignment) => {
         setSelectedAssignment(assignment);
         setIsModalOpen(true);
     };
 
-    const assignments: Assignment[] = data?.data?.map((item: any) => ({
-        id: item._id,
-        title: item.title,
-        description: item.description,
-        dueDate: item.dueDate,
-        openDate: item.createdAt,
-        status: item.status,
-        subject: item.title.split(' ')[0],
-        color: '#DCFCE7',
-        attachment: item.attachment,
-        teacher: item.teacher,
-        userGroup: item.userGroup,
-        submitAssignment: item.submitAssignment?.map((s: any) => ({
-            _id: s._id,
-            studentId: s.studentId,
-            fileAssignment: s.fileAssignment,
-            notes: s.notes,
-            createdAt: s.createdAt,
-            status: s.status,
-        })) || [],
-    })) || [];
+    const assignments: Assignment[] =
+        data?.data?.map((item: any) => ({
+            id: item._id,
+            title: item.title,
+            description: item.description,
+            dueDate: item.dueDate,
+            openDate: item.createdAt,
+            status: item.status,
+            subject: item.title.split(' ')[0],
+            color: '#DCFCE7',
+            attachment: item.attachment,
+            teacher: item.teacher,
+            userGroup: item.userGroup,
+            submitAssignment:
+                item.submitAssignment?.map((s: any) => ({
+                    _id: s._id,
+                    studentId: s.studentId,
+                    fileAssignment: s.fileAssignment,
+                    notes: s.notes,
+                    createdAt: s.createdAt,
+                    status: s.status,
+                })) || [],
+        })) || [];
 
     // Filter based on THIS user's submission status
     const getEffectiveStatus = (assignment: Assignment): AssignmentStatus => {
         if (!currentUserId) return 'PENDING';
         const mySubmission = assignment.submitAssignment?.find(
-            (s) => s.studentId === currentUserId && s.status === 'COMPLETED'
+            (s) => s.studentId === currentUserId && s.status === 'COMPLETED',
         );
         return mySubmission ? 'COMPLETED' : 'PENDING';
     };
 
-    const filteredAssignments = assignments.filter(
-        (assignment) => getEffectiveStatus(assignment) === activeTab
-    );
+    const filteredAssignments = assignments.filter((assignment) => getEffectiveStatus(assignment) === activeTab);
 
     const tabItems = [
         { key: 'PENDING', label: 'Pending' },

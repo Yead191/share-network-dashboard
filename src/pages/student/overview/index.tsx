@@ -21,11 +21,17 @@ const StudentOverview = () => {
     const { data: overviewData, isLoading, error } = useGetstudentOverviewQuery(undefined);
     const { data: profileData } = useGetprofileQuery(undefined);
     const { data: eventsData } = useGetUpcomingSessionsQuery(undefined);
-    const { data: assignmentsData } = useGetAssignmentsStudentQuery(undefined);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const studentName = profileData?.data?.firstName || profileData?.data?.name || 'Student';
     const userGroup = profileData?.data?.userGroup?.[0];
     const groupName = userGroup?.name || 'Skill Path';
+    const { data: assignmentsData } = useGetAssignmentsStudentQuery(
+        { userGroup: userGroup?._id },
+        {
+            skip: !userGroup?._id,
+        },
+    );
+
     const groupDescription = userGroup?.description || 'Welcome to your coding journey!';
     const handleEventClick = (event: any) => {
         setSelectedEvent(event);
