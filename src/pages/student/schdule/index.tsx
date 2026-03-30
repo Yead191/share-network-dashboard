@@ -6,16 +6,18 @@ import ClassScheduleDetailsModal from '../../../components/modals/admin/ClassSch
 import moment from 'moment';
 import { useGetStudentClassScheduleQuery } from '../../../redux/apiSlices/students/classSlice';
 import { imageUrl } from '../../../redux/api/baseApi';
+import { useGetprofileQuery } from '../../../redux/apiSlices/students/overview.slice';
 
 const StudentSchedule = () => {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
-    // API CALLS
-    const { data: scheduleApi, isLoading } = useGetStudentClassScheduleQuery({ page: page, limit: 10, searchTerm: searchTerm });
-    // console.log('scheduleApi', scheduleApi);
-    const  pagination= scheduleApi?.pagination;
+    const { data } = useGetprofileQuery({});
+    const user = data?.data?.data ?? data?.data ?? data;  
+    const userGroup = user?.userGroup?.[0]?._id; 
+    const { data: scheduleApi, isLoading } = useGetStudentClassScheduleQuery({ page: page, limit: 10, searchTerm: searchTerm , userGroup: userGroup });
+    const pagination = scheduleApi?.pagination;
 
     const scheduleData = scheduleApi?.data?.map((item: any) => ({
         _id: item?._id,
@@ -45,12 +47,12 @@ const StudentSchedule = () => {
                     </div>
                     <div>
                         <p className="font-semibold text-gray-800">{record.title}</p>
-             
-  <p className="text-xs text-gray-400">
-    {record.description?.length > 50
-      ? record.description.slice(0, 50) + "..."
-      : record.description}
-  </p>
+
+                        <p className="text-xs text-gray-400">
+                            {record.description?.length > 50
+                                ? record.description.slice(0, 50) + "..."
+                                : record.description}
+                        </p>
 
                     </div>
                 </div>
