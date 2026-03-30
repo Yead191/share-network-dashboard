@@ -16,8 +16,13 @@ interface Resource {
     };
 }
 
-const MentorOverviewResources = () => {
-    const { data, isLoading } = useGetMentorOverviewResourcesQuery({ targetedAudience: 'MENTOR' });
+const MentorOverviewResources = ({ mentor }: { mentor: any }) => {
+    const { data, isLoading } = useGetMentorOverviewResourcesQuery(
+        { targetedAudience: 'MENTOR', targertGroup: mentor?.userGroup?.[0]?._id },
+        {
+            skip: !mentor?.userGroup?.[0]?._id,
+        },
+    );
     const resources: Resource[] = data?.data?.resources || [];
     // console.log(resources);
     if (isLoading) {
