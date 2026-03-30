@@ -95,7 +95,7 @@ const StudentGoalsSnapshot = ({ snapshots }: { snapshots: StudentSnapshot[] }) =
                                                 `https://ui-avatars.com/api/?name=${student?.firstName}+${student?.lastName}&background=f3f4f6&color=6366f1&bold=true&rounded=true`;
                                         }}
                                     />
-                                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-[3px] border-white rounded-full shadow-lg" />
+                                    {/* <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-[3px] border-white rounded-full shadow-lg" /> */}
                                 </div>
                                 <div>
                                     <h4 className="text-xl font-bold text-gray-900 group-hover/student:text-indigo-600 transition-colors">
