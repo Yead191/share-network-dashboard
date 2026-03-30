@@ -207,7 +207,7 @@ const AdminLearningMaterials = () => {
                 </div>
             ),
         },
-    ]; 
+    ];
     // dfsf
     return (
         <section className="space-y-6">

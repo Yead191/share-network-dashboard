@@ -2,9 +2,9 @@ import { api } from '../../api/baseApi';
 
 const learningApi = api.injectEndpoints({
     endpoints: (build) => ({
-        getLearningMaterials: build.query<any, void>({
-            query: () => ({
-                url: '/learning?targeteAudience=MENTOR',
+        getLearningMaterials: build.query<any, any>({
+            query: ({ targertGroup, page = 1, limit = 10, searchTerm }) => ({
+                url: `/learning?targeteAudience=MENTOR&targertGroup=${targertGroup}&page=${page}&limit=${limit}&searchTerm=${searchTerm}`,
                 method: 'GET',
             }),
         }),
