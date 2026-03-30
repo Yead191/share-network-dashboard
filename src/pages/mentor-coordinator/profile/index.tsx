@@ -68,7 +68,21 @@ export default function MentorCoordinatorProfile() {
 
             {/* Profile Summary */}
             <div className="bg-white p-5 rounded-xl border border-gray-200 inline-flex items-center gap-5 mb-10 shadow-sm min-w-[320px]">
-                <Avatar shape="square" size={80} src={profileSrc} className="rounded-lg shadow-sm" />
+
+                {/* Avatar Wrapper */}
+                <div className="relative">
+                    <Avatar
+                        shape="square"
+                        size={80}
+                        src={profileSrc}
+                        className="rounded-lg shadow-sm"
+                    />
+
+                    {/* Active Dot */}
+                    {/* <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full"></span> */}
+                </div>
+
+                {/* User Info */}
                 <div>
                     <h3 className="text-lg font-bold text-[#333333]">{displayName}</h3>
                     <p className="text-gray-500 text-sm">{user?.email}</p>
