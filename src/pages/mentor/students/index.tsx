@@ -20,12 +20,13 @@ const Students = () => {
     );
     const { data: resourcesData, isLoading: resourcesLoading } = useGetMentorOverviewResourcesQuery({
         targetedAudience: 'STUDENT',
+        targertGroup: studentProfile?.data?.userGroup?.[0]?._id,
     });
 
     const resources = resourcesData?.data?.resources || [];
     const student = studentProfile?.data || {};
     const { data: activeAssignmentsData, isLoading: activeAssignmentsLoading } = useGetActiveAssignmentsQuery({
-        userGroup: student?.userGroup?.[0],
+        userGroup: student?.userGroup?.[0]?._id,
     });
     const { data: studentUpcomingEventsData, isLoading: studentUpcomingEventsLoading } =
         useGetStudentUpcomingEventsQuery({

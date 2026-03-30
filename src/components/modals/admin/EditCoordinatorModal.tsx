@@ -126,10 +126,10 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
 
                     <Form.Item name="status" label="Status">
                         <Select size="large" placeholder="Select status">
-                            <Select.Option value="PENDING">Pending</Select.Option>
+                            {/* <Select.Option value="PENDING">Pending</Select.Option> */}
                             <Select.Option value="ACTIVE">Active</Select.Option>
                             <Select.Option value="NON_ACTIVE">Non-Active</Select.Option>
-                            <Select.Option value="ALUMNI_GRADUATED">Alumni/Graduated</Select.Option>
+                            <Select.Option value="RESERVE">Reserve </Select.Option>
                         </Select>
                     </Form.Item>
                 </div>

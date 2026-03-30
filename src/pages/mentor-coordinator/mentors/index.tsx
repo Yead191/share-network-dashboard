@@ -136,7 +136,7 @@ const Mentors = () => {
                 <HeaderTitle title="Mentors" />
                 <div className="flex gap-4">
                     <Input
-                        placeholder="Search mentor..."
+                        placeholder="Search mentor by name/company..."
                         value={searchTerm}
                         onChange={(e) => {
                             setSearchTerm(e.target.value);

@@ -57,13 +57,15 @@ export default function MentorCoordinatorProfile() {
                     <h2 className="text-2xl font-bold text-[#333333]">Profile</h2>
                     <p className="text-gray-500 text-sm">Manage your professional information and mentor profile</p>
                 </div>
-                <Button
-                    icon={<EditOutlined />}
-                    onClick={() => setIsEditing(true)}
-                    className="flex items-center h-10 px-6 rounded-md"
-                >
-                    Edit Profile
-                </Button>
+                {user?.role !== 'COORDINATOR' && (
+                    <Button
+                        icon={<EditOutlined />}
+                        onClick={() => setIsEditing(true)}
+                        className="flex items-center h-10 px-6 rounded-md"
+                    >
+                        Edit Profile
+                    </Button>
+                )}
             </div>
 
             {/* Profile Summary */}
