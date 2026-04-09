@@ -11,6 +11,7 @@ interface AddLearningMaterialModalProps {
     refetch: () => void;
     selectedMaterial: any;
     userGroups: any;
+    userTracks: any;
 }
 
 const AddLearningMaterialModal = ({
@@ -19,10 +20,27 @@ const AddLearningMaterialModal = ({
     refetch,
     selectedMaterial,
     userGroups,
+    userTracks,
 }: AddLearningMaterialModalProps) => {
     const [form] = Form.useForm();
     const [addMaterial, { isLoading }] = useAddMaterialsMutation();
     const [editMaterial, { isLoading: isEditLoading }] = useUpdateMaterialsMutation();
+    const selectedGroup = Form.useWatch('targertGroup', form);
+
+    const isSkillPathSelected = () => {
+        if (!selectedGroup || !userGroups) return false;
+        const currentGroups = Array.isArray(selectedGroup) ? selectedGroup : [selectedGroup];
+        return currentGroups.some((groupId: string) => {
+            const group = userGroups.find((g: any) => g._id === groupId);
+            return group?.name === 'Skill Path';
+        });
+    };
+
+    useEffect(() => {
+        if (!isSkillPathSelected()) {
+            form.setFieldsValue({ targetTrack: null });
+        }
+    }, [selectedGroup, form, userGroups]);
 
     const [file, setFile] = useState<any | null>(null);
     useEffect(() => {
@@ -35,6 +53,7 @@ const AddLearningMaterialModal = ({
                 contentUrl: selectedMaterial?.url,
                 targeteAudience: selectedMaterial?.targetAudience, // Corrected to match backend
                 targertGroup: selectedMaterial?.target?._id || selectedMaterial?.target,
+                targetTrack: selectedMaterial?.targetTrack?._id || selectedMaterial?.targetTrack,
                 markAsAssigned: selectedMaterial?.status === 'Active',
             });
         } else if (open && !selectedMaterial) {
@@ -49,10 +68,13 @@ const AddLearningMaterialModal = ({
 
             // Append all fields except 'pdf' (old path) and handle undefined/null correctly
             Object.entries(values).forEach(([key, value]) => {
-                if (key !== 'pdf' && key !== 'file' && value !== undefined && value !== null) {
+                if (key !== 'pdf' && key !== 'file') {
                     if (key === 'markAsAssigned') {
                         formdata.append(key, String(!!value));
-                    } else {
+                    } else if (key === 'targetTrack' && (value === undefined || value === null)) {
+                        // Always send empty string for targetTrack if it's not selected
+                        formdata.append(key, '');
+                    } else if (value !== undefined && value !== null) {
                         formdata.append(key, String(value));
                     }
                 }
@@ -215,6 +237,22 @@ const AddLearningMaterialModal = ({
                             }))}
                         />
                     </Form.Item>
+                    {isSkillPathSelected() && (
+                        <Form.Item
+                            name="targetTrack"
+                            label={<span className="text-sm font-semibold text-gray-700">Target Track</span>}
+                        >
+                            <Select
+                                placeholder="Select track"
+                                className="w-full h-11"
+                                allowClear
+                                options={userTracks?.map((track: any) => ({
+                                    value: track._id,
+                                    label: track.name,
+                                }))}
+                            />
+                        </Form.Item>
+                    )}
                 </div>
 
                 {/* <div className="mb-4">

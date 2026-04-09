@@ -9,7 +9,7 @@ import { useGetMaterialsQuery } from '../../../redux/apiSlices/admin/adminMateri
 import { useDeleteMaterialsMutation } from '../../../redux/apiSlices/mentor/learningApi';
 import moment from 'moment';
 import { imageUrl } from '../../../redux/api/baseApi';
-import { useGetUserGroupsQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
+import { useGetUserGroupsQuery, useGetUserTracksQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
 
 const AdminLearningMaterials = () => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -28,8 +28,10 @@ const AdminLearningMaterials = () => {
         targertGroup: filterGroup,
     });
     const { data: userGroupsApi } = useGetUserGroupsQuery({});
+    const { data: userTracksApi } = useGetUserTracksQuery({});
     const [deleteMaterials] = useDeleteMaterialsMutation();
     const userGroups = userGroupsApi?.data;
+    const userTracks = userTracksApi?.data;
 
     const materialsData = materialApi?.data?.resources?.map((item: any) => ({
         _id: item?._id,
@@ -41,6 +43,7 @@ const AdminLearningMaterials = () => {
         pdf: item?.pdf,
         targetAudience: item?.targeteAudience,
         target: item?.targertGroup,
+        targetTrack: item?.targetTrack,
         status: item?.markAsAssigned ? 'Active' : 'Inactive',
         date: moment(item?.createdAt).format('YYYY-MM-DD'),
         file: item?.pdf,
@@ -161,6 +164,25 @@ const AdminLearningMaterials = () => {
                     </span>
                 </div>
             ),
+        },
+        {
+            title: 'TRACK',
+            dataIndex: 'targetTrack',
+            key: 'targetTrack',
+            render: (targetTrack: { _id: string; name: string }) => {
+                console.log('targetTrack value:', targetTrack); // 👈 add this
+                return (
+                    <div className="flex gap-2">
+                        {targetTrack?.name ? (
+                            <span className="px-3 py-1 bg-purple-50 text-purple-500 text-[10px] rounded-full border border-purple-100 uppercase tracking-tight font-medium">
+                                {targetTrack?.name}
+                            </span>
+                        ) : (
+                            <span className="text-gray-400 text-[10px]">N/A</span>
+                        )}
+                    </div>
+                );
+            },
         },
         {
             title: 'STATUS',
@@ -284,9 +306,8 @@ const AdminLearningMaterials = () => {
                     >
                         <Button
                             icon={<Filter className="w-4 h-4" />}
-                            className={`h-10 px-6 border-gray-200 text-gray-600 font-semibold flex items-center gap-2 rounded-lg shadow-sm transition-all ${
-                                filterAudience || filterGroup ? 'bg-blue-50 border-blue-200 text-blue-600' : ''
-                            }`}
+                            className={`h-10 px-6 border-gray-200 text-gray-600 font-semibold flex items-center gap-2 rounded-lg shadow-sm transition-all ${filterAudience || filterGroup ? 'bg-blue-50 border-blue-200 text-blue-600' : ''
+                                }`}
                         >
                             Filter
                         </Button>
@@ -325,6 +346,7 @@ const AdminLearningMaterials = () => {
                 selectedMaterial={selectedMaterial}
                 refetch={refetch}
                 userGroups={userGroups}
+                userTracks={userTracks}
             />
 
             <LearningMaterialDetailsModal

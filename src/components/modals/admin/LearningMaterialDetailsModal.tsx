@@ -102,13 +102,24 @@ const LearningMaterialDetailsModal = ({ open, onCancel, data }: LearningMaterial
                             <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">
                                 Target Group
                             </td>
-                            <td className="px-5 py-4 text-gray-800 text-[13px]">{data?.targetGroup || 'Full Stack'}</td>
+                            <td className="px-5 py-4 text-gray-800 text-[13px]">{data?.target?.name || 'N/A'}</td>
                         </tr>
+                        {data?.targetTrack && (
+                            <tr>
+                                <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">
+                                    Target Track
+                                </td>
+                                <td className="px-5 py-4 text-purple-600 font-medium text-[13px]">
+                                    {data?.targetTrack?.name}
+                                </td>
+                            </tr>
+                        )}
                         <tr>
                             <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">Status</td>
                             <td className="px-5 py-4">
-                                <span className="px-3 py-1 bg-green-50 text-green-500 rounded-full text-xs font-semibold">
-                                    Active
+                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${data?.status === 'Active' ? 'bg-green-50 text-green-500' : 'bg-red-50 text-red-500'
+                                    }`}>
+                                    {data?.status || 'Active'}
                                 </span>
                             </td>
                         </tr>
