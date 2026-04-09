@@ -46,7 +46,7 @@ const AddLearningMaterialModal = ({
     const onFinish = async (values: Record<string, any>) => {
         try {
             const formdata = new FormData();
-            
+
             // Append all fields except 'pdf' (old path) and handle undefined/null correctly
             Object.entries(values).forEach(([key, value]) => {
                 if (key !== 'pdf' && key !== 'file' && value !== undefined && value !== null) {
@@ -58,6 +58,10 @@ const AddLearningMaterialModal = ({
                 }
             });
 
+            // Add markAsAssigned default for new materials where the field is hidden
+            if (!selectedMaterial?._id) {
+                formdata.append('markAsAssigned', 'true');
+            }
             if (file) {
                 formdata.append('file', file);
             }
@@ -224,9 +228,11 @@ const AddLearningMaterialModal = ({
                     </Form.Item>
                 </div> */}
 
-                <Form.Item name="markAsAssigned" valuePropName="checked">
-                    <Checkbox className="text-gray-600">Mark as Assigned</Checkbox>
-                </Form.Item>
+                {selectedMaterial?._id && (
+                    <Form.Item name="markAsAssigned" valuePropName="checked">
+                        <Checkbox className="text-gray-600">Mark as Assigned</Checkbox>
+                    </Form.Item>
+                )}
 
                 <div className="flex justify-end pt-4">
                     <Button

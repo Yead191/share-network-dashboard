@@ -8,7 +8,7 @@ interface AuthSidebarProps {
 const AuthSidebar: React.FC<AuthSidebarProps> = ({ backgroundImage }) => {
     return (
         <div
-            className="relative h-screen bg-cover bg-center flex items-center justify-center"
+            className="relative h-screen bg-cover bg-center hidden lg:flex items-center justify-center"
             style={{ backgroundImage: `url(${backgroundImage})` }}
         >
             {/* Overlay */}

@@ -44,6 +44,7 @@ import HomeRedirect from '../provider/HomeRedirect';
 import AdminCoordinator from '../pages/admin/coordinator';
 import TakeAttendance from '../pages/admin/students/take-attendance/TakeAttendance';
 import GoalIndex from '../pages/student/goal/GoalIndex';
+import Register from '../pages/authentication/Register';
 
 const router = createBrowserRouter([
     {
@@ -384,6 +385,7 @@ const router = createBrowserRouter([
         ],
     },
     { path: '/login', element: <Login /> },
+    { path: '/signup', element: <Register /> },
     { path: '/forget-password', element: <ForgetPassword /> },
     { path: '/verify-otp', element: <VerifyOtp /> },
     { path: '/new-password', element: <NewPassword /> },

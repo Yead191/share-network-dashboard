@@ -2,11 +2,11 @@ import { Card } from 'antd';
 import { FileText, Download, Clock, ExternalLink, BookOpen } from 'lucide-react';
 import { imageUrl } from '../../../../redux/api/baseApi';
 
-const LearningMaterials = ({ resources }: any) => {
+const LearningMaterials = ({ resources, targertGroup }: any) => {
     return (
         <Card
             className="shadow-sm border-none rounded-2xl overflow-hidden"
-            title={<span className="text-xl font-bold">Resources</span>}
+            title={<span className="text-xl font-bold">Resources (Group: {targertGroup})</span>}
         >
             <div className="flex-1 overflow-y-auto custom-scrollbar max-h-[280px]">
                 {resources.length > 0 ? (

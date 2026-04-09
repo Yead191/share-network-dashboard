@@ -83,7 +83,7 @@ const Students = () => {
                 </div>
             </div>
             <div className="mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <LearningMaterials resources={resources} />
+                <LearningMaterials resources={resources} targertGroup={studentProfile?.data?.userGroup?.[0]?.name} />
 
                 <UpcomingEvents data={studentUpcomingEvents} />
 

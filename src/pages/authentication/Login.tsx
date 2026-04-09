@@ -79,7 +79,7 @@ const Login = () => {
     };
 
     return (
-        <section className="min-h-screen grid grid-cols-2 items-center bg-[#F8FAFC]">
+        <section className="min-h-screen grid lg:grid-cols-2 items-center bg-[#F8FAFC]">
             <AuthSidebar backgroundImage="/assets/images/auth/login.jpg" />
 
             {/* Right Side: Login Form */}
@@ -168,7 +168,7 @@ const Login = () => {
                                 )}
                             </div>
 
-                            <Form.Item className="mb-0">
+                            <Form.Item className="mb-4">
                                 <Button
                                     type="primary"
                                     htmlType="submit"
@@ -178,6 +178,13 @@ const Login = () => {
                                     Sign in
                                 </Button>
                             </Form.Item>
+
+                            <div className="text-center text-[#64748B] text-base">
+                                Don't have an account?{' '}
+                                <Link to="/signup" className="text-[#66D978] font-semibold hover:underline">
+                                    Sign Up
+                                </Link>
+                            </div>
                         </Form>
                     </div>
                 </ConfigProvider>
