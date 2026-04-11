@@ -19,7 +19,7 @@ const Students = () => {
         mentorProfile?.data?.assignedStudents[0]?._id,
     );
     const { data: resourcesData, isLoading: resourcesLoading } = useGetMentorOverviewResourcesQuery({
-        targetedAudience: 'STUDENT',
+        targeteAudience: 'STUDENT',
         targertGroup: studentProfile?.data?.userGroup?.[0]?._id,
     });
 

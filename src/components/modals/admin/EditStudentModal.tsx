@@ -4,7 +4,6 @@ import { X } from 'lucide-react';
 import {
     useUpdateStudentMutation,
     // useGetUserGroupsQuery,
-    useGetUserTracksQuery,
 } from '../../../redux/apiSlices/admin/adminStudentApi';
 import { toast } from 'sonner';
 import dayjs from 'dayjs';
@@ -20,9 +19,7 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ open, onCancel, stu
     const [form] = Form.useForm();
     const [updateStudent, { isLoading }] = useUpdateStudentMutation();
     // const { data: userGroupsApi } = useGetUserGroupsQuery({});
-    const { data: userTracksApi } = useGetUserTracksQuery({});
-    // const userGroups = userGroupsApi?.data || [];
-    const userTracks = userTracksApi?.data || [];
+
 
     useEffect(() => {
         if (student) {

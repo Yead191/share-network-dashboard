@@ -7,7 +7,7 @@ import EventDetailsModal from '../../../components/modals/admin/EventDetailsModa
 import { useDeleteEventsMutation, useGetEventsQuery } from '../../../redux/apiSlices/admin/adminEventsApi';
 import { toast } from 'sonner';
 import moment from 'moment';
-import { useGetStudentsQuery, useGetUserGroupsQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
+import { useGetUserGroupsQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
 import Spinner from '../../../components/shared/Spinner';
 
 const AdminEvents = () => {
@@ -22,7 +22,6 @@ const AdminEvents = () => {
         refetch,
         isLoading: isEventsLoading,
     } = useGetEventsQuery({ page: page, limit: 10, searchTerm: searchTerm });
-    const { data: studentsApi } = useGetStudentsQuery({ page: 0, limit: 0 });
     const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({});
     const [deleteEvents] = useDeleteEventsMutation();
     const userGroups = userGroupsApi?.data || [];
