@@ -16,9 +16,13 @@ const mentorOverviewApi = api.injectEndpoints({
             }),
         }),
         // mentor overview resources
-        getMentorOverviewResources: build.query<any, { targetedAudience: string; targertGroup: string }>({
-            query: ({ targetedAudience, targertGroup }) => ({
-                url: `/learning?targeteAudience=${targetedAudience}&targertGroup=${targertGroup}`,
+        getMentorOverviewResources: build.query<
+            any,
+            { targetedAudience: string; targertGroup: string; targetTrack?: string }
+        >({
+            query: ({ targetedAudience, targertGroup, targetTrack }) => ({
+                url: `/learning?targetedAudience=${targetedAudience}&targertGroup=${targertGroup}${targetTrack ? `&targetTrack=${targetTrack}` : ''
+                    }`,
                 method: 'GET',
             }),
         }),

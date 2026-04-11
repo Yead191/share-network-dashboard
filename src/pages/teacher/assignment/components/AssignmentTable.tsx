@@ -113,10 +113,10 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
                 <div className="flex flex-col gap-1">
 
                     <Tag
-                        key={type._id}
-                        className={`${type.name === 'Skill Path' ? 'bg-green-50 text-green-500 border-green-100' : 'bg-gray-50 text-gray-500 border-gray-100'} rounded-full px-3 py-0.5 text-[10px] w-fit font-medium`}
+                        key={type?._id}
+                        className={`${type?.name === 'Skill Path' ? 'bg-green-50 text-green-500 border-green-100' : 'bg-gray-50 text-gray-500 border-gray-100'} rounded-full px-3 py-0.5 text-[10px] w-fit font-medium`}
                     >
-                        {type.name}
+                        {type?.name}
                     </Tag>
 
                 </div>

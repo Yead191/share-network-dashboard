@@ -8,7 +8,6 @@ import { useGetprofileQuery } from '../../redux/apiSlices/students/overview.slic
 
 const HeaderDashboard = () => {
     const { data: user } = useGetprofileQuery({});
-    console.log(user)
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const role = localStorage.getItem('role')?.toLowerCase() || '';
@@ -55,6 +54,11 @@ const HeaderDashboard = () => {
                                 }>
                                     {user?.data?.userGroup[0]?.name}
                                 </Tag>
+                                {user?.data?.userGroupTrack?.name && (
+                                    <Tag color="#8a2be2">
+                                        {user?.data?.userGroupTrack?.name}
+                                    </Tag>
+                                )}
                             </div>
                             <p className="text-sm font-medium ">Platform Management Dashboard</p>
                         </div>

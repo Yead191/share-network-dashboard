@@ -24,7 +24,7 @@ const AddEventModal = ({
     userGroups,
     isGroupsLoading,
 }: AddEventModalProps) => {
-    console.log(students, 'students');
+    // console.log(students, 'students');
     const [form] = Form.useForm();
     const [addEvent, { isLoading: isAdding }] = useAddEventsMutation();
     const [updateEvent, { isLoading: isUpdating }] = useUpdateEventsMutation();

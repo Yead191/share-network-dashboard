@@ -139,6 +139,7 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ open, onCancel, stu
                     <Col span={12}>
                         <Form.Item label={<span className="font-medium text-gray-700">Email</span>} name="email">
                             <Input
+                                disabled
                                 className="h-11 rounded-md"
                                 variant="filled"
                                 style={{ backgroundColor: '#f9f9f9' }}
@@ -173,7 +174,7 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ open, onCancel, stu
                             />
                         </Form.Item>
                     </Col> */}
-                    <Col span={24}>
+                    {/* <Col span={24}>
                         <Form.Item
                             label={<span className="font-medium text-gray-700">Track</span>}
                             name="userGroupTrack"
@@ -184,7 +185,7 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ open, onCancel, stu
                                 options={userTracks.map((t: any) => ({ label: t.name, value: t._id }))}
                             />
                         </Form.Item>
-                    </Col>
+                    </Col> */}
                 </Row>
 
                 <Form.Item label={<span className="font-medium text-gray-700">About</span>} name="about">

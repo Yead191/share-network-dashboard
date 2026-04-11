@@ -18,7 +18,11 @@ interface Resource {
 
 const MentorOverviewResources = ({ mentor }: { mentor: any }) => {
     const { data, isLoading } = useGetMentorOverviewResourcesQuery(
-        { targetedAudience: 'MENTOR', targertGroup: mentor?.userGroup?.[0]?._id },
+        {
+            targetedAudience: 'MENTOR', targertGroup: mentor?.userGroup?.[0]?._id, ...(mentor?.userGroupTrack?._id && {
+                targetTrack: mentor.userGroupTrack._id,
+            }),
+        },
         {
             skip: !mentor?.userGroup?.[0]?._id,
         },
