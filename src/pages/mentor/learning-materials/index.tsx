@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Table, Button, Input } from 'antd';
+import { Table, Button, Input, Tag } from 'antd';
 import { Eye, BookOpen, ExternalLink, Download as DownloadIcon, Search } from 'lucide-react';
 import AddResourceModal from '../../../components/modals/mentor/learning-materials/AddResourceModal';
 import ResourceDetailsModal from '../../../components/modals/mentor/learning-materials/ResourceDetailsModal';
@@ -30,6 +30,9 @@ const LearningMaterials = () => {
             targertGroup: user?.userGroup?.[0]?._id,
             page,
             searchTerm,
+            ...(user?.userGroupTrack?._id && {
+                targetTrack: user.userGroupTrack._id,
+            }),
         },
         {
             skip: !user?.userGroup?.[0]?._id,
@@ -107,8 +110,48 @@ const LearningMaterials = () => {
             title: 'Target Group',
             key: 'targertGroup',
             render: (_: any, record: any) => (
-                <span className="text-gray-500">{record.targertGroup?.name || 'N/A'}</span>
+                <div className="flex gap-1 flex-wrap">
+                    {record.targertGroup?.length ? (
+                        record.targertGroup.map((group: any) => {
+                            const name = group.name?.toUpperCase();
+
+                            const color =
+                                name === 'BEGINNERS' ? "#ff6347" :
+                                    name === 'EXPEDITION' ? "#32cd32" :
+                                        name === 'SKILL PATH' ? "#1e90ff" :
+                                            "#d3d3d3";
+
+                            return (
+                                <Tag key={group._id} color={color}>
+                                    {name}
+                                </Tag>
+                            );
+                        })
+                    ) : (
+                        'N/A'
+                    )}
+                </div>
             ),
+        }, {
+            title: 'Target Track',
+            key: 'targetTrack',
+            render: (_: any, record: any) => {
+                const trackName = record.targetTrack?.name?.toUpperCase();
+
+                if (!trackName) return <span className="text-gray-500">N/A</span>;
+
+                const color =
+                    trackName === 'FRONTEND' ? "#f59e0b" :
+                        trackName === 'BACKEND' ? "#10b981" :
+                            trackName === 'FULLSTACK' ? "#6366f1" :
+                                "#8a2be2";
+
+                return (
+                    <Tag color={color}>
+                        {trackName}
+                    </Tag>
+                );
+            },
         },
         {
             title: 'Date added',
