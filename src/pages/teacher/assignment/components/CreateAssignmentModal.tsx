@@ -25,6 +25,7 @@ const CreateAssignmentModal: React.FC<CreateAssignmentModalProps> = ({
     const { data: userGroupsTrack } = useGetUserGroupsTrackQuery({ page: 1, limit: 10 });
     const [form] = Form.useForm();
 
+    console.log(initialValues)
     useEffect(() => {
         if (open) {
             if (mode === 'edit' && initialValues) {
@@ -48,8 +49,12 @@ const CreateAssignmentModal: React.FC<CreateAssignmentModalProps> = ({
     const handleSubmit = () => {
         form.validateFields()
             .then((values) => {
+                const skillPathGroup = userGroups?.data?.find((g: any) => g.name === 'Skill Path');
+                const isSkillPathSelected = values.userGroup === skillPathGroup?._id;
+
                 onFinish({
                     ...values,
+                    userGroupTrack: isSkillPathSelected ? values.userGroupTrack : null,
                     dueDate: values.dueDate ? values.dueDate.format('YYYY-MM-DD HH:mm') : null,
                     id: mode === 'edit' ? initialValues.key : undefined,
                 });
@@ -124,9 +129,15 @@ const CreateAssignmentModal: React.FC<CreateAssignmentModalProps> = ({
                         rules={[{ required: true, message: 'Please select a group' }]}
                     >
                         <Select
-                            mode="multiple"
+                            // mode="multiple"
                             placeholder="Select groups"
                             className="custom-select-full rounded-lg !h-[44px]"
+                            onChange={(value) => {
+                                const skillPathGroup = userGroups?.data?.find((g: any) => g.name === 'Skill Path');
+                                if (value !== skillPathGroup?._id) {
+                                    form.setFieldValue('userGroupTrack', null);
+                                }
+                            }}
                         >
                             {userGroups?.data?.map((group: any) => (
                                 <Select.Option key={group._id} value={group._id}>
@@ -149,6 +160,7 @@ const CreateAssignmentModal: React.FC<CreateAssignmentModalProps> = ({
                                     name="userGroupTrack"
                                 >
                                     <Select
+                                        allowClear
                                         placeholder="Select track"
                                         disabled={!isSkillPathSelected}
                                         className="h-11 custom-select-full rounded-lg"
@@ -220,8 +232,8 @@ const CreateAssignmentModal: React.FC<CreateAssignmentModalProps> = ({
                                             } else if (info.fileList.length > 0) {
                                                 setFile(
                                                     info.fileList[0].originFileObj ||
-                                                        info.file.originFileObj ||
-                                                        info.file,
+                                                    info.file.originFileObj ||
+                                                    info.file,
                                                 );
                                             }
                                         }}

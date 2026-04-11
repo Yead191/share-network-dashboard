@@ -228,11 +228,10 @@ function Assignment() {
                         setActiveTab('assignment');
                         setSearchText('');
                     }}
-                    className={`h-10 px-6 rounded-lg font-bold transition-all ${
-                        activeTab === 'assignment'
-                            ? 'bg-[#3182CE] text-white shadow-lg shadow-[#3182CE]/20'
-                            : 'bg-white text-gray-500 border border-gray-100'
-                    }`}
+                    className={`h-10 px-6 rounded-lg font-bold transition-all ${activeTab === 'assignment'
+                        ? 'bg-[#3182CE] text-white shadow-lg shadow-[#3182CE]/20'
+                        : 'bg-white text-gray-500 border border-gray-100'
+                        }`}
                 >
                     All Assignment
                 </button>
@@ -241,11 +240,10 @@ function Assignment() {
                         setActiveTab('submission');
                         setSearchText('');
                     }}
-                    className={`h-10 px-6 rounded-lg font-bold transition-all ${
-                        activeTab === 'submission'
-                            ? 'bg-[#3182CE] text-white shadow-lg shadow-[#3182CE]/20'
-                            : 'bg-white text-gray-500 border border-gray-100'
-                    }`}
+                    className={`h-10 px-6 rounded-lg font-bold transition-all ${activeTab === 'submission'
+                        ? 'bg-[#3182CE] text-white shadow-lg shadow-[#3182CE]/20'
+                        : 'bg-white text-gray-500 border border-gray-100'
+                        }`}
                 >
                     Submission
                 </button>

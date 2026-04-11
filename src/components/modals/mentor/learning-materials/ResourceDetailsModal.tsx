@@ -4,6 +4,7 @@ import { imageUrl } from '../../../../redux/api/baseApi';
 import moment from 'moment';
 
 const ResourceDetailsModal = ({ open, onCancel, resource }: any) => {
+    console.log(resource)
     if (!resource) return null;
 
     const downloadUrl = resource.pdf ? `${imageUrl}${resource.pdf?.replace('/uploads', '')}` : null;
@@ -66,8 +67,10 @@ const ResourceDetailsModal = ({ open, onCancel, resource }: any) => {
                     <p className="text-gray-600 leading-relaxed text-lg">
                         {resource.description ||
                             'Access this educational resource to support your teaching and student guidance. This material belongs to the ' +
-                                (resource.targertGroup?.name || 'assigned') +
-                                ' group.'}
+                            (Array.isArray(resource.targertGroup)
+                                ? resource.targertGroup.map((g: any) => g.name).join(', ')
+                                : resource.targertGroup?.name || 'assigned') +
+                            ' group.'}
                     </p>
                 </div>
 
@@ -80,7 +83,17 @@ const ResourceDetailsModal = ({ open, onCancel, resource }: any) => {
                                 Target Group
                             </h3>
                             <div className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-gray-700 font-medium">
-                                {resource.targertGroup?.name || 'N/A'}
+                                {Array.isArray(resource.targertGroup) ? (
+                                    <div className="flex flex-wrap gap-2">
+                                        {resource.targertGroup.map((group: any) => (
+                                            <Tag key={group._id} color="blue" className="m-0">
+                                                {group.name}
+                                            </Tag>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    resource.targertGroup?.name || 'N/A'
+                                )}
                             </div>
                         </div>
                     </div>

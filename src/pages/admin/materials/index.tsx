@@ -157,11 +157,20 @@ const AdminLearningMaterials = () => {
             title: 'TARGET',
             dataIndex: 'target',
             key: 'target',
-            render: (tags: { _id: string; name: string }) => (
-                <div className="flex gap-2">
-                    <span className="px-3 py-1 bg-gray-50 text-gray-400 text-[10px] rounded-full border border-gray-200 uppercase tracking-tight font-medium">
-                        {tags?.name}
-                    </span>
+            render: (targets: { _id: string; name: string }[]) => (
+                <div className="flex gap-2 flex-wrap">
+                    {Array.isArray(targets) && targets.length > 0 ? (
+                        targets.map((item) => (
+                            <span
+                                key={item._id}
+                                className="px-3 py-1 bg-gray-50 text-gray-400 text-[10px] rounded-full border border-gray-200 uppercase tracking-tight font-medium"
+                            >
+                                {item?.name}
+                            </span>
+                        ))
+                    ) : (
+                        <span className="text-gray-400 text-[10px]">N/A</span>
+                    )}
                 </div>
             ),
         },

@@ -22,6 +22,7 @@ const AddLearningMaterialModal = ({
     userGroups,
     userTracks,
 }: AddLearningMaterialModalProps) => {
+    console.log(selectedMaterial)
     const [form] = Form.useForm();
     const [addMaterial, { isLoading }] = useAddMaterialsMutation();
     const [editMaterial, { isLoading: isEditLoading }] = useUpdateMaterialsMutation();
@@ -52,13 +53,15 @@ const AddLearningMaterialModal = ({
                 pdf: selectedMaterial?.pdf,
                 contentUrl: selectedMaterial?.url,
                 targeteAudience: selectedMaterial?.targetAudience, // Corrected to match backend
-                targertGroup: selectedMaterial?.target?._id || selectedMaterial?.target,
+                targertGroup: Array.isArray(selectedMaterial?.target)
+                    ? selectedMaterial.target.map((t: any) => t._id || t)
+                    : selectedMaterial?.target?._id || selectedMaterial?.target,
                 targetTrack: selectedMaterial?.targetTrack?._id || selectedMaterial?.targetTrack,
                 markAsAssigned: selectedMaterial?.status === 'Active',
             });
         } else if (open && !selectedMaterial) {
             form.resetFields();
-            setFile(null); // Clear file on new material
+            setFile(null);
         }
     }, [open, selectedMaterial, form]);
 
@@ -69,12 +72,22 @@ const AddLearningMaterialModal = ({
             // Append all fields except 'pdf' (old path) and handle undefined/null correctly
             Object.entries(values).forEach(([key, value]) => {
                 if (key !== 'pdf' && key !== 'file') {
+
                     if (key === 'markAsAssigned') {
                         formdata.append(key, String(!!value));
-                    } else if (key === 'targetTrack' && (value === undefined || value === null)) {
-                        // Always send empty string for targetTrack if it's not selected
-                        formdata.append(key, '');
-                    } else if (value !== undefined && value !== null) {
+
+                    } else if (Array.isArray(value)) {
+                        value.forEach((item, index) => {
+                            if (typeof item === 'object' && item !== null) {
+                                Object.entries(item).forEach(([subKey, subValue]) => {
+                                    formdata.append(`${key}[${index}][${subKey}]`, String(subValue));
+                                });
+                            } else {
+                                formdata.append(`${key}[${index}]`, String(item));
+                            }
+                        });
+
+                    } else if (value !== undefined && value !== null && value !== '') {
                         formdata.append(key, String(value));
                     }
                 }
@@ -229,6 +242,7 @@ const AddLearningMaterialModal = ({
                         label={<span className="text-sm font-semibold text-gray-700">Target Group</span>}
                     >
                         <Select
+                            mode="multiple"
                             placeholder="Select group"
                             className="w-full h-11"
                             options={userGroups?.map((group: any) => ({
@@ -237,22 +251,23 @@ const AddLearningMaterialModal = ({
                             }))}
                         />
                     </Form.Item>
-                    {isSkillPathSelected() && (
-                        <Form.Item
-                            name="targetTrack"
-                            label={<span className="text-sm font-semibold text-gray-700">Target Track</span>}
-                        >
-                            <Select
-                                placeholder="Select track"
-                                className="w-full h-11"
-                                allowClear
-                                options={userTracks?.map((track: any) => ({
-                                    value: track._id,
-                                    label: track.name,
-                                }))}
-                            />
-                        </Form.Item>
-                    )}
+                    <Form.Item
+                        name="targetTrack"
+                        label={<span className="text-sm font-semibold text-gray-700">Target Track</span>}
+                    >
+                        <Select
+                            // disabled={!isSkillPathSelected}
+                            // mode="multiple"
+                            placeholder="Select track"
+                            className="w-full h-11"
+                            allowClear
+                            options={userTracks?.map((track: any) => ({
+                                value: track._id,
+                                label: track.name,
+                            }))}
+                        />
+                    </Form.Item>
+
                 </div>
 
                 {/* <div className="mb-4">

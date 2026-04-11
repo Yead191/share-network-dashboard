@@ -106,6 +106,23 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
             ),
         },
         {
+            title: 'TRACK',
+            dataIndex: 'type',
+            key: 'type',
+            render: (type: { name: string; _id: string }) => (
+                <div className="flex flex-col gap-1">
+
+                    <Tag
+                        key={type._id}
+                        className={`${type.name === 'Skill Path' ? 'bg-green-50 text-green-500 border-green-100' : 'bg-gray-50 text-gray-500 border-gray-100'} rounded-full px-3 py-0.5 text-[10px] w-fit font-medium`}
+                    >
+                        {type.name}
+                    </Tag>
+
+                </div>
+            ),
+        },
+        {
             title: 'DUE DATE',
             dataIndex: 'dueDate',
             key: 'dueDate',
@@ -138,13 +155,12 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
                         />
                     </div>
                     <Tag
-                        className={`w-fit rounded-lg text-[10px] px-2 py-0.5 font-bold ${
-                            record.status === 'COMPLETED'
-                                ? 'bg-green-50 text-green-500 border-green-100'
-                                : record.status === 'IN_PROGRESS'
-                                  ? 'bg-blue-50 text-blue-500 border-blue-100'
-                                  : 'bg-yellow-50 text-yellow-500 border-yellow-100'
-                        }`}
+                        className={`w-fit rounded-lg text-[10px] px-2 py-0.5 font-bold ${record.status === 'COMPLETED'
+                            ? 'bg-green-50 text-green-500 border-green-100'
+                            : record.status === 'IN_PROGRESS'
+                                ? 'bg-blue-50 text-blue-500 border-blue-100'
+                                : 'bg-yellow-50 text-yellow-500 border-yellow-100'
+                            }`}
                     >
                         {record.status}
                     </Tag>

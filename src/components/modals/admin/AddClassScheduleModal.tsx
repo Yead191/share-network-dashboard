@@ -169,7 +169,7 @@ const AddClassScheduleModal = ({ open, onCancel, refetch, selectedSchedule }: Ad
                         <Select
                             placeholder="Select group"
                             className="w-full h-11"
-                            mode="multiple"
+                            // mode="multiple"
                             options={userGroups?.data?.map((group: any) => ({
                                 value: group._id,
                                 label: group.name,
@@ -181,6 +181,7 @@ const AddClassScheduleModal = ({ open, onCancel, refetch, selectedSchedule }: Ad
                         label={<span className="text-sm font-semibold text-gray-700">Target Track</span>}
                     >
                         <Select
+                            allowClear
                             placeholder="Select Track"
                             className="w-full h-11"
                             options={userGroupTracks?.data?.map((track: any) => ({

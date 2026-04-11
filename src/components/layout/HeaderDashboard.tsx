@@ -4,8 +4,11 @@ import { toast } from 'sonner';
 import { useDispatch } from 'react-redux';
 import { api } from '../../redux/api/baseApi';
 import { Tag } from 'antd';
+import { useGetprofileQuery } from '../../redux/apiSlices/students/overview.slice';
 
 const HeaderDashboard = () => {
+    const { data: user } = useGetprofileQuery({});
+    console.log(user)
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const role = localStorage.getItem('role')?.toLowerCase() || '';
@@ -14,26 +17,26 @@ const HeaderDashboard = () => {
         role === 'super_admin'
             ? 'Admin'
             : role === 'teacher'
-              ? 'Teacher'
-              : role === 'coordinator'
-                ? 'Mentor Coordinator'
-                : role === 'student'
-                  ? 'Student'
-                  : role === 'mentor'
-                    ? 'Mentor'
-                    : 'Admin';
+                ? 'Teacher'
+                : role === 'coordinator'
+                    ? 'Mentor Coordinator'
+                    : role === 'student'
+                        ? 'Student'
+                        : role === 'mentor'
+                            ? 'Mentor'
+                            : 'Admin';
     const routeRole =
         role === 'super_admin'
             ? 'admin'
             : role === 'teacher'
-              ? 'teacher'
-              : role === 'coordinator'
-                ? 'mentor-coordinator'
-                : role === 'student'
-                  ? 'student'
-                  : role === 'mentor'
-                    ? 'mentor'
-                    : 'admin';
+                ? 'teacher'
+                : role === 'coordinator'
+                    ? 'mentor-coordinator'
+                    : role === 'student'
+                        ? 'student'
+                        : role === 'mentor'
+                            ? 'mentor'
+                            : 'admin';
     return (
         <div className="container  bg-transparent flex items-center justify-between text-white h-[80px]">
             <div>
@@ -44,6 +47,14 @@ const HeaderDashboard = () => {
                             <div className="flex items-center gap-2">
                                 <p className="text-2xl font-bold font-heading"> Share Network App </p>
                                 <Tag color="#4f46e5">{ShareNetwork}</Tag>
+                                <Tag color={
+                                    user?.data?.userGroup[0]?.name?.toUpperCase() === 'BEGINNERS' ? "#ff6347" :  // Red for BEGINNERS
+                                        user?.data?.userGroup[0]?.name?.toUpperCase() === 'EXPEDITION' ? "#32cd32" :  // Green for EXPEDITION
+                                            user?.data?.userGroup[0]?.name?.toUpperCase() === 'SKILL PATH' ? "#1e90ff" :  // Blue for SKILL PATH
+                                                "#d3d3d3"  // Default color if group doesn't match
+                                }>
+                                    {user?.data?.userGroup[0]?.name}
+                                </Tag>
                             </div>
                             <p className="text-sm font-medium ">Platform Management Dashboard</p>
                         </div>
