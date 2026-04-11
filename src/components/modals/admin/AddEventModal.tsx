@@ -1,8 +1,9 @@
-import { Modal, Input, Select, DatePicker, Form, Button, Spin } from 'antd';
-import { useEffect } from 'react';
+import { Modal, Input, Select, DatePicker, Form, Button, Spin, Radio, Checkbox } from 'antd';
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import dayjs from 'dayjs';
 import { useAddEventsMutation, useUpdateEventsMutation } from '../../../redux/apiSlices/admin/adminEventsApi';
+import { useGetStudentsQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
 import { toast } from 'sonner';
 
 interface AddEventModalProps {
@@ -10,7 +11,6 @@ interface AddEventModalProps {
     onCancel: () => void;
     refetch: () => void;
     selectedEvent?: any;
-    students?: any[];
     userGroups?: any[];
     isGroupsLoading?: boolean;
 }
@@ -20,14 +20,26 @@ const AddEventModal = ({
     onCancel,
     refetch,
     selectedEvent,
-    students,
     userGroups,
     isGroupsLoading,
 }: AddEventModalProps) => {
-    // console.log(students, 'students');
     const [form] = Form.useForm();
     const [addEvent, { isLoading: isAdding }] = useAddEventsMutation();
     const [updateEvent, { isLoading: isUpdating }] = useUpdateEventsMutation();
+
+    const selectedGroup = Form.useWatch('targetGroup', form);
+    const invitationType = Form.useWatch('invitationType', form);
+
+    const { data: studentsApi, isFetching: isStudentsLoading } = useGetStudentsQuery(
+        {
+            selectedGroup: selectedGroup,
+            page: 0,
+            limit: 0,
+        },
+        { skip: !open || (invitationType === 'all' && !selectedEvent) },
+    );
+
+    const students = studentsApi?.data?.data || [];
 
     useEffect(() => {
         if (open && selectedEvent) {
@@ -37,12 +49,14 @@ const AddEventModal = ({
                 date: selectedEvent.date ? dayjs(selectedEvent.date) : undefined,
                 location: selectedEvent.location,
                 type: selectedEvent.type,
+                invitationType: selectedEvent.students?.length > 0 ? 'selective' : 'all',
                 targetGroup: selectedEvent.targetGroup?._id || selectedEvent.targetGroup,
                 targetUser: selectedEvent.targetUser?._id || selectedEvent.targetUser,
                 students: selectedEvent.students ? selectedEvent.students.map((s: any) => s._id || s) : undefined,
             });
         } else if (open && !selectedEvent) {
             form.resetFields();
+            form.setFieldsValue({ invitationType: 'selective' });
         }
     }, [open, selectedEvent, form]);
 
@@ -50,8 +64,8 @@ const AddEventModal = ({
         try {
             const finalData = {
                 ...values,
-                date: values.date ? dayjs(values.date).format('YYYY-MM-DD') : undefined,
-                studentAssigned: values.students,
+                date: values.date ? dayjs(values.date).format('YYYY-MM-DD HH:mm') : undefined,
+                ...(values.invitationType !== 'all' && { studentAssigned: values.students }),
             };
 
             const mutation = selectedEvent?._id
@@ -136,10 +150,14 @@ const AddEventModal = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Form.Item
                         name="date"
-                        label={<span className="text-sm font-semibold text-gray-700">Event Date</span>}
-                        rules={[{ required: true, message: 'Please select date' }]}
+                        label={<span className="text-sm font-semibold text-gray-700">Event Date & Time</span>}
+                        rules={[{ required: true, message: 'Please select date and time' }]}
                     >
-                        <DatePicker className="w-full h-11 rounded-lg border-gray-200" />
+                        <DatePicker
+                            showTime={{ format: 'HH:mm' }}
+                            format="YYYY-MM-DD HH:mm"
+                            className="w-full h-11 rounded-lg border-gray-200"
+                        />
                     </Form.Item>
                     <Form.Item
                         name="location"
@@ -164,47 +182,85 @@ const AddEventModal = ({
                         </Select>
                     </Form.Item>
                     <Form.Item
-                        label={<span className="font-bold text-gray-700">Select Group</span>}
-                        name="targetGroup"
-                        rules={[{ required: false, message: 'Please select at least one group' }]}
+                        name="invitationType"
+                        label={<span className="text-sm font-semibold text-gray-700">Invitation Type</span>}
+                        initialValue="selective"
                     >
-                        <Select
-                            placeholder="Choose groups"
-                            className="h-11 rounded-md"
-                            variant="filled"
-                            style={{ backgroundColor: '#f9f9f9' }}
-                            loading={isGroupsLoading}
-                            options={userGroups?.map((g: any) => ({
-                                label: g.name,
-                                value: g._id,
-                            }))}
-                            allowClear
-                        />
+                        <Radio.Group className="flex flex-col gap-2 mt-2">
+                            <Radio value="all">Invite all students</Radio>
+                            <Radio value="selective">Invite by groups or individual</Radio>
+                        </Radio.Group>
                     </Form.Item>
                 </div>
 
-                <Form.Item
-                    name="students"
-                    label={<span className="text-sm font-semibold text-gray-700">Select Students (optional)</span>}
-                >
-                    <Select
-                        mode="multiple"
-                        placeholder="Choose students"
-                        className="w-full"
-                        style={{ height: 'auto', minHeight: '44px' }}
-                        options={
-                            students?.map((student: any) => ({
-                                value: student?._id,
-                                label: `${student?.firstName} ${student?.lastName} (${student?.email})`,
-                            })) || []
-                        }
-                        filterOption={(input, option) =>
-                            (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
-                        }
-                    />
-                </Form.Item>
+                {invitationType === 'selective' && (
+                    <div className="">
+                        <Form.Item
+                            label={<span className="font-bold text-gray-700">Filter by Group (Optional)</span>}
+                            name="targetGroup"
+                        >
+                            <Select
+                                placeholder="Choose groups"
+                                className="h-11 rounded-md"
+                                variant="filled"
+                                style={{ backgroundColor: '#f9f9f9' }}
+                                loading={isGroupsLoading}
+                                options={userGroups?.map((g: any) => ({
+                                    label: g.name,
+                                    value: g._id,
+                                }))}
+                                allowClear
+                                onChange={() => form.setFieldValue('students', [])}
+                            />
+                        </Form.Item>
 
-                <div className="flex justify-end pt-4">
+
+                    </div>
+                )}
+
+                {invitationType === 'selective' && (
+                    <div className='relative'>
+                        <Form.Item
+                            name="students"
+                            label={<span className="text-sm font-semibold text-gray-700">Select Students (optional)</span>}
+                        >
+                            <Select
+                                mode="multiple"
+                                placeholder="Choose students"
+                                className="w-full"
+                                loading={isStudentsLoading}
+                                style={{ height: 'auto', minHeight: '44px' }}
+                                options={
+                                    students?.map((student: any) => ({
+                                        value: student?._id,
+                                        label: `${student?.firstName} ${student?.lastName} (${student?.email})`,
+                                    })) || []
+                                }
+                                filterOption={(input, option) =>
+                                    (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+                                }
+                            />
+                        </Form.Item>
+                        <div className="flex flex-col justify-end pb-4 absolute top-0 right-0">
+                            <Checkbox
+                                onChange={(e) => {
+                                    if (e.target.checked) {
+                                        form.setFieldValue(
+                                            'students',
+                                            students.map((s: any) => s._id),
+                                        );
+                                    } else {
+                                        form.setFieldValue('students', []);
+                                    }
+                                }}
+                            >
+                                Select All Students
+                            </Checkbox>
+                        </div>
+                    </div>
+                )}
+
+                <div className="flex justify-end pt-4 ">
                     <Button
                         type="primary"
                         htmlType="submit"

@@ -208,7 +208,6 @@ const AdminEvents = () => {
                 }}
                 refetch={refetch}
                 selectedEvent={selectedEvent}
-                students={studentsApi?.data?.data || []}
                 isGroupsLoading={isUserGroupsLoading}
                 userGroups={userGroups}
             />
