@@ -1,4 +1,4 @@
-import { Card, Button } from 'antd';
+import { Card, Button, Tag } from 'antd';
 import { MessageSquare, Eye } from 'lucide-react';
 import { useState } from 'react';
 import StudentProfileModal from '../../../../components/modals/mentor/StudentProfileModal';
@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCreateChatRoomMutation } from '../../../../redux/apiSlices/chatSlice';
 import { toast } from 'sonner';
 import { getImageUrl } from '../../../../utils/getImageUrl';
+import { UsergroupAddOutlined, AimOutlined } from '@ant-design/icons';
 
 const StudentProfile = ({ student }: { student: any }) => {
     const navigate = useNavigate();
@@ -46,7 +47,33 @@ const StudentProfile = ({ student }: { student: any }) => {
                 <h2 className="text-[16px] text-center font-semibold text-gray-800 mb-1">
                     {student?.firstName + ' ' + student?.lastName}
                 </h2>
-                <p className="text-gray-500  font-medium mb-6">{student?.email}</p>
+                <p className="text-gray-500  font-medium mb-4 ">{student?.email}</p>
+                <div className='flex gap-2 mb-6'>
+                    {/* Groups Tag */}
+                    {student.userGroup && student.userGroup.length > 0 ? (
+                        student.userGroup.map((group: any) => (
+                            <Tag
+                                key={group.id}
+                                icon={<UsergroupAddOutlined />}
+                                color="blue"
+                            >
+                                {group.name}
+                            </Tag>
+                        ))
+                    ) : (
+                        <Tag icon={<UsergroupAddOutlined />} color="default">
+                            No groups joined
+                        </Tag>
+                    )}
+
+                    {/* Track Tag */}
+                    {student.userGroupTrack && <Tag
+                        icon={<AimOutlined />}
+                        color={student?.userGroupTrack?.name ? 'purple' : 'default'}
+                    >
+                        {student?.userGroupTrack?.name}
+                    </Tag>}
+                </div>
 
                 <div className="flex gap-4 w-full">
                     <Button

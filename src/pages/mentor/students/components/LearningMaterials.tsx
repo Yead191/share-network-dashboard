@@ -35,12 +35,12 @@ const LearningMaterials = ({ resources, targertGroup }: any) => {
                                                     <Clock size={12} />
                                                     {new Date(resource.createdAt).toLocaleDateString()}
                                                 </div>
-                                                {resource.createdBy && (
+                                                {/* {resource.createdBy && (
                                                     <div className="flex items-center gap-1.5 text-xs text-gray-400">
                                                         <span className="w-1 h-1 bg-gray-300 rounded-full" />
                                                         By {resource.createdBy.firstName} {resource.createdBy.lastName}
                                                     </div>
-                                                )}
+                                                )} */}
                                             </div>
                                         </div>
                                     </div>

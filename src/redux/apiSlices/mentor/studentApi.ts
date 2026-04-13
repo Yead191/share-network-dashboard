@@ -7,7 +7,11 @@ const studentApi = api.injectEndpoints({
         getStudentUpcomingEvents: builder.query({
             query: ({ targetGroup }) => `/admin-event?targetGroup=${targetGroup}`,
         }),
+        getStudentSchedule: builder.query({
+            query: ({ userGroup, userGroupTrack }) => `/class?userGroup=${userGroup}${userGroupTrack ? `&userGroupTrack=${userGroupTrack}` : ''
+                }`
+        }),
     }),
 });
 
-export const { useGetStudentProfileQuery, useGetActiveAssignmentsQuery, useGetStudentUpcomingEventsQuery } = studentApi;
+export const { useGetStudentProfileQuery, useGetActiveAssignmentsQuery, useGetStudentUpcomingEventsQuery, useGetStudentScheduleQuery } = studentApi;
