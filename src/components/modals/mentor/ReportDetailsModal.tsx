@@ -9,13 +9,13 @@ interface ReportDetailsModalProps {
 const ReportDetailsModal = ({ open, onCancel, data }: ReportDetailsModalProps) => {
     const skillProgressData = data?.goalSheet
         ? [
-              {
-                  key: '1',
-                  skill: data.goalSheet.skillName,
-                  planned: `${data.goalSheet.plannedProgress}%`,
-                  actual: `${data.goalSheet.actualProgress}%`,
-              },
-          ]
+            {
+                key: '1',
+                skill: data.goalSheet.skillName,
+                planned: `${data.goalSheet.plannedProgress}%`,
+                actual: `${data.goalSheet.actualProgress}%`,
+            },
+        ]
         : [];
 
     const skillColumns = [

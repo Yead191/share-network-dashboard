@@ -3,10 +3,32 @@ import { api } from '../../api/baseApi';
 const adminClassScheduleApi = api.injectEndpoints({
     endpoints: (build) => ({
         getClassSchedule: build.query({
-            query: ({ page, limit, searchTerm }: { page: number; limit: number; searchTerm: string }) => ({
-                url: `/class?page=${page}&limit=${limit}&searchTerm=${searchTerm}`,
-                method: 'GET',
-            }),
+            query: ({
+                page,
+                limit,
+                searchTerm,
+                userGroup,
+                userGroupTrack,
+            }: {
+                page: number;
+                limit: number;
+                searchTerm: string;
+                userGroup?: string;
+                userGroupTrack?: string;
+            }) => {
+                const params = new URLSearchParams({
+                    page: page.toString(),
+                    limit: limit.toString(),
+                    searchTerm: searchTerm,
+                });
+                if (userGroup) params.append('userGroup', userGroup);
+                if (userGroupTrack) params.append('userGroupTrack', userGroupTrack);
+
+                return {
+                    url: `/class?${params.toString()}`,
+                    method: 'GET',
+                };
+            },
         }),
         addClassSchedule: build.mutation({
             query: ({ data }: { data: any }) => ({

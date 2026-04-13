@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Table, Button, Input, Modal, message } from 'antd';
+import { Table, Button, Input, Modal, message, Popover, Select } from 'antd';
 import { Search, Plus, Calendar, MapPin, Eye, Edit, Trash2, Filter as FilterIcon } from 'lucide-react';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
 import AddClassScheduleModal from '../../../components/modals/admin/AddClassScheduleModal';
@@ -8,6 +8,7 @@ import {
     useDeleteClassScheduleMutation,
     useGetClassScheduleQuery,
 } from '../../../redux/apiSlices/admin/adminClassScheduleApi';
+import { useGetUserGroupsQuery, useGetUserTracksQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
 import moment from 'moment';
 import { toast } from 'sonner';
 
@@ -17,8 +18,22 @@ const AdminSchedule = () => {
     const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+    const [filterGroup, setFilterGroup] = useState<string | undefined>(undefined);
+    const [filterTrack, setFilterTrack] = useState<string | undefined>(undefined);
+
     // API CALLS
-    const { data: scheduleApi, refetch } = useGetClassScheduleQuery({ page: page, limit: 10, searchTerm: searchTerm });
+    const { data: scheduleApi, refetch } = useGetClassScheduleQuery({
+        page: page,
+        limit: 10,
+        searchTerm: searchTerm,
+        userGroup: filterGroup,
+        userGroupTrack: filterTrack,
+    });
+    const { data: userGroupsApi } = useGetUserGroupsQuery({});
+    const { data: userTracksApi } = useGetUserTracksQuery({});
+
+    const userGroups = userGroupsApi?.data;
+    const userTracks = userTracksApi?.data;
     const [deleteSchedule] = useDeleteClassScheduleMutation();
 
     const scheduleData = scheduleApi?.data?.map((item: any) => ({
@@ -188,12 +203,71 @@ const AdminSchedule = () => {
                             style={{ backgroundColor: 'white' }}
                         />
                     </div>
-                    <Button
-                        icon={<FilterIcon className="w-4 h-4" />}
-                        className="h-10 px-6 border-gray-200 text-gray-600 font-medium flex items-center gap-2 rounded-lg"
+                    <Popover
+                        content={
+                            <div className="w-64 space-y-4 p-2">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                        Target Group
+                                    </label>
+                                    <Select
+                                        placeholder="Select Group"
+                                        className="w-full h-10"
+                                        value={filterGroup}
+                                        onChange={(v) => setFilterGroup(v)}
+                                        allowClear
+                                        options={userGroups?.map((group: any) => ({
+                                            value: group._id,
+                                            label: group.name,
+                                        }))}
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                        Category (Track)
+                                    </label>
+                                    <Select
+                                        placeholder="Select Track"
+                                        className="w-full h-10"
+                                        value={filterTrack}
+                                        onChange={(v) => setFilterTrack(v)}
+                                        allowClear
+                                        options={userTracks?.map((track: any) => ({
+                                            value: track._id,
+                                            label: track.name,
+                                        }))}
+                                    />
+                                </div>
+                                <div className="pt-2 flex justify-between gap-3">
+                                    <Button
+                                        className="flex-1 h-9 rounded-lg text-xs font-medium border-gray-200"
+                                        onClick={() => {
+                                            setFilterGroup(undefined);
+                                            setFilterTrack(undefined);
+                                        }}
+                                    >
+                                        Reset
+                                    </Button>
+                                </div>
+                            </div>
+                        }
+                        title={
+                            <div className="px-2 py-1.5 border-b border-gray-100 mb-2">
+                                <span className="font-bold text-gray-800">Filter Schedule</span>
+                            </div>
+                        }
+                        trigger="click"
+                        placement="bottomRight"
+                        overlayClassName="filter-popover"
                     >
-                        Filter
-                    </Button>
+                        <Button
+                            icon={<FilterIcon className="w-4 h-4" />}
+                            className={`h-10 px-6 border-gray-200 text-gray-600 font-semibold flex items-center gap-2 rounded-lg shadow-sm transition-all ${filterGroup || filterTrack ? 'bg-blue-50 border-blue-200 text-blue-600' : ''
+                                }`}
+                        >
+                            Filter
+                        </Button>
+                    </Popover>
                     <Button
                         icon={<Plus className="w-4 h-4" />}
                         className="h-10 px-6 bg-[#22C55E] text-white hover:bg-[#1ea34d] border-none font-medium flex items-center gap-2 rounded-lg"

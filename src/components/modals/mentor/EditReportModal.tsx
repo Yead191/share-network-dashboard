@@ -68,8 +68,14 @@ const EditReportModal = ({
                     onCancel();
                     return res.message || 'Report updated successfully';
                 },
-                error: (err) => {
-                    return err?.data?.message || 'Failed to update report';
+                error: (err: any) => {
+                    return (
+                        err?.data?.errorMessages
+                            ?.map((err: any) => err.message)
+                            .join(', ') ||
+                        err?.data?.message ||
+                        'Failed to add report'
+                    );
                 },
             });
         } catch (error) {

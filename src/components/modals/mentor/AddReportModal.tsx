@@ -36,8 +36,14 @@ const AddReportModal = ({ open, onCancel, assignedStudent, refetch }: AddReportM
                     onCancel();
                     return res.message || 'Report added successfully';
                 },
-                error: (err) => {
-                    return err.data.message || 'Failed to add report';
+                error: (err: any) => {
+                    return (
+                        err?.data?.errorMessages
+                            ?.map((err: any) => err.message)
+                            .join(', ') ||
+                        err?.data?.message ||
+                        'Failed to add report'
+                    );
                 },
             });
         } catch (error) {
