@@ -47,24 +47,6 @@ export default function ScheduleModal({ isModalOpen, setIsModalOpen, selectedSch
                     </div>
                 </div>
 
-                {/* Teacher Box */}
-                {selectedSchedule?.teacher && (
-                    <div className="bg-gray-50/50 rounded-2xl p-4 border border-gray-100 flex items-center gap-4 mb-6">
-                        <img
-                            src={selectedSchedule.teacher.profile}
-                            alt={selectedSchedule.teacher.firstName}
-                            className="w-12 h-12 rounded-xl object-cover border-2 border-white shadow-sm"
-                        />
-                        <div>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Instructor</p>
-                            <h4 className="text-sm font-bold text-gray-800">
-                                {selectedSchedule.teacher.firstName} {selectedSchedule.teacher.lastName}
-                            </h4>
-                            <p className="text-xs text-blue-500 hover:underline cursor-pointer">{selectedSchedule.teacher.email}</p>
-                        </div>
-                    </div>
-                )}
-
                 {/* Content Sections */}
                 <div className="space-y-6">
                     {/* Description */}

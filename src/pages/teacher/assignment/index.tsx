@@ -70,14 +70,14 @@ function Assignment() {
     const modifiedData = submissionData?.data?.data?.map((item) => {
         return {
             key: item._id,
-            avatar: item.studentId.profile,
-            name: item.studentId.name,
-            email: item.studentId.email,
-            assignment: item.assignmentId,
-            submissionDate: item.createdAt,
-            attachment: item.fileAssignment,
-            grade: item.marks,
-            review: item.feedback,
+            avatar: item?.studentId?.profile,
+            name: item?.studentId?.name,
+            email: item?.studentId?.email,
+            assignment: item?.assignmentId,
+            submissionDate: item?.createdAt,
+            attachment: item?.fileAssignment,
+            grade: item?.marks,
+            review: item?.feedback,
         };
     });
 
