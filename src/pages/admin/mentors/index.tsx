@@ -142,7 +142,6 @@ const AdminMentors = () => {
                             setIsDetailsModalOpen(true);
                         }}
                     >
-                        View
                     </Button>
                     <Button
                         icon={<Edit2 size={14} />}
@@ -152,7 +151,6 @@ const AdminMentors = () => {
                             setIsEditModalOpen(true);
                         }}
                     >
-                        Edit
                     </Button>
                     {/* <Button
                         icon={<Star size={14} />}
@@ -170,7 +168,6 @@ const AdminMentors = () => {
                         className="flex items-center gap-2 font-medium h-9 rounded-md border-red-200 text-red-500"
                         onClick={() => handleDelete(record._id)}
                     >
-                        Remove
                     </Button>
                 </Space>
             ),
