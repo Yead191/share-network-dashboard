@@ -39,7 +39,6 @@ function Assignment() {
     const { data: userGroups } = useGetUserGroupsQuery({ page: 1, limit: 100 });
     const [reviewSubmission] = useGiveMarksOfSubmissionMutation();
     const [file, setFile] = useState<any | null>(null);
-
     // Modal States
     const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);

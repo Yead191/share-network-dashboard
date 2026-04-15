@@ -143,6 +143,7 @@ const AdminWeeklyReport = () => {
     if (isLoading) {
         return <Spinner />;
     }
+
     return (
         <section className="space-y-6">
             <div className="flex justify-between items-center">
@@ -167,7 +168,7 @@ const AdminWeeklyReport = () => {
                     pagination={{
                         current: page,
                         pageSize: 10,
-                        total: weeklyReportApi?.data?.total,
+                        total: weeklyReportApi?.data?.pagination?.total,
                         showSizeChanger: false,
                         onChange: (page) => setPage(page),
                     }}
