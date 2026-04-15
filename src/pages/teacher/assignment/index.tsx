@@ -69,7 +69,7 @@ function Assignment() {
 
     const modifiedData = submissionData?.data?.data?.map((item) => {
         return {
-            key: item._id,
+            key: item?._id,
             avatar: item?.studentId?.profile,
             name: item?.studentId?.name,
             email: item?.studentId?.email,
