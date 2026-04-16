@@ -1,7 +1,8 @@
-import { Modal, Input, Select, DatePicker, TimePicker, Checkbox, Form, Spin } from 'antd';
-import { useEffect } from 'react';
+import { Modal, Input, Select, DatePicker, TimePicker, Checkbox, Form, Spin, Upload, Button } from 'antd';
+import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import { X } from 'lucide-react';
+import { X, Upload as UploadIcon } from 'lucide-react';
+import { getImageUrl } from '../../../utils/getImageUrl';
 import {
     useAddClassScheduleMutation,
     useUpdateClassScheduleMutation,
@@ -25,6 +26,7 @@ const AddClassScheduleModal = ({ open, onCancel, refetch, selectedSchedule }: Ad
     const { data: userGroups } = useGetAllUserGroupsQuery(undefined, { skip: !open });
     const { data: userGroupTracks } = useGetAllUserGroupTracksQuery(undefined, { skip: !open });
     // const { data: teachersData } = useGetTeachersQuery({ page: 1, limit: 100, searchTerm: '' }, { skip: !open });
+    const [fileList, setFileList] = useState<any[]>([]);
 
     useEffect(() => {
         if (open && selectedSchedule) {
@@ -38,15 +40,29 @@ const AddClassScheduleModal = ({ open, onCancel, refetch, selectedSchedule }: Ad
                 time: selectedSchedule?.classDate ? dayjs(selectedSchedule.classDate) : undefined,
                 virtualClass: selectedSchedule?.virtualClass,
                 location: selectedSchedule?.location,
+                slideUrl: selectedSchedule?.slideUrl,
             });
+            if (selectedSchedule?.file) {
+                setFileList([
+                    {
+                        uid: '-1',
+                        name: selectedSchedule.file.split('/').pop() || 'existing-file',
+                        status: 'done',
+                        url: getImageUrl(selectedSchedule.file),
+                    },
+                ]);
+            } else {
+                setFileList([]);
+            }
         } else if (open && !selectedSchedule) {
             form.resetFields();
+            setFileList([]);
         }
     }, [open, selectedSchedule, form]);
 
     const onFinish = async (values: any) => {
         try {
-            const { date, time, ...rest } = values;
+            const { date, time, slideUrl, file: ignoreFileField, ...rest } = values;
             // Combine date and time into a single ISO timestamp
             let classDate;
             if (date && time) {
@@ -57,16 +73,46 @@ const AddClassScheduleModal = ({ open, onCancel, refetch, selectedSchedule }: Ad
                 classDate = combined.toISOString();
             }
 
-            const finalData = {
-                ...rest,
-                classDate,
-                published: true,
-                status: true,
-            };
+            const formData = new FormData();
+
+            Object.entries(rest).forEach(([key, value]) => {
+                if (Array.isArray(value)) {
+                    value.forEach((item, index) => {
+                        if (typeof item === 'object' && item !== null) {
+                            Object.entries(item).forEach(([subKey, subValue]) => {
+                                formData.append(`${key}[${index}][${subKey}]`, String(subValue));
+                            });
+                        } else {
+                            formData.append(`${key}[${index}]`, String(item));
+                        }
+                    });
+                } else if (value !== undefined && value !== null && value !== '') {
+                    formData.append(key, String(value));
+                }
+            });
+
+            if (classDate) {
+                formData.append('classDate', classDate);
+            }
+            if (slideUrl) {
+                formData.append('slideUrl', slideUrl);
+            }
+
+            formData.append('published', 'true');
+            formData.append('status', 'true');
+
+            // Handle file upload/removal
+            const newFile = fileList[0]?.originFileObj;
+            if (newFile) {
+                formData.append('file', newFile);
+            } else if (fileList.length === 0 && selectedSchedule?.file) {
+                // If the user removed the existing file
+                formData.append('file', 'null'); // Sending a signal to backend if needed
+            }
 
             const mutation = selectedSchedule?._id
-                ? editClass({ id: selectedSchedule._id, data: finalData }).unwrap()
-                : addClass({ data: finalData }).unwrap();
+                ? editClass({ id: selectedSchedule._id, data: formData }).unwrap()
+                : addClass({ data: formData }).unwrap();
 
             toast.promise(mutation, {
                 loading: selectedSchedule?._id ? 'Updating class schedule...' : 'Creating class schedule...',
@@ -201,8 +247,8 @@ const AddClassScheduleModal = ({ open, onCancel, refetch, selectedSchedule }: Ad
                     </Form.Item>
                 </div>
 
-                <div>
-                    <Form.Item name="virtualClass" valuePropName="checked" className="mb-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Form.Item name="virtualClass" valuePropName="checked" className="mb-0 flex items-center h-full">
                         <Checkbox>Virtual Class</Checkbox>
                     </Form.Item>
                     <Form.Item
@@ -210,6 +256,50 @@ const AddClassScheduleModal = ({ open, onCancel, refetch, selectedSchedule }: Ad
                         label={<span className="text-sm font-semibold text-gray-700">Location</span>}
                     >
                         <Input placeholder="Enter location" className="h-11 rounded-lg border-gray-200" />
+                    </Form.Item>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                    <Form.Item
+                        name="slideUrl"
+                        label={<span className="text-sm font-semibold text-gray-700">Slide / Content URL</span>}
+                    >
+                        <Input placeholder="https://..." className="h-11 rounded-lg border-gray-200" />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="file"
+                        label={<span className="text-sm font-semibold text-gray-700">Lecture Material</span>}
+                    >
+                        <Upload
+                            accept=".pdf,.doc,.docx"
+                            fileList={fileList}
+                            onChange={({ fileList }) => {
+                                // For single file upload, always keep the last one
+                                setFileList(fileList.slice(-1));
+                            }}
+                            beforeUpload={(uploadedFile) => {
+                                const isValidType =
+                                    uploadedFile.type === "application/pdf" ||
+                                    uploadedFile.type === "application/msword" ||
+                                    uploadedFile.type ===
+                                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+                                if (!isValidType) {
+                                    toast.error("Only PDF and DOC/DOCX files are allowed!");
+                                    return Upload.LIST_IGNORE;
+                                }
+                                return false; // stop auto upload
+                            }}
+                            maxCount={1}
+                            className="w-full"
+                        >
+                            {fileList.length < 1 && (
+                                <Button className="w-full h-11 rounded-lg border-gray-200 flex items-center justify-center gap-2">
+                                    <UploadIcon size={16} /> Select File
+                                </Button>
+                            )}
+                        </Upload>
                     </Form.Item>
                 </div>
 

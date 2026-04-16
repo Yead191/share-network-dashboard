@@ -1,5 +1,6 @@
 import { Modal, Tag } from 'antd';
 import { X } from 'lucide-react';
+import { getImageUrl } from '../../../utils/getImageUrl';
 
 interface ClassScheduleDetailsModalProps {
     open: boolean;
@@ -8,6 +9,7 @@ interface ClassScheduleDetailsModalProps {
 }
 
 const ClassScheduleDetailsModal = ({ open, onCancel, data }: ClassScheduleDetailsModalProps) => {
+
     return (
         <Modal
             title={null}
@@ -50,10 +52,10 @@ const ClassScheduleDetailsModal = ({ open, onCancel, data }: ClassScheduleDetail
                                 <span className="text-gray-800">
                                     {data?.userGroup?.length > 0
                                         ? data?.userGroup?.map((group: any) => (
-                                              <Tag key={group._id} color="blue">
-                                                  {group.name}
-                                              </Tag>
-                                          ))
+                                            <Tag key={group._id} color="blue">
+                                                {group.name}
+                                            </Tag>
+                                        ))
                                         : 'No Group'}
                                 </span>
                             </td>
@@ -73,6 +75,30 @@ const ClassScheduleDetailsModal = ({ open, onCancel, data }: ClassScheduleDetail
                         <tr>
                             <td className="px-5 py-3.5 bg-gray-50/50 font-medium text-gray-600">Location</td>
                             <td className="px-5 py-3.5 text-gray-800">{data?.location || '12 Street, USA'}</td>
+                        </tr>
+                        <tr>
+                            <td className="px-5 py-3.5 bg-gray-50/50 font-medium text-gray-600">Slide / Content URL</td>
+                            <td className="px-5 py-3.5 text-gray-800">
+                                {data?.slideUrl ? (
+                                    <a href={data?.slideUrl} target="_blank" rel="noreferrer" className="text-blue-500 hover:text-blue-600 hover:underline">
+                                        View Link
+                                    </a>
+                                ) : (
+                                    <span className="text-gray-400">Not provided</span>
+                                )}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td className="px-5 py-3.5 bg-gray-50/50 font-medium text-gray-600">Lecture Material</td>
+                            <td className="px-5 py-3.5 text-gray-800">
+                                {data?.file ? (
+                                    <a href={getImageUrl(data?.file)} target="_blank" rel="noreferrer" className="text-blue-500 hover:text-blue-600 hover:underline">
+                                        View / Download
+                                    </a>
+                                ) : (
+                                    <span className="text-gray-400">Not provided</span>
+                                )}
+                            </td>
                         </tr>
                         <tr>
                             <td className="px-5 py-3.5 bg-gray-50/50 font-medium text-gray-600">Status</td>

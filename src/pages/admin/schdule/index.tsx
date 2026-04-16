@@ -51,9 +51,11 @@ const AdminSchedule = () => {
         teacher: item?.teacher,
         userGroupTrack: item?.userGroupTrack,
         virtualClass: item?.virtualClass,
-        target: item,
         location: item?.location,
+        target: item,
         status: `${item?.status === true ? 'Active' : 'Inactive'}`,
+        slideUrl: item?.slideUrl,
+        file: item?.file,
     }));
 
     const handleDelete = (id: string) => {

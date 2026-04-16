@@ -7,6 +7,7 @@ import { useProfileQuery } from '../../../redux/apiSlices/authSlice';
 import {
     useGetActiveAssignmentsQuery,
     useGetStudentProfileQuery,
+    useGetStudentScheduleQuery,
     useGetStudentUpcomingEventsQuery,
 } from '../../../redux/apiSlices/mentor/studentApi';
 import Spinner from '../../../components/shared/Spinner';
@@ -33,6 +34,14 @@ const Students = () => {
         useGetStudentUpcomingEventsQuery({
             targetGroup: student?.userGroup?.[0]?._id,
         });
+    const { data: schedule, isLoading: scheduleLoading } = useGetStudentScheduleQuery({
+        userGroup: student?.userGroup?.[0]?._id,
+        filterType: "upcoming",
+        ...(student?.userGroupTrack?._id && {
+            userGroupTrack: student?.userGroupTrack?._id,
+        })
+    });
+
     const activeAssignments = activeAssignmentsData?.data || [];
     const studentUpcomingEvents = studentUpcomingEventsData?.data?.data || [];
 
@@ -41,7 +50,8 @@ const Students = () => {
         studentLoading ||
         resourcesLoading ||
         activeAssignmentsLoading ||
-        studentUpcomingEventsLoading
+        studentUpcomingEventsLoading ||
+        scheduleLoading
     ) {
         return <Spinner />;
     }
@@ -83,7 +93,7 @@ const Students = () => {
                     <CoreGoals goals={student?.Goals} />
                 </div>
                 <div className="lg:col-span-2 h-full">
-                    <StudentSchedule student={student} />
+                    <StudentSchedule student={student} schedule={schedule} />
                 </div>
             </div>
             <div className="mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">

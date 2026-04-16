@@ -1,7 +1,7 @@
-
 import { Modal, Tag } from 'antd';
 import moment from 'moment';
-import { Calendar, Clock, MapPin, User, X, BookOpen } from 'lucide-react';
+import { Calendar, Clock, MapPin, User, X, BookOpen, ExternalLink, Download } from 'lucide-react';
+import { getImageUrl } from '../../../../utils/getImageUrl';
 export default function ScheduleModal({ isModalOpen, setIsModalOpen, selectedSchedule }: { isModalOpen: boolean, setIsModalOpen: (open: boolean) => void, selectedSchedule: any }) {
     return (
         <Modal
@@ -100,6 +100,59 @@ export default function ScheduleModal({ isModalOpen, setIsModalOpen, selectedSch
                         </div>
                     </div>
                 </div>
+
+                {/* Learning Materials */}
+                {(selectedSchedule?.slideUrl || selectedSchedule?.file) && (
+                    <div className="pt-2">
+                        <div className="flex items-center gap-2 mb-3">
+                            <h4 className="text-sm font-bold text-gray-700">Learning Materials</h4>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            {selectedSchedule?.slideUrl && (
+                                <a
+                                    href={selectedSchedule.slideUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="flex items-center justify-between p-3 rounded-xl bg-blue-50/50 border border-blue-100/50 hover:bg-blue-50 transition-all group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
+                                            <ExternalLink size={16} />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-bold text-gray-700">Slide / Slide Deck</p>
+                                            <p className="text-[10px] text-gray-500">Click to visit slide</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <ExternalLink size={14} />
+                                    </div>
+                                </a>
+                            )}
+                            {selectedSchedule?.file && (
+                                <a
+                                    href={getImageUrl(selectedSchedule.file)}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="flex items-center justify-between p-3 rounded-xl bg-indigo-50/50 border border-indigo-100/50 hover:bg-indigo-50 transition-all group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600">
+                                            <Download size={16} />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-bold text-gray-700">Lecture Material</p>
+                                            <p className="text-[10px] text-gray-500">Click to download file</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Download size={14} />
+                                    </div>
+                                </a>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
         </Modal>
     )

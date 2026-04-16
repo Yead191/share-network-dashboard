@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Table, Button, Input, Tag } from 'antd';
-import { Search, Calendar, MapPin, Eye } from 'lucide-react';
+import { Table, Button, Input, Tag, Tooltip } from 'antd';
+import { Search, Calendar, MapPin, Eye, Clock, CheckCircle2, ExternalLink, Download } from 'lucide-react';
+import { getImageUrl } from '../../../utils/getImageUrl';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
 import ClassScheduleDetailsModal from '../../../components/modals/admin/ClassScheduleDetailsModal';
 import moment from 'moment';
 import { useGetStudentClassScheduleQuery } from '../../../redux/apiSlices/students/classSlice';
-import { imageUrl } from '../../../redux/api/baseApi';
 import { useGetprofileQuery } from '../../../redux/apiSlices/students/overview.slice';
 import Spinner from '../../../components/shared/Spinner';
 
@@ -14,15 +14,17 @@ const StudentSchedule = () => {
     const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+    const [activeTab, setActiveTab] = useState<'upcoming' | 'completed'>('upcoming');
     const { data } = useGetprofileQuery({});
     const user = data?.data?.data ?? data?.data ?? data;
     const userGroup = user?.userGroup?.[0]?._id;
     // console.log(userGroup);
-    const { data: scheduleApi, isLoading } = useGetStudentClassScheduleQuery({
+    const { data: scheduleApi, isLoading, isFetching } = useGetStudentClassScheduleQuery({
         page: page,
         limit: 10,
         searchTerm: searchTerm,
         userGroup: userGroup,
+        filterType: activeTab,
     });
     const pagination = scheduleApi?.pagination;
 
@@ -41,6 +43,8 @@ const StudentSchedule = () => {
         target: item,
         location: item?.location,
         status: `${item?.status === true ? 'Active' : 'Inactive'}`,
+        slideUrl: item?.slideUrl,
+        file: item?.file,
     }));
 
     const columns = [
@@ -75,27 +79,42 @@ const StudentSchedule = () => {
             ),
         },
         {
-            title: 'Teacher',
-            dataIndex: 'teacher',
-            key: 'teacher',
-            render: (teacher: { profile: string; firstName: string; lastName: string }) => (
-                <div className="flex items-center gap-1">
-                    {teacher?.profile && (
-                        <img
-                            className="w-8 h-8 rounded-full"
-                            src={
-                                teacher?.profile?.startsWith('https')
-                                    ? teacher?.profile
-                                    : `${imageUrl}${teacher?.profile}`
-                            }
-                            alt=""
-                        />
+            title: 'MATERIALS',
+            key: 'materials',
+            render: (_: any, record: any) => (
+                <div className="flex items-center gap-2">
+                    {record.slideUrl ? (
+                        <Tooltip title="View Slides">
+                            <a
+                                href={record.slideUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                            >
+                                <ExternalLink size={16} />
+                            </a>
+                        </Tooltip>
+                    ) : (
+                        <div className="p-2 rounded-lg bg-gray-50 text-gray-300">
+                            <ExternalLink size={16} />
+                        </div>
                     )}
-
-                    <p className=" text-gray-800 text-[10px] ">
-                        {' '}
-                        <span>{teacher?.firstName} </span> <span>{teacher?.lastName}</span>
-                    </p>
+                    {record.file ? (
+                        <Tooltip title="Download Materials">
+                            <a
+                                href={getImageUrl(record.file)}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="p-2 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors"
+                            >
+                                <Download size={16} />
+                            </a>
+                        </Tooltip>
+                    ) : (
+                        <div className="p-2 rounded-lg bg-gray-50 text-gray-300">
+                            <Download size={16} />
+                        </div>
+                    )}
                 </div>
             ),
         },
@@ -154,7 +173,7 @@ const StudentSchedule = () => {
         },
     ];
 
-    if (isLoading) {
+    if (isLoading || isFetching) {
         return <Spinner />;
     }
 
@@ -179,6 +198,48 @@ const StudentSchedule = () => {
                         Filter
                     </Button> */}
                 </div>
+            </div>
+
+            {/* Tab Filter */}
+            <div className="flex items-center gap-1 p-1 bg-gray-100/80 rounded-xl w-fit">
+                <button
+                    onClick={() => { setActiveTab('upcoming'); setPage(1); }}
+                    className={`
+                        relative flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold
+                        transition-all duration-300 ease-out cursor-pointer
+                        ${activeTab === 'upcoming'
+                            ? 'bg-white text-blue-600 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
+                            : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                        }
+                    `}
+                >
+                    <Clock size={15} className={activeTab === 'upcoming' ? 'text-blue-500' : 'text-gray-400'} />
+                    Upcoming
+                    {activeTab === 'upcoming' && pagination?.total != null && (
+                        <span className="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                            {pagination.total}
+                        </span>
+                    )}
+                </button>
+                <button
+                    onClick={() => { setActiveTab('completed'); setPage(1); }}
+                    className={`
+                        relative flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold
+                        transition-all duration-300 ease-out cursor-pointer
+                        ${activeTab === 'completed'
+                            ? 'bg-white text-emerald-600 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
+                            : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                        }
+                    `}
+                >
+                    <CheckCircle2 size={15} className={activeTab === 'completed' ? 'text-emerald-500' : 'text-gray-400'} />
+                    Completed
+                    {activeTab === 'completed' && pagination?.total != null && (
+                        <span className="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+                            {pagination.total}
+                        </span>
+                    )}
+                </button>
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">

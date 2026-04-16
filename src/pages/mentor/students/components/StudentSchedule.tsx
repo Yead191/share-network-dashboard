@@ -2,29 +2,14 @@ import { useState } from 'react';
 import { Tag } from 'antd';
 import { Calendar, Clock, MapPin, Video, } from 'lucide-react';
 import moment from 'moment';
-import Spinner from "../../../../components/shared/Spinner";
-import { useGetStudentScheduleQuery } from "../../../../redux/apiSlices/mentor/studentApi";
 import ScheduleModal from './ScheduleModal';
 import { UsergroupAddOutlined } from '@ant-design/icons';
 
 
-const StudentSchedule = ({ student }: { student: any }) => {
+const StudentSchedule = ({ student, schedule }: { student: any, schedule: any }) => {
     const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const { data: schedule, isLoading: scheduleLoading } = useGetStudentScheduleQuery({
-        userGroup: student?.userGroup?.[0]?._id,
-        ...(student?.userGroupTrack?._id && {
-            userGroupTrack: student?.userGroupTrack?._id,
-        })
-    });
-
-    if (scheduleLoading) {
-        return <Spinner />;
-    }
-
     const scheduleData = schedule?.data || [];
-
     const handleOpenDetails = (item: any) => {
         setSelectedSchedule(item);
         setIsModalOpen(true);
