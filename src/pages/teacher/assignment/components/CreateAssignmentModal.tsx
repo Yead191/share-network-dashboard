@@ -25,7 +25,7 @@ const CreateAssignmentModal: React.FC<CreateAssignmentModalProps> = ({
     const { data: userGroupsTrack } = useGetUserGroupsTrackQuery({ page: 1, limit: 10 });
     const [form] = Form.useForm();
 
-    console.log(initialValues)
+    // console.log(initialValues)
     useEffect(() => {
         if (open) {
             if (mode === 'edit' && initialValues) {

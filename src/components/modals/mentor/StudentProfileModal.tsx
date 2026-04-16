@@ -10,7 +10,7 @@ interface StudentProfileModalProps {
 
 const StudentProfileModal = ({ isOpen, onClose, student }: StudentProfileModalProps) => {
     if (!student) return null;
-    console.log(student);
+    // console.log(student);
     const infoItems = [
         { icon: <Mail className="w-4 h-4 text-primary" />, label: 'Email', value: student.email },
         { icon: <Phone className="w-4 h-4 text-primary" />, label: 'Mobile', value: student.mobileNumber },

@@ -24,7 +24,7 @@ const CreateClassModal: React.FC<CreateClassModalProps> = ({ visible, onClose, o
                 ...values,
                 userGroup: values.userGroup ? [values.userGroup] : [],
             };
-            console.log(processedValues);
+            // console.log(processedValues);
             onSave(processedValues);
             form.resetFields();
             onClose();

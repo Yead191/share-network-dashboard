@@ -23,14 +23,14 @@ export default function Mentor() {
     // Format mentor for UI
     const formattedMentor = mentorRaw
         ? {
-              ...mentorRaw,
-              profile: getImageUrl(mentorRaw.profile),
-              role: 'Mentor',
-              subtext: 'Guiding you towards success',
-              location: mentorRaw.address || 'Not provided',
-              specialization: mentorRaw.jobTitle || 'Not provided',
-              availability: 'Available',
-          }
+            ...mentorRaw,
+            profile: getImageUrl(mentorRaw.profile),
+            role: 'Mentor',
+            subtext: 'Guiding you towards success',
+            location: mentorRaw.address || 'Not provided',
+            specialization: mentorRaw.jobTitle || 'Not provided',
+            availability: 'Available',
+        }
         : null;
 
     const handleChat = async (id: string) => {
@@ -41,7 +41,7 @@ export default function Mentor() {
             {
                 loading: 'Creating chat room...',
                 success: (res) => {
-                    console.log(res);
+                    // console.log(res);
                     navigate(`/student/chat`);
                     return res?.data?.message || 'Chat room created successfully';
                 },

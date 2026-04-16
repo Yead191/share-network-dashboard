@@ -22,7 +22,7 @@ const AddLearningMaterialModal = ({
     userGroups,
     userTracks,
 }: AddLearningMaterialModalProps) => {
-    console.log(selectedMaterial)
+    // console.log(selectedMaterial)
     const [form] = Form.useForm();
     const [addMaterial, { isLoading }] = useAddMaterialsMutation();
     const [editMaterial, { isLoading: isEditLoading }] = useUpdateMaterialsMutation();

@@ -4,7 +4,7 @@ import { imageUrl } from '../../../../redux/api/baseApi';
 import moment from 'moment';
 
 const ResourceDetailsModal = ({ open, onCancel, resource }: any) => {
-    console.log(resource)
+    // console.log(resource)
     if (!resource) return null;
 
     const downloadUrl = resource.pdf ? `${imageUrl}${resource.pdf?.replace('/uploads', '')}` : null;

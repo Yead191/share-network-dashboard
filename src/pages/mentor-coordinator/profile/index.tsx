@@ -10,7 +10,7 @@ export default function MentorCoordinatorProfile() {
     const { data, isLoading, refetch } = useGetProfileQuery({});
 
     const user = data?.data?.data ?? data?.data ?? data;
-    console.log(user);
+    // console.log(user);
     const [isEditing, setIsEditing] = useState(false);
 
     if (isEditing) {
@@ -45,7 +45,7 @@ export default function MentorCoordinatorProfile() {
             ? user?.profile
             : `${imageUrl}${user.profile}`
         : undefined;
-    console.log('User Profile Data:', profileSrc);
+    // console.log('User Profile Data:', profileSrc);
 
     if (isLoading) {
         return <Spinner />;

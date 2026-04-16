@@ -33,8 +33,8 @@ const Resources = () => {
     const [selectedGroup, setSelectedGroup] = useState<string | undefined>(undefined);
     const { data: resources, isLoading, isFetching, refetch } = useGetResourcesQuery({ page: page, limit: 10, searchTerm: searchText, targertGroup: selectedGroup });
     const [deleteResource] = useDeleteResourseMutation();
-    const { data: userGroups } = useGetUserGroupsQuery({ page: 1, limit: 100 }); 
-    console.log(selectedGroup); 
+    const { data: userGroups } = useGetUserGroupsQuery({ page: 1, limit: 100 });
+    // console.log(selectedGroup); 
 
     const newData = resources?.data?.resources?.map((item) => {
         return {

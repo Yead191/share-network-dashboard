@@ -121,7 +121,7 @@ const CreateGoalModal: React.FC<CreateGoalModalProps> = ({ open, onCancel, refet
                 ['existingGoals', index, 'description'],
             ]);
             const goal = form.getFieldValue(['existingGoals', index]);
-            console.log(goal);
+            // console.log(goal);
             toast.promise(deleteGoal(goal._id), {
                 loading: 'Deleting goal...',
                 success: (res) => {
@@ -144,37 +144,36 @@ const CreateGoalModal: React.FC<CreateGoalModalProps> = ({ open, onCancel, refet
             footer={
                 activeTab === 'create'
                     ? [
-                          <Button
-                              key="cancel"
-                              onClick={onCancel}
-                              className="px-6 h-10 border-gray-300 rounded-md font-medium text-gray-500 hover:text-gray-700"
-                          >
-                              Cancel
-                          </Button>,
-                          <Button
-                              key="submit"
-                              type="primary"
-                              onClick={handleOk}
-                              loading={isCreating}
-                              disabled={isSubmitDisabled}
-                              className={`px-6 h-10 border-none rounded-md font-medium ${
-                                  isSubmitDisabled
-                                      ? 'bg-gray-100 text-gray-400'
-                                      : 'bg-[#63d97d] hover:bg-[#52c41a] text-white'
-                              }`}
-                          >
-                              Create Goals
-                          </Button>,
-                      ]
+                        <Button
+                            key="cancel"
+                            onClick={onCancel}
+                            className="px-6 h-10 border-gray-300 rounded-md font-medium text-gray-500 hover:text-gray-700"
+                        >
+                            Cancel
+                        </Button>,
+                        <Button
+                            key="submit"
+                            type="primary"
+                            onClick={handleOk}
+                            loading={isCreating}
+                            disabled={isSubmitDisabled}
+                            className={`px-6 h-10 border-none rounded-md font-medium ${isSubmitDisabled
+                                    ? 'bg-gray-100 text-gray-400'
+                                    : 'bg-[#63d97d] hover:bg-[#52c41a] text-white'
+                                }`}
+                        >
+                            Create Goals
+                        </Button>,
+                    ]
                     : [
-                          <Button
-                              key="close"
-                              onClick={onCancel}
-                              className="px-6 h-10 border-gray-300 rounded-md font-medium text-gray-500 hover:text-gray-700"
-                          >
-                              Close
-                          </Button>,
-                      ]
+                        <Button
+                            key="close"
+                            onClick={onCancel}
+                            className="px-6 h-10 border-gray-300 rounded-md font-medium text-gray-500 hover:text-gray-700"
+                        >
+                            Close
+                        </Button>,
+                    ]
             }
             closeIcon={<X size={20} />}
             width={750}

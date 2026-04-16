@@ -54,7 +54,7 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({
     }, [teacher, form]);
 
     const onFinish = async (values: any) => {
-        console.log(values);
+        // console.log(values);
 
         try {
             toast.promise(
