@@ -101,7 +101,10 @@ const Student = () => {
                             className="rounded-full px-4 py-0.5 bg-[#f6ffed] border-none text-[#52c41a] font-medium"
                         >
                             {group.name || group}
-                            {group?.name === 'Skill Path' && record?.userGroupTrack?.name
+                            {/* {group?.name === 'Skill Path' && record?.userGroupTrack?.name
+                                ? ` (${record.userGroupTrack.name})`
+                                : ''} */}
+                            {record?.userGroupTrack?.name
                                 ? ` (${record.userGroupTrack.name})`
                                 : ''}
                         </Tag>

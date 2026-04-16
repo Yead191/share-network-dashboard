@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Table, Button, Input, Modal, message, Popover, Select } from 'antd';
-import { Search, Plus, Calendar, MapPin, Eye, Edit, Trash2, Filter as FilterIcon } from 'lucide-react';
+import { Search, Plus, Calendar, MapPin, Eye, Edit, Trash2, Filter as FilterIcon, Clock, CheckCircle2 } from 'lucide-react';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
 import AddClassScheduleModal from '../../../components/modals/admin/AddClassScheduleModal';
 import ClassScheduleDetailsModal from '../../../components/modals/admin/ClassScheduleDetailsModal';
@@ -11,6 +11,7 @@ import {
 import { useGetUserGroupsQuery, useGetUserTracksQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
 import moment from 'moment';
 import { toast } from 'sonner';
+import Spinner from '../../../components/shared/Spinner';
 
 const AdminSchedule = () => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -20,14 +21,16 @@ const AdminSchedule = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterGroup, setFilterGroup] = useState<string | undefined>(undefined);
     const [filterTrack, setFilterTrack] = useState<string | undefined>(undefined);
+    const [activeTab, setActiveTab] = useState<'upcoming' | 'completed'>('upcoming');
 
     // API CALLS
-    const { data: scheduleApi, refetch } = useGetClassScheduleQuery({
+    const { data: scheduleApi, isLoading, isFetching, refetch } = useGetClassScheduleQuery({
         page: page,
         limit: 10,
         searchTerm: searchTerm,
         userGroup: filterGroup,
         userGroupTrack: filterTrack,
+        filterType: activeTab
     });
     const { data: userGroupsApi } = useGetUserGroupsQuery({});
     const { data: userTracksApi } = useGetUserTracksQuery({});
@@ -188,6 +191,9 @@ const AdminSchedule = () => {
             ),
         },
     ];
+    if (isLoading || isFetching) {
+        return <Spinner />
+    }
 
     return (
         <section className="space-y-6">
@@ -281,26 +287,47 @@ const AdminSchedule = () => {
                 </div>
             </div>
 
-            {/* <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <div className="flex items-center gap-4">
-                    <div className="bg-gray-50 p-2.5 rounded-lg border border-gray-100">
-                        <FilterIcon size={18} className="text-gray-400" />
-                    </div>
-                    <Select
-                        placeholder="All Groups"
-                        className="w-48 h-10"
-                        options={[{ value: 'all', label: 'All Groups' }]}
-                    />
-                    <Select
-                        placeholder="Select option"
-                        className="w-48 h-10"
-                        options={[{ value: 'option1', label: 'Option 1' }]}
-                    />
-                    <button className="text-gray-800 font-medium px-6 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        Clear Filters
-                    </button>
-                </div>
-            </div> */}
+            {/* Tab Filter */}
+            <div className="flex items-center gap-1 p-1 bg-gray-100/80 rounded-xl w-fit">
+                <button
+                    onClick={() => { setActiveTab('upcoming'); setPage(1); }}
+                    className={`
+                        relative flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold
+                        transition-all duration-300 ease-out cursor-pointer
+                        ${activeTab === 'upcoming'
+                            ? 'bg-white text-blue-600 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
+                            : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                        }
+                    `}
+                >
+                    <Clock size={15} className={activeTab === 'upcoming' ? 'text-blue-500' : 'text-gray-400'} />
+                    Upcoming
+                    {activeTab === 'upcoming' && scheduleApi?.pagination?.total != null && (
+                        <span className="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                            {scheduleApi.pagination.total}
+                        </span>
+                    )}
+                </button>
+                <button
+                    onClick={() => { setActiveTab('completed'); setPage(1); }}
+                    className={`
+                        relative flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold
+                        transition-all duration-300 ease-out cursor-pointer
+                        ${activeTab === 'completed'
+                            ? 'bg-white text-emerald-600 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
+                            : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                        }
+                    `}
+                >
+                    <CheckCircle2 size={15} className={activeTab === 'completed' ? 'text-emerald-500' : 'text-gray-400'} />
+                    Completed
+                    {activeTab === 'completed' && scheduleApi?.pagination?.total != null && (
+                        <span className="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+                            {scheduleApi.pagination.total}
+                        </span>
+                    )}
+                </button>
+            </div>
 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <Table

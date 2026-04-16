@@ -121,7 +121,7 @@ export default function AdminCoordinator() {
                             setIsDetailsModalOpen(true);
                         }}
                     >
-                        View
+
                     </Button>
                     <Button
                         icon={<Edit2 size={14} />}
@@ -131,7 +131,7 @@ export default function AdminCoordinator() {
                             setIsEditModalOpen(true);
                         }}
                     >
-                        Edit
+
                     </Button>
                     <Button
                         icon={<Trash2 size={14} />}
@@ -139,7 +139,7 @@ export default function AdminCoordinator() {
                         className="flex items-center gap-2 font-medium h-9 rounded-md border-red-200 text-red-500"
                         onClick={() => handleDelete(record._id)}
                     >
-                        Remove
+
                     </Button>
                 </Space>
             ),

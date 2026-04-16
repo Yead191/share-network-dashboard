@@ -9,12 +9,14 @@ const adminClassScheduleApi = api.injectEndpoints({
                 searchTerm,
                 userGroup,
                 userGroupTrack,
+                filterType
             }: {
                 page: number;
                 limit: number;
                 searchTerm: string;
                 userGroup?: string;
                 userGroupTrack?: string;
+                filterType?: "upcoming" | "completed"
             }) => {
                 const params = new URLSearchParams({
                     page: page.toString(),
@@ -23,6 +25,7 @@ const adminClassScheduleApi = api.injectEndpoints({
                 });
                 if (userGroup) params.append('userGroup', userGroup);
                 if (userGroupTrack) params.append('userGroupTrack', userGroupTrack);
+                if (filterType) params.append('filterType', filterType);
 
                 return {
                     url: `/class?${params.toString()}`,
