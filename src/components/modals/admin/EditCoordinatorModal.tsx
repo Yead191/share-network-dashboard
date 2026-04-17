@@ -160,7 +160,7 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
                             showSearch
                             placeholder="Select mentors to assign"
                             filterOption={(input, option) =>
-                                (option?.label ?? '')?.toString().toLowerCase().includes(input.toLowerCase())
+                                String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                             }
                             options={
                                 mentors?.map((mentor) => ({

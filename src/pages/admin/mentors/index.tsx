@@ -13,7 +13,6 @@ import FilterMentorModal from '../../../components/modals/admin/FilterMentorModa
 import { toast } from 'sonner';
 import { Modal, message } from 'antd';
 import {
-    useGetStudentsQuery,
     useGetUserGroupsQuery,
     useGetUserTracksQuery,
 } from '../../../redux/apiSlices/admin/adminStudentApi';
@@ -38,7 +37,6 @@ const AdminMentors = () => {
         isLoading: isMentorLoading,
         refetch,
     } = useGetAdminMentorsQuery({ page, searchTerm, userGroup: selectedGroup });
-    const { data: studentsApi } = useGetStudentsQuery({ page: 0, limit: 0 });
     const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({});
     const { data: userTracksApi, isLoading: isUserTracksLoading } = useGetUserTracksQuery({});
     const [deleteMentor] = useDeleteAdminMentorMutation();
@@ -107,10 +105,10 @@ const AdminMentors = () => {
             ),
         },
         {
-            title: 'LOCATION',
-            dataIndex: 'address',
-            key: 'location',
-            render: (address: string) => <span className="text-gray-500 font-medium">{address || 'N/A'}</span>,
+            title: 'Company Name',
+            dataIndex: 'company',
+            key: 'company',
+            render: (company: string) => <span className="text-gray-500 font-medium">{company || 'N/A'}</span>,
         },
         {
             title: 'Status',
@@ -292,7 +290,6 @@ const AdminMentors = () => {
                 open={isEditModalOpen}
                 onCancel={() => setIsEditModalOpen(false)}
                 mentor={selectedMentor}
-                students={studentsApi?.data?.data || []}
                 refetch={refetch}
                 userGroups={userGroups}
                 userTracks={userTracks}

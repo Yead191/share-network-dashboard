@@ -23,6 +23,7 @@ const Login = () => {
     const navigate = useNavigate();
     // api call
     const [login] = useLoginMutation();
+    // const [resendOtp] = useResendOtpMutation()
     const [form] = Form.useForm();
     const [hiddenForget, setHiddenForget] = useState(false);
 
@@ -31,6 +32,19 @@ const Login = () => {
             toast.promise(login(values).unwrap(), {
                 loading: 'Logging in...',
                 success: (res) => {
+                    // console.log(res)
+                    // if (
+                    //     res?.success === false &&
+                    //     res?.message === "Please verify your account, then try to login again"
+                    // ) {
+                    //     try {
+                    //         resendOtp({ email: values.email }).unwrap();
+                    //         navigate('/verify-otp');
+                    //         return 'OTP sent. Please verify your account.';
+                    //     } catch (otpErr) {
+                    //         return 'Failed to resend OTP';
+                    //     }
+                    // }
                     // console.log(res);
                     localStorage.setItem('token', res?.data?.accessToken);
                     localStorage.setItem('role', res?.data?.role);
@@ -44,7 +58,26 @@ const Login = () => {
                     navigate(`/${routeRole}/overview`);
                     return res.message || 'Login successful';
                 },
-                error: (err) => err.data.errorMessages[0].message || 'Login failed',
+                error: async (err) => {
+                    const message =
+                        err?.data?.message ||
+                        err?.data?.errorMessages?.[0]?.message ||
+                        'Login failed';
+
+                    // if (
+                    //     message === "Please verify your account, then try to login again"
+                    // ) {
+                    //     try {
+                    //         await resendOtp({ email: values.email }).unwrap();
+                    //         navigate('/verify-otp');
+                    //         return 'OTP sent. Please verify your account.';
+                    //     } catch (otpErr) {
+                    //         return 'Failed to resend OTP';
+                    //     }
+                    // }
+
+                    return message;
+                },
             });
         } catch (error) {
             const err = error as errorType;
@@ -58,24 +91,7 @@ const Login = () => {
         } else {
             setHiddenForget(false);
         }
-        // if (changedValues.role) {
-        //     const roleCredentials: Record<string, { email: string }> = {
-        //         admin: { email: 'azizulsparktech@gmail.com' },
-        //         student: { email: 'woyik33076@helesco.com' },
-        //         mentor: { email: 'bonodej524@gamening.com' },
-        //         teacher: { email: 'teacher@gxuzi.com' },
-        //         'mentor-coordinator': { email: 'matin51126@codgal.com' },
-        //     };
 
-        //     const creds = roleCredentials[changedValues.role];
-        //     if (creds) {
-        //         form.setFieldsValue({
-        //             email: creds.email,
-        //             // password: creds.email === 'segiba3385@gxuzi.com' ? '123456' : '12345678',
-        //             password: '12345678',
-        //         });
-        //     }
-        // }
     };
 
     return (

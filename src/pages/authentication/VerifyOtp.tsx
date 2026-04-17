@@ -96,7 +96,7 @@ const VerifyOtp = () => {
                                 </h1>
                                 <p>
                                     We sent a {flow === 'register' ? 'verification' : 'reset'} code to <span className="font-semibold text-[#1E293B]">{email}</span>.
-                                    Enter the 5-digit code mentioned in the email.
+                                    Enter the 4-digit code mentioned in the email.
                                 </p>
                             </div>
 

@@ -3,12 +3,12 @@ import { Modal, Button, Form, Input, Select } from 'antd';
 import { X } from 'lucide-react';
 import { useUpdateAdminMentorMutation } from '../../../redux/apiSlices/admin/adminMentorsApi';
 import { toast } from 'sonner';
+import { useGetStudentsQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
 
 interface EditMentorModalProps {
     open: boolean;
     onCancel: () => void;
     mentor: any;
-    students: any[];
     refetch: () => void;
     userTracks: any;
     userGroups: any;
@@ -20,7 +20,6 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({
     open,
     onCancel,
     mentor,
-    students,
     refetch,
     userGroups,
     userTracks,
@@ -29,7 +28,8 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({
 }) => {
     const [form] = Form.useForm();
     const [updateMentor, { isLoading }] = useUpdateAdminMentorMutation();
-
+    const { data: studentsApi, isLoading: isStudentsLoading } = useGetStudentsQuery({ page: 0, limit: 0 });
+    const students = studentsApi?.data?.data || [];
     const selectedGroups = Form.useWatch('userGroup', form);
 
     const isSkillPathSelected = () => {
@@ -107,12 +107,13 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({
                         className="w-full"
                         allowClear
                         style={{ height: '44px' }}
+                        loading={isStudentsLoading}
                         options={students?.map((student: any) => ({
                             label: `${student.firstName} ${student.lastName} (${student.email})`,
                             value: student._id,
                         }))}
                         filterOption={(input, option) =>
-                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                            String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                         }
                         showSearch
                     />
@@ -199,9 +200,14 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({
                         </Form.Item>
                     )}
                 </div>
-                <Form.Item label={<span className="font-semibold text-gray-700">Job Title</span>} name="jobTitle">
-                    <Input placeholder="Enter Job Title" className="h-11 rounded-md" />
-                </Form.Item>
+                <div className='grid grid-cols-2 gap-6'>
+                    <Form.Item label={<span className="font-semibold text-gray-700">Job Title</span>} name="jobTitle">
+                        <Input placeholder="Enter Job Title" className="h-11 rounded-md" />
+                    </Form.Item>
+                    <Form.Item label={<span className="font-semibold text-gray-700">Company Name</span>} name="company">
+                        <Input placeholder="Enter Company Name" className="h-11 rounded-md" />
+                    </Form.Item>
+                </div>
 
                 <Form.Item label={<span className="font-semibold text-gray-700">Address</span>} name="address">
                     <Input placeholder="Enter address" className="h-11 rounded-md" />

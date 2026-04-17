@@ -237,7 +237,7 @@ const AddEventModal = ({
                                     })) || []
                                 }
                                 filterOption={(input, option) =>
-                                    (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+                                    String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                                 }
                             />
                         </Form.Item>

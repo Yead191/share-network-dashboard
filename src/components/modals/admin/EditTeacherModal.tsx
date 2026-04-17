@@ -168,7 +168,7 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({
                             value: student._id,
                         }))}
                         filterOption={(input, option) =>
-                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                            String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                         }
                     />
                 </Form.Item>

@@ -32,6 +32,7 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ open, onCancel, stu
                 highestEducation: student.highestEducation,
                 gender: student.gender,
                 status: student.status,
+                verified: student.verified,
                 userGroup: student.userGroup?.map((g: any) => g._id || g),
                 userGroupTrack: student.userGroupTrack?._id || student.userGroupTrack,
                 about: student.about,
@@ -211,6 +212,22 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ open, onCancel, stu
                         </Form.Item>
                     </Col>
                     <Col span={12}>
+                        <Form.Item label={<span className="font-medium text-gray-700">Verified</span>} name="verified">
+                            <Select
+                                className="h-11 rounded-md"
+                                options={[
+                                    { label: 'Yes', value: true },
+                                    { label: 'No', value: false },
+                                ]}
+                            />
+                        </Form.Item>
+                    </Col>
+
+                </Row>
+                <Row gutter={24}>
+
+
+                    <Col span={12}>
                         <Form.Item label={<span className="font-medium text-gray-700">Gender</span>} name="gender">
                             <Select
                                 className="h-11 rounded-md"
@@ -222,24 +239,27 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ open, onCancel, stu
                             />
                         </Form.Item>
                     </Col>
-                </Row>
+                    <Col span={12}>
 
-                <Form.Item
-                    label={<span className="font-medium text-gray-700">Highest Education</span>}
-                    name="highestEducation"
-                >
-                    <Select
-                        placeholder="Select high school"
-                        className="h-11 rounded-md"
-                        options={[
-                            { label: 'High School', value: 'High School' },
-                            { label: 'Associate Degree', value: 'Associate Degree' },
-                            { label: 'Bachelor Degree', value: 'Bachelor Degree' },
-                            { label: 'Master Degree', value: 'Master Degree' },
-                            { label: 'PhD', value: 'PhD' },
-                        ]}
-                    />
-                </Form.Item>
+                        <Form.Item
+                            label={<span className="font-medium text-gray-700">Highest Education</span>}
+                            name="highestEducation"
+                        >
+                            <Select
+                                placeholder="Select high school"
+                                className="h-11 rounded-md"
+                                options={[
+                                    { label: 'High School', value: 'High School' },
+                                    { label: 'Associate Degree', value: 'Associate Degree' },
+                                    { label: 'Bachelor Degree', value: 'Bachelor Degree' },
+                                    { label: 'Master Degree', value: 'Master Degree' },
+                                    { label: 'PhD', value: 'PhD' },
+                                ]}
+                            />
+                        </Form.Item>
+                    </Col>
+
+                </Row>
 
                 <Form.Item
                     label={<span className="font-medium text-gray-700">Career Directions</span>}
@@ -256,6 +276,8 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ open, onCancel, stu
                                 'Cybersecurity',
                                 'Web design / UXD (User experience design)',
                                 'Tester',
+                                'UI/UX',
+                                'Data Analyst'
                             ].map((direction) => (
                                 <Col span={12} key={direction}>
                                     <Checkbox value={direction}>{direction}</Checkbox>
