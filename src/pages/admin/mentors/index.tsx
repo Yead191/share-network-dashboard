@@ -36,7 +36,7 @@ const AdminMentors = () => {
         data: mentorsApi,
         isLoading: isMentorLoading,
         refetch,
-    } = useGetAdminMentorsQuery({ page, searchTerm, userGroup: selectedGroup });
+    } = useGetAdminMentorsQuery({ page, searchTerm, userGroup: selectedGroup, limit: 10 });
     const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({});
     const { data: userTracksApi, isLoading: isUserTracksLoading } = useGetUserTracksQuery({});
     const [deleteMentor] = useDeleteAdminMentorMutation();
@@ -248,9 +248,10 @@ const AdminMentors = () => {
                     dataSource={mentors}
                     loading={isMentorLoading}
                     pagination={{
-                        total: pagination?.totalItems,
+                        total: pagination?.total,
                         current: pagination?.currentPage,
                         pageSize: 10,
+                        showSizeChanger: false,
                         onChange: (page) => {
                             setPage(page);
                         },

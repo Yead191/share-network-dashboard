@@ -4,7 +4,6 @@ import { Eye, Edit2, Trash2, User, Plus, Search } from 'lucide-react';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
 import {
     useGetCoordinatorQuery,
-    useGetMentorsQuery,
     useDeleteCoordinatorMutation,
 } from '../../../redux/apiSlices/admin/adminCoordinatorApi';
 import CreateCoordinatorModal from '../../../components/modals/admin/CreateCoordinatorModal';
@@ -25,14 +24,13 @@ export default function AdminCoordinator() {
 
     // API CALLS
     const { data: coordinatorApi, isLoading, refetch } = useGetCoordinatorQuery({ page, searchTerm });
-    const { data: mentorsApi } = useGetMentorsQuery({});
+
     const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({});
     const [deleteCoordinator] = useDeleteCoordinatorMutation();
     const userGroups = userGroupsApi?.data;
 
     const coordinators = coordinatorApi?.data?.data || [];
     const pagination = coordinatorApi?.data?.pagination;
-    const allMentors = mentorsApi?.data?.mentors || [];
 
     const columns = [
         {
@@ -60,12 +58,6 @@ export default function AdminCoordinator() {
             dataIndex: 'contactNumber',
             key: 'contact',
             render: (contact: string) => <span className="text-gray-500 font-medium">{contact || 'N/A'}</span>,
-        },
-        {
-            title: 'LOCATION',
-            dataIndex: 'location',
-            key: 'location',
-            render: (location: string) => <span className="text-gray-500 font-medium">{location || 'N/A'}</span>,
         },
         {
             title: 'ROLE',
@@ -239,7 +231,6 @@ export default function AdminCoordinator() {
                 onCancel={() => setIsEditModalOpen(false)}
                 refetch={refetch}
                 coordinator={selectedCoordinator}
-                mentors={allMentors}
                 userGroups={userGroups}
                 isUserGroupsLoading={isUserGroupsLoading}
             />

@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { Modal, Form, Input, Select, Button } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Modal, Form, Input, Select, Button, Spin } from 'antd';
 import { X } from 'lucide-react';
-import { useUpdateCoordinatorMutation } from '../../../redux/apiSlices/admin/adminCoordinatorApi';
+import { useGetMentorsQuery, useUpdateCoordinatorMutation } from '../../../redux/apiSlices/admin/adminCoordinatorApi';
 import { toast } from 'sonner';
 
 interface EditCoordinatorModalProps {
@@ -9,7 +9,6 @@ interface EditCoordinatorModalProps {
     onCancel: () => void;
     refetch: () => void;
     coordinator: any | null;
-    mentors: any[] | null;
     userGroups: any[] | null;
     isUserGroupsLoading: boolean;
 }
@@ -19,12 +18,78 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
     onCancel,
     refetch,
     coordinator,
-    mentors,
     userGroups,
     isUserGroupsLoading,
 }) => {
     const [form] = Form.useForm();
     const [updateCoordinator, { isLoading }] = useUpdateCoordinatorMutation();
+
+    const [allMentors, setAllMentors] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [hasMore, setHasMore] = useState(true);
+
+    const { data: mentorsApi, isFetching: isMentorsLoading } = useGetMentorsQuery({
+        page,
+        limit: 10,
+        searchTerm
+    }, { skip: !open });
+
+    // Reset state when modal opens/closes
+    useEffect(() => {
+        if (open) {
+            setPage(1);
+            setSearchTerm('');
+            if (coordinator?.assignedMentors) {
+                setAllMentors(coordinator.assignedMentors);
+            } else {
+                setAllMentors([]);
+            }
+        }
+    }, [open, coordinator]);
+
+    // Handle incoming data
+    useEffect(() => {
+        if (mentorsApi?.data?.mentors) {
+            const newMentors = mentorsApi.data.mentors;
+            setAllMentors(prev => {
+                if (page === 1) {
+                    const combined = [...newMentors];
+                    if (coordinator?.assignedMentors) {
+                        coordinator.assignedMentors.forEach((m: any) => {
+                            if (!combined.some(item => item._id === m._id)) {
+                                combined.unshift(m);
+                            }
+                        });
+                    }
+                    return combined;
+                }
+                const existingIds = new Set(prev.map(m => m._id));
+                const uniqueNew = newMentors.filter((m: any) => !existingIds.has(m._id));
+                return [...prev, ...uniqueNew];
+            });
+        }
+    }, [mentorsApi, page, coordinator]);
+
+    // Update hasMore separately
+    useEffect(() => {
+        if (mentorsApi?.data?.pagination) {
+            const { total } = mentorsApi.data.pagination;
+            setHasMore(allMentors.length < total);
+        }
+    }, [allMentors.length, mentorsApi]);
+
+    const handleSearch = (value: string) => {
+        setSearchTerm(value);
+        setPage(1);
+    };
+
+    const handlePopupScroll = (e: any) => {
+        const { scrollTop, scrollHeight, clientHeight } = e.target;
+        if (scrollHeight - scrollTop <= clientHeight + 10 && hasMore && !isMentorsLoading) {
+            setPage(prev => prev + 1);
+        }
+    };
 
     useEffect(() => {
         if (open && coordinator) {
@@ -159,16 +224,26 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
                             size="large"
                             showSearch
                             placeholder="Select mentors to assign"
-                            filterOption={(input, option) =>
-                                String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                            }
+                            filterOption={false}
+                            onSearch={handleSearch}
+                            onPopupScroll={handlePopupScroll}
                             options={
-                                mentors?.map((mentor) => ({
+                                allMentors?.map((mentor: any) => ({
                                     value: mentor._id,
                                     label: `${mentor.firstName} ${mentor.lastName}`,
                                 })) || []
                             }
                             className="w-full"
+                            dropdownRender={(menu) => (
+                                <>
+                                    {menu}
+                                    {isMentorsLoading && (
+                                        <div className="flex justify-center p-2 border-t">
+                                            <Spin size="small" />
+                                        </div>
+                                    )}
+                                </>
+                            )}
                         />
                     </Form.Item>
                 </div>
