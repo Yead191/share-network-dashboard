@@ -28,6 +28,7 @@ const LearningMaterials = () => {
     } = useGetLearningMaterialsQuery(
         {
             targertGroup: user?.userGroup?.[0]?._id,
+            targeteAudience: 'MENTOR',
             page,
             searchTerm,
             ...(user?.userGroupTrack?._id && {

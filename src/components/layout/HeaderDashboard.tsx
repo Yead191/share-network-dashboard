@@ -52,7 +52,7 @@ const HeaderDashboard = () => {
                                             user?.data?.userGroup[0]?.name?.toUpperCase() === 'SKILL PATH' ? "#1e90ff" :  // Blue for SKILL PATH
                                                 "#d3d3d3"  // Default color if group doesn't match
                                 }>
-                                    {user?.data?.userGroup[0]?.name}
+                                    {user?.data?.userGroup?.map((item: any) => item?.name).join(', ')}
                                 </Tag>
                                 {user?.data?.userGroupTrack?.name && (
                                     <Tag color="#8a2be2">

@@ -3,10 +3,20 @@ import { api } from '../../api/baseApi';
 const learningApi = api.injectEndpoints({
     endpoints: (build) => ({
         getLearningMaterials: build.query<any, any>({
-            query: ({ targertGroup, page = 1, limit = 10, searchTerm, targetTrack }) => ({
-                url: `/learning?targeteAudience=MENTOR&targertGroup=${targertGroup}&page=${page}&limit=${limit}&searchTerm=${searchTerm}${targetTrack ? `&targetTrack=${targetTrack}` : ''}`,
-                method: 'GET',
-            }),
+            query: ({ targertGroup, page = 1, limit = 10, searchTerm, targetTrack, targeteAudience }) => {
+                const params = new URLSearchParams();
+                if (targeteAudience) params.append('targeteAudience', targeteAudience);
+                if (targertGroup) params.append('targertGroup', targertGroup);
+                params.append('page', page.toString());
+                params.append('limit', limit.toString());
+                if (searchTerm) params.append('searchTerm', searchTerm);
+                if (targetTrack) params.append('targetTrack', targetTrack);
+
+                return {
+                    url: `/learning?${params.toString()}`,
+                    method: 'GET',
+                };
+            },
         }),
         addMaterials: build.mutation({
             query: (data: any) => ({

@@ -1,25 +1,23 @@
 import { api } from "../../api/baseApi";
 
-interface GetResourcesParams {
-  page?: number;
-  limit?: number;
-  searchTerm?: string;
-  markAsAssigned?: boolean;
-}
 
 const resourcesDetails = api.injectEndpoints({
   endpoints: (build) => ({
-    getResources: build.query<any, GetResourcesParams>({
-      query: ({
-        page = 1,
-        limit = 10,
-        searchTerm = "",
-        markAsAssigned = true,
-      }) => ({
-        url: "/coordinator/resources",
-        method: "GET",
-        params: { page, limit, searchTerm, markAsAssigned },
-      }),
+    getCoordinatorResources: build.query<any, any>({
+      query: ({ targertGroup, page = 1, limit = 10, searchTerm, targetTrack, targeteAudience }: any) => {
+        const params = new URLSearchParams();
+        if (targeteAudience) params.append('targeteAudience', targeteAudience);
+        if (targertGroup) params.append('targertGroup', targertGroup);
+        params.append('page', page.toString());
+        params.append('limit', limit.toString());
+        if (searchTerm) params.append('searchTerm', searchTerm);
+        if (targetTrack) params.append('targetTrack', targetTrack);
+
+        return {
+          url: `/learning?${params.toString()}`,
+          method: 'GET',
+        };
+      },
     }),
 
     getResourceById: build.query<any, string>({
@@ -32,6 +30,6 @@ const resourcesDetails = api.injectEndpoints({
 });
 
 export const {
-  useGetResourcesQuery,
+  useGetCoordinatorResourcesQuery,
   useGetResourceByIdQuery,
 } = resourcesDetails;
