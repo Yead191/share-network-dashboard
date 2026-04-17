@@ -13,7 +13,6 @@ import {
     useGetUserGroupsQuery,
     useGetUserTracksQuery,
 } from '../../../../redux/apiSlices/admin/adminStudentApi';
-import { useGetAdminMentorsQuery } from '../../../../redux/apiSlices/admin/adminMentorsApi';
 import { toast } from 'sonner';
 import { GoGoal } from 'react-icons/go';
 import CreateGoalModal from '../../../../components/modals/admin/CreateGoalModal';
@@ -36,7 +35,6 @@ const Student = () => {
     const [selectedStatus, setSelectedStatus] = useState('');
     // API CALLS
 
-    const { data: mentorsApi, isLoading: isMentorsLoading } = useGetAdminMentorsQuery({});
     const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({});
     const { data: userTracksApi, isLoading: isUserTracksLoading } = useGetUserTracksQuery({});
     const [deleteStudent, { isLoading: isDeleting }] = useDeleteStudentMutation();
@@ -46,7 +44,6 @@ const Student = () => {
         refetch,
     } = useGetStudentsQuery({ page, searchTerm, limit: 10, selectedGroup, selectedStatus });
     const allStudents = studentsApi?.data?.data;
-    const allMentors = mentorsApi?.data?.mentors || [];
     const userGroups = userGroupsApi?.data;
     const userTracks = userTracksApi?.data;
     const pagination = studentsApi?.data?.pagination;
@@ -210,7 +207,7 @@ const Student = () => {
         },
     ];
 
-    if (isStudentsLoading || isMentorsLoading || isUserGroupsLoading || isUserTracksLoading) {
+    if (isStudentsLoading || isUserGroupsLoading || isUserTracksLoading) {
         return <Spinner />;
     }
 
@@ -297,8 +294,6 @@ const Student = () => {
                 open={isAssignModalOpen}
                 onCancel={() => setIsAssignModalOpen(false)}
                 student={selectedStudent}
-                allMentors={allMentors}
-                isMentorsLoading={isMentorsLoading}
                 refetch={refetch}
                 userGroups={userGroups}
                 userTracks={userTracks}

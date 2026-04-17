@@ -1,15 +1,14 @@
-import React, { useEffect } from 'react';
-import { Modal, Button, Form, Select } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Modal, Button, Form, Select, Spin } from 'antd';
 import { X } from 'lucide-react';
 import { useUpdateMentorMutation } from '../../../redux/apiSlices/admin/adminStudentApi';
 import { toast } from 'sonner';
+import { useGetAdminMentorsQuery } from '../../../redux/apiSlices/admin/adminMentorsApi';
 
 interface AssignMentorModalProps {
     open: boolean;
     onCancel: () => void;
     student: any;
-    allMentors: any;
-    isMentorsLoading: boolean;
     refetch: () => void;
     userGroups: any;
     userTracks: any;
@@ -21,8 +20,6 @@ const AssignMentorModal: React.FC<AssignMentorModalProps> = ({
     open,
     onCancel,
     student,
-    allMentors,
-    isMentorsLoading,
     refetch,
     userGroups,
     userTracks,
@@ -32,7 +29,80 @@ const AssignMentorModal: React.FC<AssignMentorModalProps> = ({
     const [form] = Form.useForm();
     const [updateMentor, { isLoading: isUpdating }] = useUpdateMentorMutation();
 
+    const [allMentors, setAllMentors] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [hasMore, setHasMore] = useState(true);
+
+    const { data: mentorsApi, isFetching: isMentorsLoading } = useGetAdminMentorsQuery({
+        page,
+        limit: 10,
+        searchTerm
+    }, { skip: !open });
+
     const selectedGroups = Form.useWatch('userGroup', form);
+
+    // Reset state when modal opens/closes
+    useEffect(() => {
+        if (open) {
+            setPage(1);
+            setSearchTerm('');
+            if (student?.mentorId) {
+                // mentorId could be an object or an ID string
+                const initialMentor = typeof student.mentorId === 'object' ? student.mentorId : null;
+                if (initialMentor) {
+                    setAllMentors([initialMentor]);
+                } else {
+                    setAllMentors([]);
+                }
+            } else {
+                setAllMentors([]);
+            }
+        }
+    }, [open, student]);
+
+    // Handle incoming data
+    useEffect(() => {
+        if (mentorsApi?.data?.mentors) {
+            const newMentors = mentorsApi.data.mentors;
+            setAllMentors(prev => {
+                if (page === 1) {
+                    const combined = [...newMentors];
+                    const currentMentor = typeof student?.mentorId === 'object' ? student.mentorId : null;
+                    if (currentMentor) {
+                        const mentorId = currentMentor._id;
+                        if (!combined.some(m => m._id === mentorId)) {
+                            combined.unshift(currentMentor);
+                        }
+                    }
+                    return combined;
+                }
+                const existingIds = new Set(prev.map(m => m._id));
+                const uniqueNew = newMentors.filter((m: any) => !existingIds.has(m._id));
+                return [...prev, ...uniqueNew];
+            });
+        }
+    }, [mentorsApi, page, student]);
+
+    // Update hasMore separately
+    useEffect(() => {
+        if (mentorsApi?.data?.pagination) {
+            const { total } = mentorsApi.data.pagination;
+            setHasMore(allMentors.length < total);
+        }
+    }, [allMentors.length, mentorsApi]);
+
+    const handleSearch = (value: string) => {
+        setSearchTerm(value);
+        setPage(1);
+    };
+
+    const handlePopupScroll = (e: any) => {
+        const { scrollTop, scrollHeight, clientHeight } = e.target;
+        if (scrollHeight - scrollTop <= clientHeight + 10 && hasMore && !isMentorsLoading) {
+            setPage(prev => prev + 1);
+        }
+    };
 
     const isSkillPathSelected = () => {
         if (!selectedGroups || !userGroups) return false;
@@ -131,8 +201,19 @@ const AssignMentorModal: React.FC<AssignMentorModalProps> = ({
                         }))}
                         allowClear
                         showSearch
-                        optionFilterProp="label"
-                        autoClearSearchValue
+                        filterOption={false}
+                        onSearch={handleSearch}
+                        onPopupScroll={handlePopupScroll}
+                        dropdownRender={(menu) => (
+                            <>
+                                {menu}
+                                {isMentorsLoading && (
+                                    <div className="flex justify-center p-2 border-t">
+                                        <Spin size="small" />
+                                    </div>
+                                )}
+                            </>
+                        )}
                     />
                 </Form.Item>
                 <Form.Item

@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Modal, Button, Form, Input, Select } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Modal, Button, Form, Input, Select, Spin } from 'antd';
 import { X } from 'lucide-react';
 import { useUpdateAdminMentorMutation } from '../../../redux/apiSlices/admin/adminMentorsApi';
 import { toast } from 'sonner';
@@ -28,9 +28,74 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({
 }) => {
     const [form] = Form.useForm();
     const [updateMentor, { isLoading }] = useUpdateAdminMentorMutation();
-    const { data: studentsApi, isLoading: isStudentsLoading } = useGetStudentsQuery({ page: 0, limit: 0 });
-    const students = studentsApi?.data?.data || [];
+
+    const [allStudents, setAllStudents] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [hasMore, setHasMore] = useState(true);
+
+    const { data: studentsApi, isFetching: isStudentsLoading } = useGetStudentsQuery({
+        page,
+        limit: 10,
+        searchTerm
+    }, { skip: !open });
+
     const selectedGroups = Form.useWatch('userGroup', form);
+
+    // Reset state when modal opens/closes
+    useEffect(() => {
+        if (open) {
+            setPage(1);
+            setSearchTerm('');
+            if (mentor?.assignedStudents?.[0]) {
+                setAllStudents([mentor.assignedStudents[0]]);
+            } else {
+                setAllStudents([]);
+            }
+        }
+    }, [open, mentor]);
+
+    // Handle incoming data
+    useEffect(() => {
+        if (studentsApi?.data?.data) {
+            const newStudents = studentsApi.data.data;
+            setAllStudents(prev => {
+                if (page === 1) {
+                    const combined = [...newStudents];
+                    if (mentor?.assignedStudents?.[0]) {
+                        const assignedId = mentor.assignedStudents[0]._id;
+                        if (!combined.some(s => s._id === assignedId)) {
+                            combined.unshift(mentor.assignedStudents[0]);
+                        }
+                    }
+                    return combined;
+                }
+                const existingIds = new Set(prev.map(s => s._id));
+                const uniqueNew = newStudents.filter((s: any) => !existingIds.has(s._id));
+                return [...prev, ...uniqueNew];
+            });
+        }
+    }, [studentsApi, page, mentor]);
+
+    // Update hasMore separately to avoid stale closure issues
+    useEffect(() => {
+        if (studentsApi?.data?.pagination) {
+            const { total } = studentsApi.data.pagination;
+            setHasMore(allStudents.length < total);
+        }
+    }, [allStudents.length, studentsApi]);
+
+    const handleSearch = (value: string) => {
+        setSearchTerm(value);
+        setPage(1);
+    };
+
+    const handlePopupScroll = (e: any) => {
+        const { scrollTop, scrollHeight, clientHeight } = e.target;
+        if (scrollHeight - scrollTop <= clientHeight + 10 && hasMore && !isStudentsLoading) {
+            setPage(prev => prev + 1);
+        }
+    };
 
     const isSkillPathSelected = () => {
         if (!selectedGroups || !userGroups) return false;
@@ -108,14 +173,24 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({
                         allowClear
                         style={{ height: '44px' }}
                         loading={isStudentsLoading}
-                        options={students?.map((student: any) => ({
+                        options={allStudents?.map((student: any) => ({
                             label: `${student.firstName} ${student.lastName} (${student.email})`,
                             value: student._id,
                         }))}
-                        filterOption={(input, option) =>
-                            String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                        }
+                        filterOption={false} // Server-side filtering
+                        onSearch={handleSearch}
+                        onPopupScroll={handlePopupScroll}
                         showSearch
+                        dropdownRender={(menu) => (
+                            <>
+                                {menu}
+                                {isStudentsLoading && (
+                                    <div className="flex justify-center p-2 border-t">
+                                        <Spin size="small" />
+                                    </div>
+                                )}
+                            </>
+                        )}
                     />
                 </Form.Item>
 
