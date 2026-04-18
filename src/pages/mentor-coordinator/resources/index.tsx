@@ -17,13 +17,13 @@ const CoordinatorResources = () => {
     // API CALLS
     const { data: userProfile, isLoading: isProfileLoading } = useGetprofileQuery({});
     const user = userProfile?.data?.data ?? userProfile?.data ?? userProfile;
-
+    console.log(user)
     const {
         data,
         isLoading: materialsLoading,
     } = useGetCoordinatorResourcesQuery(
         {
-            targertGroup: user?.userGroup?.[0]?._id,
+            targertGroup: user?.userGroup?.map((group: any) => group._id),
             page,
             searchTerm,
         },
@@ -201,9 +201,9 @@ const CoordinatorResources = () => {
                     columns={columns}
                     rowKey="_id"
                     pagination={{
-                        pageSize: data?.pagination?.limit || 10,
-                        current: data?.pagination?.page || 1,
-                        total: data?.pagination?.total || 0,
+                        pageSize: data?.data?.pagination?.limit || 10,
+                        current: data?.data?.pagination?.page || 1,
+                        total: data?.data?.pagination?.total || 0,
                         onChange: (page) => {
                             setPage(page);
                         },

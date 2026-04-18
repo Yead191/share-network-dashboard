@@ -182,10 +182,10 @@ const AddLearningMaterialModal = ({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Form.Item name="type" label={<span className="text-sm font-semibold text-gray-700">Type</span>}>
-                        <Select placeholder="Select" className="w-full h-11">
-                            <Select.Option value="PDF">PDF</Select.Option>
-                            <Select.Option value="DOCX">DOCX</Select.Option>
-                            <Select.Option value="LINK">LINK</Select.Option>
+                        <Select placeholder="Select Resource Type" className="w-full h-11">
+                            <Select.Option value="LECTURE">Lecture</Select.Option>
+                            <Select.Option value="SLIDES">Slides</Select.Option>
+                            <Select.Option value="MATERIAL">Material</Select.Option>
                         </Select>
                     </Form.Item>
                     <Form.Item

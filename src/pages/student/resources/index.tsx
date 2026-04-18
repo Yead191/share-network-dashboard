@@ -1,13 +1,28 @@
-import { BookOpen, Clock, Download, ExternalLink, FileText } from 'lucide-react';
+import { BookOpen, Clock, Download, ExternalLink, FileText, Search } from 'lucide-react';
 import { useGetStudentResourcesQuery } from '../../../redux/apiSlices/students/resources.slice';
 import { imageUrl } from '../../../redux/api/baseApi';
 import Spinner from '../../../components/shared/Spinner';
 import { useState } from 'react';
-import { Pagination } from 'antd';
+import { Pagination, Input } from 'antd';
+import { useGetprofileQuery } from '../../../redux/apiSlices/students/overview.slice';
 
 export default function StudentResources() {
+    const { data: profile } = useGetprofileQuery({})
     const [page, setPage] = useState(1);
-    const { data, isLoading } = useGetStudentResourcesQuery({ page, limit: 10 });
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const { data, isLoading } = useGetStudentResourcesQuery({
+        page, limit: 10,
+        searchTerm,
+        targertGroup: profile?.userGroup?.[0]?._id,
+        ...(profile?.userGroupTrack?._id && {
+            targetTrack: profile?.userGroupTrack?._id,
+        }),
+    },
+        //  {
+        //     skip: !profile?.userGroup?.[0]?._id
+        // }
+    );
 
     const resources = data?.data?.resources || [];
     const pagination = data?.data?.pagination;
@@ -17,6 +32,21 @@ export default function StudentResources() {
 
     return (
         <section className="space-y-6 animate-fadeIn">
+            {/* Search Input */}
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 w-full bg-white p-4 rounded-2xl shadow-sm">
+                <Input
+                    placeholder="Search resources..."
+                    prefix={<Search size={18} className="text-gray-400 mr-2" />}
+                    value={searchTerm}
+                    onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        setPage(1); // reset to first page on search
+                    }}
+                    className="max-w-md w-full h-11 rounded-xl"
+                    allowClear
+                />
+            </div>
+
             <div className="space-y-4 ">
                 {resources.length > 0 ? (
                     <div className="divide-y divide-gray-50 flex flex-col gap-4">

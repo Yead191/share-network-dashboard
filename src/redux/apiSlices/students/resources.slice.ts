@@ -3,10 +3,22 @@ import { api } from '../../api/baseApi';
 const resourcesStudents = api.injectEndpoints({
     endpoints: (build) => ({
         getStudentResources: build.query({
-            query: ({ page = 1, limit = 10 }) => {
-                // console.log(page, limit);
+            query: ({ page = 1, limit = 10, targeteAudience, targertGroup, searchTerm }: any) => {
+                const params = new URLSearchParams({
+                    page: String(page),
+                    limit: String(limit),
+                });
+
+                if (searchTerm) params.append('searchTerm', searchTerm);
+                if (targeteAudience) {
+                    params.append('targeteAudience', targeteAudience);
+                } else {
+                    params.append('targeteAudience', 'STUDENT');
+                }
+                if (targertGroup) params.append('targertGroup', targertGroup);
+
                 return {
-                    url: `/learning?targeteAudience=STUDENT&page=${page}&limit=${limit}`,
+                    url: `/learning?${params.toString()}`,
                     method: 'GET',
                 };
             },
