@@ -19,7 +19,7 @@ const StudentSchedule = () => {
     const user = data?.data?.data ?? data?.data ?? data;
     const userGroup = user?.userGroup?.[0]?._id;
     // console.log(userGroup);
-    const { data: scheduleApi, isLoading, isFetching } = useGetStudentClassScheduleQuery({
+    const { data: scheduleApi, isLoading } = useGetStudentClassScheduleQuery({
         page: page,
         limit: 10,
         searchTerm: searchTerm,
@@ -173,7 +173,7 @@ const StudentSchedule = () => {
         },
     ];
 
-    if (isLoading || isFetching) {
+    if (isLoading) {
         return <Spinner />;
     }
 
@@ -181,65 +181,60 @@ const StudentSchedule = () => {
         <section className="space-y-6">
             <div className="flex justify-between items-center">
                 <HeaderTitle title="Class Schedule" />
-                <div className="flex gap-3">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
-                        <Input
-                            placeholder="Search materials"
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="h-10 pl-10 bg-[#F9FAFB] border-none shadow-none w-64"
-                            style={{ backgroundColor: 'white' }}
-                        />
-                    </div>
-                    {/* <Button
-                        icon={<FilterIcon className="w-4 h-4" />}
-                        className="h-10 px-6 border-gray-200 text-gray-600 font-medium flex items-center gap-2 rounded-lg"
-                    >
-                        Filter
-                    </Button> */}
-                </div>
             </div>
+            <div className='flex justify-between items-center'>
 
-            {/* Tab Filter */}
-            <div className="flex items-center gap-1 p-1 bg-gray-100/80 rounded-xl w-fit">
-                <button
-                    onClick={() => { setActiveTab('upcoming'); setPage(1); }}
-                    className={`
+                {/* Tab Filter */}
+                <div className="flex items-center gap-1 p-1 bg-gray-100/80 rounded-xl w-fit">
+                    <button
+                        onClick={() => { setActiveTab('upcoming'); setPage(1); }}
+                        className={`
                         relative flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold
                         transition-all duration-300 ease-out cursor-pointer
                         ${activeTab === 'upcoming'
-                            ? 'bg-white text-blue-600 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
-                            : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
-                        }
+                                ? 'bg-white text-blue-600 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
+                                : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                            }
                     `}
-                >
-                    <Clock size={15} className={activeTab === 'upcoming' ? 'text-blue-500' : 'text-gray-400'} />
-                    Upcoming
-                    {activeTab === 'upcoming' && pagination?.total != null && (
-                        <span className="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-blue-50 text-blue-600 border border-blue-100">
-                            {pagination.total}
-                        </span>
-                    )}
-                </button>
-                <button
-                    onClick={() => { setActiveTab('completed'); setPage(1); }}
-                    className={`
+                    >
+                        <Clock size={15} className={activeTab === 'upcoming' ? 'text-blue-500' : 'text-gray-400'} />
+                        Upcoming
+                        {activeTab === 'upcoming' && pagination?.total != null && (
+                            <span className="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                                {pagination.total}
+                            </span>
+                        )}
+                    </button>
+                    <button
+                        onClick={() => { setActiveTab('completed'); setPage(1); }}
+                        className={`
                         relative flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold
                         transition-all duration-300 ease-out cursor-pointer
                         ${activeTab === 'completed'
-                            ? 'bg-white text-emerald-600 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
-                            : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
-                        }
+                                ? 'bg-white text-emerald-600 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
+                                : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                            }
                     `}
-                >
-                    <CheckCircle2 size={15} className={activeTab === 'completed' ? 'text-emerald-500' : 'text-gray-400'} />
-                    Completed
-                    {activeTab === 'completed' && pagination?.total != null && (
-                        <span className="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
-                            {pagination.total}
-                        </span>
-                    )}
-                </button>
+                    >
+                        <CheckCircle2 size={15} className={activeTab === 'completed' ? 'text-emerald-500' : 'text-gray-400'} />
+                        Completed
+                        {activeTab === 'completed' && pagination?.total != null && (
+                            <span className="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+                                {pagination.total}
+                            </span>
+                        )}
+                    </button>
+                </div>
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+                    <Input
+                        placeholder="Search Schedule"
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="h-10 pl-10 bg-[#F9FAFB] border-none shadow-none w-64"
+                        style={{ backgroundColor: 'white' }}
+                        allowClear
+                    />
+                </div>
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
