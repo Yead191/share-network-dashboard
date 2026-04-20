@@ -15,8 +15,8 @@ const StudentDetails = ({ students, refetch }: { students: any[], refetch: any }
             <div className="bg-white p-4 pb-5 rounded-lg shadow-sm mb-6 border border-gray-100 max-h-[345px] overflow-y-auto">
                 <h2 className="text-xl font-semibold text-gray-700 mb-6">Student Details</h2>
                 <div className="space-y-6">
-                    {students.length > 0 ? (
-                        students.map((student: any) => (
+                    {students?.length > 0 ? (
+                        students?.map((student: any) => (
                             <div
                                 key={student._id}
                                 className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"

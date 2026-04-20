@@ -202,7 +202,7 @@ const MentorTable = () => {
               Assigned Mentors
             </Text>
             <Text type="secondary" style={{ marginLeft: 8, fontSize: 13 }}>
-              {data?.length} of {data.length} mentors
+              {data?.length} of {data?.length} mentors
             </Text>
           </div>
           <Input

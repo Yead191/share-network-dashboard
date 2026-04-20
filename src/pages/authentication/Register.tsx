@@ -28,15 +28,16 @@ const Register = () => {
         const data = {
             ...values,
             role: "STUDENT",
-            status: "PENDING"
+            status: "PENDING",
+            verified: true,
         };
 
         try {
             toast.promise(signup(data).unwrap(), {
                 loading: 'Creating account...',
                 success: (res) => {
-                    navigate('/verify-otp', { state: { email: values.email, flow: 'register' } });
-                    return res.message || 'Registration successful! Please verify your email.';
+                    navigate('/login');
+                    return res.message || 'Registration successful! Please login.';
                 },
                 error: (err) => err?.data?.message || err?.data?.errorMessages?.[0]?.message || 'Registration failed',
             });
