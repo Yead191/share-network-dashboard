@@ -65,7 +65,7 @@ const LearningMaterialDetailsModal = ({ open, onCancel, data }: LearningMaterial
                         </tr>
                         <tr>
                             <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">Type</td>
-                            <td className="px-5 py-4 text-gray-800 text-[13px]">{data?.typeLabel || 'Link'}</td>
+                            <td className="px-5 py-4 text-gray-800 text-[13px]">{data?.type || 'N/A'}</td>
                         </tr>
                         <tr>
                             <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">

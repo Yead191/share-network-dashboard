@@ -13,7 +13,7 @@ const learningApi = api.injectEndpoints({
                 if (targetTrack) params.append('targetTrack', targetTrack);
 
                 return {
-                    url: `/learning?${params.toString()}`,
+                    url: `/learning/all?${params.toString()}`,
                     method: 'GET',
                 };
             },

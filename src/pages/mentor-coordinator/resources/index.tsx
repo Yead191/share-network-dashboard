@@ -17,7 +17,7 @@ const CoordinatorResources = () => {
     // API CALLS
     const { data: userProfile, isLoading: isProfileLoading } = useGetprofileQuery({});
     const user = userProfile?.data?.data ?? userProfile?.data ?? userProfile;
-    console.log(user)
+    // console.log(user)
     const {
         data,
         isLoading: materialsLoading,

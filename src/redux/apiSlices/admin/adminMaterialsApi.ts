@@ -26,13 +26,13 @@ const adminMaterialsApi = api.injectEndpoints({
                 if (targertGroup) params.append('targertGroup', targertGroup);
 
                 return {
-                    url: `/learning?${params.toString()}`,
+                    url: `/learning/all?${params.toString()}`,
                     method: 'GET',
                 };
             },
         }),
         addMaterials: build.mutation({
-            query: ( data: any ) => { 
+            query: (data: any) => {
                 return {
                     url: '/learning',
                     method: 'POST',

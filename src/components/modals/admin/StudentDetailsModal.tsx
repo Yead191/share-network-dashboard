@@ -155,7 +155,7 @@ const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ open, onCance
                                     type="primary"
                                     danger
                                     onClick={() => {
-                                        console.log(student._id, student.mentorId._id);
+                                        // console.log(student._id, student.mentorId._id);
                                         toast.promise(
                                             removeAssign({
                                                 studentId: student._id,

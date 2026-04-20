@@ -1,4 +1,4 @@
-import { Card } from 'antd';
+import { Card, Tag } from 'antd';
 import { FileText, Download, Clock, ExternalLink, BookOpen } from 'lucide-react';
 import { imageUrl } from '../../../../redux/api/baseApi';
 
@@ -23,9 +23,9 @@ const LearningMaterials = ({ resources, targertGroup }: any) => {
                                                 <h4 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors leading-tight">
                                                     {resource.title}
                                                 </h4>
-                                                {/* <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] font-bold uppercase tracking-wider rounded-md">
+                                                <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] font-bold uppercase tracking-wider rounded-md">
                                                     {resource.type}
-                                                </span> */}
+                                                </span>
                                             </div>
                                             <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
                                                 {resource.description}
@@ -35,12 +35,10 @@ const LearningMaterials = ({ resources, targertGroup }: any) => {
                                                     <Clock size={12} />
                                                     {new Date(resource.createdAt).toLocaleDateString()}
                                                 </div>
-                                                {/* {resource.createdBy && (
-                                                    <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                                                        <span className="w-1 h-1 bg-gray-300 rounded-full" />
-                                                        By {resource.createdBy.firstName} {resource.createdBy.lastName}
-                                                    </div>
-                                                )} */}
+
+                                            </div>
+                                            <div className='mt-1.5'>
+                                                <Tag color="blue">{resource?.targertGroup.map((item: any) => item.name).join(", ")}</Tag>
                                             </div>
                                         </div>
                                     </div>

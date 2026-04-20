@@ -11,7 +11,7 @@ type ViewState = 'questionnaire' | 'results';
 
 const Goal = () => {
     const { data: profileData, isLoading, refetch } = useProfileQuery(undefined);
-    console.log(profileData, 'profile data');
+    // console.log(profileData, 'profile data');
     const [submitOnboarding] = useSubmitonboardingMutation();
 
     const [view, setView] = useState<ViewState>('questionnaire');

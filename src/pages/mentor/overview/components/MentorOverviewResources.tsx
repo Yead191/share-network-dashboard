@@ -1,6 +1,7 @@
 import { FileText, ExternalLink, Download, BookOpen, Clock } from 'lucide-react';
 import { useGetMentorOverviewResourcesQuery } from '../../../../redux/apiSlices/mentor/mentorOverviewApi';
 import { imageUrl } from '../../../../redux/api/baseApi';
+import { Tag } from 'antd';
 
 interface Resource {
     _id: string;
@@ -14,6 +15,9 @@ interface Resource {
         firstName: string;
         lastName: string;
     };
+    targertGroup: {
+        name: string;
+    }[];
 }
 
 const MentorOverviewResources = ({ mentor }: { mentor: any }) => {
@@ -75,12 +79,9 @@ const MentorOverviewResources = ({ mentor }: { mentor: any }) => {
                                                     <Clock size={12} />
                                                     {new Date(resource.createdAt).toLocaleDateString()}
                                                 </div>
-                                                {/* {resource.createdBy && (
-                                                    <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                                                        <span className="w-1 h-1 bg-gray-300 rounded-full" />
-                                                        By {resource.createdBy.firstName} {resource.createdBy.lastName}
-                                                    </div>
-                                                )} */}
+                                            </div>
+                                            <div className='mt-1.5'>
+                                                <Tag color="blue">{resource?.targertGroup?.map((item: any) => item.name).join(", ")}</Tag>
                                             </div>
                                         </div>
                                     </div>

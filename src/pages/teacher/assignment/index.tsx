@@ -167,7 +167,7 @@ function Assignment() {
     };
 
     const handleReviewFinish = (key: string, grade: string, review: string) => {
-        console.log(review);
+        // console.log(review);
 
         const { error }: any = reviewSubmission({ id: key, data: { marks: grade, feedback: review } });
         if (!error) {

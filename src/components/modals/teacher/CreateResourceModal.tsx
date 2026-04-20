@@ -21,13 +21,13 @@ const CreateResourceModal: React.FC<CreateResourceModalProps> = ({ visible, onCl
     const [file, setFile] = useState<any | null>(null);
     const [createResourse] = useCreateResourseMutation();
     const [updateResource] = useUpdateResourseMutation();
-    console.log(file); 
+    // console.log(file); 
 
-useEffect(() => {
-    if (visible && initialValues) {
-        form.setFieldsValue(initialValues);
-    }
-}, [visible, initialValues, form]);
+    useEffect(() => {
+        if (visible && initialValues) {
+            form.setFieldsValue(initialValues);
+        }
+    }, [visible, initialValues, form]);
 
     const onFinish = async (values: Record<string, any>) => {
         try {
@@ -53,7 +53,7 @@ useEffect(() => {
             toast.promise(mutation, {
                 loading: initialValues?._id ? 'Updating material...' : 'Creating material...',
                 success: (res: any) => {
-                    console.log(res);
+                    // console.log(res);
                     if (res?.success) {
                         refetch();
                         form.resetFields();
@@ -211,8 +211,8 @@ useEffect(() => {
 
                 <div className="flex justify-end mt-4">
                     <Button
-                        type="primary" 
-                         htmlType="submit"
+                        type="primary"
+                        htmlType="submit"
                         className="bg-[#22C55E] hover:bg-[#16a34a] border-none px-8 h-[42px] rounded-lg font-semibold"
                     >
                         {initialValues ? 'Save Changes' : 'Create Event'}

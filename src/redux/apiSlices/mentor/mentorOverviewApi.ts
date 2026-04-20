@@ -21,7 +21,7 @@ const mentorOverviewApi = api.injectEndpoints({
             { targeteAudience: string; targertGroup: string; targetTrack?: string }
         >({
             query: ({ targeteAudience, targertGroup, targetTrack }) => ({
-                url: `/learning?targeteAudience=${targeteAudience}&targertGroup=${targertGroup}${targetTrack ? `&targetTrack=${targetTrack}` : ''
+                url: `/learning/all?targeteAudience=${targeteAudience}&targertGroup=${targertGroup}${targetTrack ? `&targetTrack=${targetTrack}` : ''
                     }`,
                 method: 'GET',
             }),

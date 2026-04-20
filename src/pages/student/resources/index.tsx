@@ -1,140 +1,203 @@
-import { BookOpen, Clock, Download, ExternalLink, FileText, Search } from 'lucide-react';
+import { BookOpen, ExternalLink, Download as DownloadIcon, Search, Eye } from 'lucide-react';
 import { useGetStudentResourcesQuery } from '../../../redux/apiSlices/students/resources.slice';
 import { imageUrl } from '../../../redux/api/baseApi';
 import Spinner from '../../../components/shared/Spinner';
 import { useState } from 'react';
-import { Pagination, Input } from 'antd';
+import { Input, Table, Button, Select, Tag } from 'antd';
 import { useGetprofileQuery } from '../../../redux/apiSlices/students/overview.slice';
+import ResourceDetailsModal from '../../../components/modals/mentor/learning-materials/ResourceDetailsModal';
 
 export default function StudentResources() {
-    const { data: profile } = useGetprofileQuery({})
+    const { data: profile, isLoading: isProfileLoading } = useGetprofileQuery({})
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+    const [type, setType] = useState('ALL');
+    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+    const [selectedResource, setSelectedResource] = useState();
+    // console.log(profile)
 
-    const { data, isLoading } = useGetStudentResourcesQuery({
+    const { data, isLoading, isFetching } = useGetStudentResourcesQuery({
         page, limit: 10,
         searchTerm,
-        targertGroup: profile?.userGroup?.[0]?._id,
-        ...(profile?.userGroupTrack?._id && {
-            targetTrack: profile?.userGroupTrack?._id,
+        type,
+        targertGroup: profile?.data?.userGroup?.[0]?._id,
+        ...(profile?.data?.userGroupTrack?._id && {
+            targetTrack: profile?.data?.userGroupTrack?._id,
         }),
     },
-        //  {
-        //     skip: !profile?.userGroup?.[0]?._id
-        // }
+        {
+            skip: !profile?.data?.userGroup?.[0]?._id
+        }
     );
 
     const resources = data?.data?.resources || [];
     const pagination = data?.data?.pagination;
-    if (isLoading) {
+
+    const columns = [
+        {
+            title: 'Material',
+            key: 'material',
+            render: (_: any, record: any) => (
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 border border-indigo-100 shadow-sm">
+                        <BookOpen size={18} />
+                    </div>
+                    <div>
+                        <p className="font-semibold text-gray-800 text-[13px]">{record.title}</p>
+                        <p className="text-xs text-gray-400">
+                            {record.description?.length > 50
+                                ? `${record.description.slice(0, 50)}...`
+                                : record.description}
+                        </p>
+                    </div>
+                </div>
+            ),
+        },
+        {
+            title: 'Type',
+            key: 'type',
+            dataIndex: 'type',
+            render: (text: string) => (
+                <Tag color={text === 'LECTURE' ? 'purple' : text === 'SLIDES' ? 'orange' : 'cyan'}>
+                    {text || 'MATERIAL'}
+                </Tag>
+            )
+        },
+        {
+            title: 'Content URL',
+            key: 'url',
+            render: (_: any, record: any) => (
+                <div>
+                    {record.contentUrl ? (
+                        <Button
+                            href={record.contentUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            icon={<ExternalLink size={14} />}
+                            className="flex items-center gap-1.5 text-xs text-blue-600 hover:!text-blue-700 border-blue-100 bg-blue-50 px-3 py-1.5 h-auto font-medium shadow-none"
+                        >
+                            Open URL
+                        </Button>
+                    ) : (
+                        <span className="text-gray-400 text-xs">No URL</span>
+                    )}
+                </div>
+            ),
+        },
+        {
+            title: 'File',
+            key: 'pdf',
+            render: (_: any, record: any) => {
+                const downloadUrl = record.pdf ? `${imageUrl}${record.pdf?.replace('/uploads', '')}` : null;
+                return (
+                    <div>
+                        {downloadUrl ? (
+                            <Button
+                                href={downloadUrl}
+                                download
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                icon={<DownloadIcon size={14} />}
+                                className="flex items-center gap-1.5 text-xs text-green-600 hover:!text-green-700 border-green-100 bg-green-50 px-3 py-1.5 h-auto font-medium shadow-none"
+                            >
+                                Download
+                            </Button>
+                        ) : (
+                            <span className="font-medium text-gray-400 text-xs">No File</span>
+                        )}
+                    </div>
+                );
+            },
+        },
+        {
+            title: 'Date added',
+            dataIndex: 'createdAt',
+            key: 'dateAdded',
+            render: (text: string) => <span className="text-gray-500">{new Date(text).toLocaleDateString()}</span>,
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: (_: any, record: any) => (
+                <div className="flex gap-2">
+                    <Button
+                        icon={<Eye size={16} />}
+                        onClick={() => {
+                            setSelectedResource(record);
+                            setIsDetailsModalOpen(true);
+                        }}
+                        className="flex items-center gap-2 text-gray-400 hover:text-indigo-600 border-gray-100 bg-gray-50/30"
+                    >
+                        View
+                    </Button>
+                </div>
+            ),
+        },
+    ];
+
+    if (isLoading && !isFetching || isProfileLoading) {
         return <Spinner />;
     }
 
     return (
         <section className="space-y-6 animate-fadeIn">
-            {/* Search Input */}
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 w-full bg-white p-4 rounded-2xl shadow-sm">
-                <Input
-                    placeholder="Search resources..."
-                    prefix={<Search size={18} className="text-gray-400 mr-2" />}
-                    value={searchTerm}
-                    onChange={(e) => {
-                        setSearchTerm(e.target.value);
-                        setPage(1); // reset to first page on search
-                    }}
-                    className="max-w-md w-full h-11 rounded-xl"
-                    allowClear
-                />
-            </div>
-
-            <div className="space-y-4 ">
-                {resources.length > 0 ? (
-                    <div className="divide-y divide-gray-50 flex flex-col gap-4">
-                        {resources?.map((resource: any) => (
-                            <div
-                                key={resource._id}
-                                className="xl:p-4 hover:bg-white/90 transition-colors group bg-white rounded-2xl"
-                            >
-                                <div className="flex items-start justify-between gap-4">
-                                    <div className="flex gap-4">
-                                        <div className="mt-1 p-3 bg-indigo-50 rounded-xl text-indigo-600 group-hover:bg-indigo-100 transition-colors xl:flex h-fit hidden ">
-                                            <FileText size={24} />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <div className="flex items-center gap-2">
-                                                <h4 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors leading-tight">
-                                                    {resource.title}
-                                                </h4>
-                                                {/* <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] font-bold uppercase tracking-wider rounded-md">
-                                                    {resource.type}
-                                                </span> */}
-                                            </div>
-                                            <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
-                                                {resource.description}
-                                            </p>
-                                            <div className="flex flex-col xl:flex-row xl:items-center justify-start  gap-4 pt-2">
-                                                <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                                                    <Clock size={12} />
-                                                    {new Date(resource.createdAt).toLocaleDateString()}
-                                                </div>
-                                                {/* {resource.createdBy && (
-                                                    <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                                                        <span className="w-1 h-1 bg-gray-300 rounded-full" />
-                                                        By {resource.createdBy.firstName} {resource.createdBy.lastName}
-                                                    </div>
-                                                )} */}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex flex-col gap-2 shrink-0">
-                                        {resource.contentUrl && (
-                                            <a
-                                                href={resource.contentUrl}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm active:scale-95"
-                                            >
-                                                <ExternalLink size={16} /> View
-                                            </a>
-                                        )}
-                                        {resource.pdf && (
-                                            <a
-                                                href={`${imageUrl}${resource.pdf}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100 active:scale-95"
-                                            >
-                                                <Download size={16} /> Download
-                                            </a>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="h-full flex flex-col items-center justify-center p-12 text-center">
-                        <div className="p-4 bg-gray-50 rounded-full text-gray-300 mb-4">
-                            <BookOpen size={48} />
-                        </div>
-                        <h4 className="text-gray-900 font-bold mb-1">No resources found</h4>
-                        <p className="text-sm text-gray-500 max-w-[200px]">
-                            Check back later for new learning materials.
-                        </p>
-                    </div>
-                )}
-                {/* Pagination */}
-                <div className="flex justify-end pt-6">
-                    <Pagination
-                        current={pagination?.page || page}
-                        total={pagination?.total}
-                        pageSize={pagination?.limit}
-                        onChange={(page) => setPage(page)}
-                        showSizeChanger={false}
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 w-full bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-800">Student Resources</h1>
+                    <p className="text-gray-500 mt-1 text-sm">Access your learning materials, lectures, and slides.</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <Select
+                        value={type}
+                        onChange={(value) => {
+                            setType(value);
+                            setPage(1);
+                        }}
+                        className="w-40 h-[40px]"
+                        options={[
+                            { value: 'ALL', label: 'All Types' },
+                            { value: 'LECTURE', label: 'Lectures' },
+                            { value: 'SLIDES', label: 'Slides' },
+                            { value: 'MATERIAL', label: 'Materials' },
+                        ]}
+                    />
+                    <Input
+                        placeholder="Search materials..."
+                        prefix={<Search size={18} className="text-gray-400 mr-2" />}
+                        value={searchTerm}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            setPage(1); // reset to first page on search
+                        }}
+                        className="max-w-md w-full h-[40px] rounded-xl"
+                        allowClear
                     />
                 </div>
             </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                <Table
+                    dataSource={resources}
+                    columns={columns}
+                    rowKey="_id"
+                    loading={isFetching}
+                    pagination={{
+                        pageSize: pagination?.limit,
+                        current: pagination?.page || page,
+                        total: pagination?.total,
+                        onChange: (page) => {
+                            setPage(page);
+                        },
+                    }}
+                    className="custom-table"
+                />
+            </div>
+
+            <ResourceDetailsModal
+                open={isDetailsModalOpen}
+                onCancel={() => setIsDetailsModalOpen(false)}
+                resource={selectedResource}
+            />
         </section>
     );
 }

@@ -179,7 +179,7 @@ const AdminLearningMaterials = () => {
             dataIndex: 'targetTrack',
             key: 'targetTrack',
             render: (targetTrack: { _id: string; name: string }) => {
-                console.log('targetTrack value:', targetTrack); // 👈 add this
+                // console.log('targetTrack value:', targetTrack); // 👈 add this
                 return (
                     <div className="flex gap-2">
                         {targetTrack?.name ? (
