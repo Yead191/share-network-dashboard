@@ -201,7 +201,7 @@ const AddLearningMaterialModal = ({
                         label={<span className="text-sm font-semibold text-gray-700">Upload PDF</span>}
                     >
                         <Dragger
-                            className="border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:border-indigo-400 transition-colors"
+                            className="border-gray-300 rounded-xl bg-gray-50 hover:border-indigo-400 transition-colors"
                             height={180}
                             accept=".pdf"
                             beforeUpload={(file) => {
