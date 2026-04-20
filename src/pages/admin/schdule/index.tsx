@@ -193,7 +193,7 @@ const AdminSchedule = () => {
             ),
         },
     ];
-    if (isLoading || isFetching) {
+    if (isLoading) {
         return <Spinner />
     }
 
@@ -335,6 +335,7 @@ const AdminSchedule = () => {
                 <Table
                     columns={columns}
                     dataSource={scheduleData}
+                    loading={isFetching}
                     pagination={{
                         current: page,
                         pageSize: 10,

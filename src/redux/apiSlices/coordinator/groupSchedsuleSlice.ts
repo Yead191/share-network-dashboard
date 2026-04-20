@@ -3,11 +3,23 @@ import { api } from "../../api/baseApi";
 const groupScheduleSlice = api.injectEndpoints({
     endpoints: (build) => ({
         getClassesSchedule: build.query({
-            query: () => {
-                return {
-                    url: "/coordinator/classes",
-                    method: "GET",
+            query: ({ page, limit, searchTerm, userGroup, filterType }) => {
+                const params = new URLSearchParams({
+                    page: page.toString(),
+                    limit: limit.toString(),
+                    searchTerm: searchTerm,
+                });
+                if (userGroup?.length) {
+                    userGroup.forEach((id: string, index: number) => {
+                        params.append(`userGroup[${index}]`, id);
+                    });
                 }
+                if (filterType) params.append('filterType', filterType);
+
+                return {
+                    url: `/class?${params.toString()}`,
+                    method: 'GET',
+                };
             },
 
         }),
@@ -23,8 +35,8 @@ const groupScheduleSlice = api.injectEndpoints({
     }),
 });
 
-export const {  
-    useGetClassesScheduleQuery, 
+export const {
+    useGetClassesScheduleQuery,
     useUpdateStatusMutation
 
 } = groupScheduleSlice;

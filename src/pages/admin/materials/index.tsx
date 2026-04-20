@@ -15,6 +15,8 @@ const AdminLearningMaterials = () => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [selectedMaterial, setSelectedMaterial] = useState<any>(null);
+    const [type, setType] = useState('ALL');
+
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterAudience, setFilterAudience] = useState<string | undefined>(undefined);
@@ -26,6 +28,7 @@ const AdminLearningMaterials = () => {
         searchTerm: searchTerm,
         targeteAudience: filterAudience,
         targertGroup: filterGroup,
+        type,
     });
     const { data: userGroupsApi } = useGetUserGroupsQuery({});
     const { data: userTracksApi } = useGetUserTracksQuery({});
@@ -216,7 +219,7 @@ const AdminLearningMaterials = () => {
                             setIsDetailsModalOpen(true);
                         }}
                     >
-                        View
+
                     </Button>
                     <Button
                         icon={<Edit size={16} />}
@@ -226,14 +229,14 @@ const AdminLearningMaterials = () => {
                         }}
                         className="flex items-center justify-center gap-1.5 text-xs text-gray-600 hover:!text-green-500 border-none shadow-none bg-[#F9FAFB] px-3 py-1.5 h-auto font-medium"
                     >
-                        Edit
+
                     </Button>
                     <Button
                         icon={<Trash2 size={16} />}
                         onClick={() => handleDelete(record._id)}
                         className="flex items-center justify-center gap-1.5 text-xs text-red-500 hover:!bg-red-50 border border-red-100 rounded-lg px-3 py-1.5 h-auto font-medium shadow-none"
                     >
-                        Delete
+
                     </Button>
                 </div>
             ),
@@ -254,6 +257,20 @@ const AdminLearningMaterials = () => {
                             className="h-10 pl-10 bg-white border border-gray-200 shadow-sm w-72 rounded-lg"
                         />
                     </div>
+                    <Select
+                        value={type}
+                        onChange={(value) => {
+                            setType(value);
+                            setPage(1);
+                        }}
+                        className="w-40 h-[40px]"
+                        options={[
+                            { value: 'ALL', label: 'All Types' },
+                            { value: 'LECTURE', label: 'Lectures' },
+                            { value: 'SLIDES', label: 'Slides' },
+                            { value: 'MATERIAL', label: 'Materials' },
+                        ]}
+                    />
                     <Popover
                         content={
                             <div className="w-64 space-y-4 p-2">

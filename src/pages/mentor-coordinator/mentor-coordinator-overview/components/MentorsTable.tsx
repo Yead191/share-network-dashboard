@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Table,
   Input,
@@ -7,7 +7,6 @@ import {
   Button,
   Space,
   Typography,
-  Badge,
   Tooltip,
   Card,
 } from "antd";
@@ -16,28 +15,22 @@ import {
   SearchOutlined,
   UserOutlined,
   EyeOutlined,
-  TeamOutlined,
-  GithubOutlined,
-  LinkedinOutlined,
 } from "@ant-design/icons";
 import MentorDetailsModal from "./MentorDetailsModal";
+import Spinner from "../../../../components/shared/Spinner";
+import { useProfileQuery } from "../../../../redux/apiSlices/authSlice";
 
 const { Text } = Typography;
 
-const CAREER_COLORS: Record<string, string> = {
-  "App development": "blue",
-  "Web Development": "cyan",
-  "AI (Artificial Intelligence)": "purple",
-  Cybersecurity: "red",
-};
-interface MentorTableProps {
-  data: any[];
-}
 
-const MentorTable: React.FC<MentorTableProps> = ({ data }) => {
+
+const MentorTable = () => {
   const [searchText, setSearchText] = useState("");
+  const { data, isLoading } = useProfileQuery({});
   const [selectedMentor, setSelectedMentor] = useState<any | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const mentors = data?.data?.assignedMentors || [];
 
   const handleViewDetails = (mentor: any) => {
     setSelectedMentor(mentor);
@@ -48,6 +41,23 @@ const MentorTable: React.FC<MentorTableProps> = ({ data }) => {
     setModalOpen(false);
     setSelectedMentor(null);
   };
+
+  const filteredData = mentors?.filter((mentor: any) => {
+    const searchLower = searchText.toLowerCase();
+    const fullName = `${mentor.firstName} ${mentor.lastName}`.toLowerCase();
+    const email = mentor.email?.toLowerCase() || "";
+    const group = mentor.userGroup?.map((g: any) => g.name.toLowerCase()).join(" ") || "";
+    const track = mentor.userGroupTrack?.name?.toLowerCase() || "";
+    const company = mentor.company?.toLowerCase() || "";
+
+    return (
+      fullName.includes(searchLower) ||
+      email.includes(searchLower) ||
+      group.includes(searchLower) ||
+      track.includes(searchLower) ||
+      company.includes(searchLower)
+    );
+  });
 
   const columns: ColumnsType<any> = [
     {
@@ -76,72 +86,50 @@ const MentorTable: React.FC<MentorTableProps> = ({ data }) => {
       ),
     },
     {
-      title: "Title",
-      dataIndex: "professionalTitle",
-      key: "professionalTitle",
-      width: 160,
-      render: (title?: string) =>
-        title ? (
-          <Tag color="blue" style={{ borderRadius: 4 }}>
-            {title}
-          </Tag>
-        ) : (
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            —
-          </Text>
-        ),
+      title: "Groups",
+      dataIndex: "userGroup",
+      key: "userGroup",
+      width: 180,
+      render: (groups: any[]) => (
+        <Space wrap size={4}>
+          {groups?.map((group) => (
+            <Tag key={group._id} color="blue" style={{ borderRadius: 4, fontSize: 11 }}>
+              {group.name}
+            </Tag>
+          ))}
+        </Space>
+      ),
     },
     {
-      title: "Career Directions",
-      dataIndex: "careerDirections",
-      key: "careerDirections",
-      width: 260,
-      render: (directions: string[]) =>
-        directions.length > 0 ? (
-          <Space wrap size={4}>
-            {directions.map((dir) => (
-              <Tag
-                key={dir}
-                color={CAREER_COLORS[dir] ?? "geekblue"}
-                style={{ borderRadius: 4, fontSize: 11 }}
-              >
-                {dir}
-              </Tag>
-            ))}
-          </Space>
-        ) : (
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            Not specified
-          </Text>
-        ),
+      title: "Track",
+      dataIndex: "userGroupTrack",
+      key: "userGroupTrack",
+      width: 120,
+      render: (track: any) => (
+        <Tag color="purple" style={{ borderRadius: 4, fontSize: 11 }}>
+          {track?.name || "N/A"}
+        </Tag>
+      ),
     },
     {
-      title: "Students",
-      key: "students",
-      width: 110,
-      align: "center",
-      sorter: (a, b) => a.assignedStudents.length - b.assignedStudents.length,
-      render: (_, record) => (
-        <Badge
-          count={record.assignedStudents.length}
-          showZero
-          style={{ backgroundColor: record.assignedStudents.length > 0 ? "#1677ff" : "#d9d9d9" }}
+      title: "Company Name",
+      dataIndex: "company",
+      key: "company",
+      width: 150,
+      render: (company?: string) => company || "N/A",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      width: 100,
+      render: (status: string) => (
+        <Tag
+          color={status === "ACTIVE" ? "success" : "error"}
+          style={{ borderRadius: 4, fontSize: 11 }}
         >
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: "50%",
-              background: "#f0f5ff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto",
-            }}
-          >
-            <TeamOutlined style={{ color: "#1677ff", fontSize: 16 }} />
-          </div>
-        </Badge>
+          {status}
+        </Tag>
       ),
     },
     {
@@ -149,9 +137,9 @@ const MentorTable: React.FC<MentorTableProps> = ({ data }) => {
       key: "studentsPreview",
       width: 160,
       render: (_, record) =>
-        record.assignedStudents.length > 0 ? (
-          <Avatar.Group maxCount={3} size={30}>
-            {record.assignedStudents.map((s: any) => (
+        record?.assignedStudents?.length > 0 ? (
+          <Avatar.Group max={{ count: 3 }} size={30}>
+            {record?.assignedStudents?.map((s: any) => (
               <Tooltip
                 key={s._id}
                 title={`${s.firstName} ${s.lastName}`}
@@ -173,43 +161,6 @@ const MentorTable: React.FC<MentorTableProps> = ({ data }) => {
         ),
     },
     {
-      title: "Links",
-      key: "links",
-      width: 90,
-      align: "center",
-      render: (_, record) => (
-        <Space size={4}>
-          {record.githubProfile && (
-            <Tooltip title="GitHub">
-              <a href={record.githubProfile} target="_blank" rel="noreferrer">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<GithubOutlined />}
-                  style={{ color: "#595959" }}
-                />
-              </a>
-            </Tooltip>
-          )}
-          {record.linkedInProfile && (
-            <Tooltip title="LinkedIn">
-              <a href={record.linkedInProfile} target="_blank" rel="noreferrer">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<LinkedinOutlined />}
-                  style={{ color: "#1677ff" }}
-                />
-              </a>
-            </Tooltip>
-          )}
-          {!record.githubProfile && !record.linkedInProfile && (
-            <Text type="secondary" style={{ fontSize: 12 }}>—</Text>
-          )}
-        </Space>
-      ),
-    },
-    {
       title: "Action",
       key: "action",
       width: 110,
@@ -227,7 +178,9 @@ const MentorTable: React.FC<MentorTableProps> = ({ data }) => {
       ),
     },
   ];
-
+  if (isLoading) {
+    return <Spinner />
+  }
   return (
     <>
       <Card
@@ -265,7 +218,7 @@ const MentorTable: React.FC<MentorTableProps> = ({ data }) => {
         {/* Table */}
         <Table
           columns={columns}
-          dataSource={data}
+          dataSource={filteredData}
           rowKey="_id"
           pagination={{
             pageSize: 10,

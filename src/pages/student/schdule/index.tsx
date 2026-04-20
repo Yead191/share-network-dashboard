@@ -19,7 +19,7 @@ const StudentSchedule = () => {
     const user = data?.data?.data ?? data?.data ?? data;
     const userGroup = user?.userGroup?.[0]?._id;
     // console.log(userGroup);
-    const { data: scheduleApi, isLoading } = useGetStudentClassScheduleQuery({
+    const { data: scheduleApi, isLoading, isFetching } = useGetStudentClassScheduleQuery({
         page: page,
         limit: 10,
         searchTerm: searchTerm,
@@ -241,7 +241,7 @@ const StudentSchedule = () => {
                 <Table
                     columns={columns}
                     dataSource={scheduleData}
-                    loading={isLoading}
+                    loading={isFetching}
                     pagination={{
                         current: page,
                         pageSize: 10,

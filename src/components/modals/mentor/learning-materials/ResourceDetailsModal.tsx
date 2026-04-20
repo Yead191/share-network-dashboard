@@ -42,7 +42,7 @@ const ResourceDetailsModal = ({ open, onCancel, resource }: any) => {
                             {resource.type || 'Resource'}
                         </Tag>
                         <Tag className="bg-green-400/20 border-green-400/30 text-green-300 font-semibold px-3 py-0.5 rounded-full uppercase text-[10px] tracking-wider">
-                            Mentor Resource
+                            {resource.targeteAudience || 'All Audiences'} Resource
                         </Tag>
                     </div>
                     <h2 className="text-3xl font-bold leading-tight">{resource.title}</h2>

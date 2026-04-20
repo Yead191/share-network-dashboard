@@ -8,7 +8,6 @@ import NewPassword from '../pages/authentication/NewPassword';
 import AdminOverview from '../pages/admin/overview';
 import MentorCoordinatorOverview from '../pages/mentor-coordinator/mentor-coordinator-overview';
 import MentorCoordinatorProfile from '../pages/mentor-coordinator/profile';
-import Mentors from '../pages/mentor-coordinator/mentors';
 import GroupSchedule from '../pages/mentor-coordinator/group-schedule';
 import CoordinatorResources from '../pages/mentor-coordinator/resources';
 import TeacherOverview from '../pages/teacher/overview';
@@ -45,6 +44,7 @@ import AdminCoordinator from '../pages/admin/coordinator';
 import TakeAttendance from '../pages/admin/students/take-attendance/TakeAttendance';
 import GoalIndex from '../pages/student/goal/GoalIndex';
 import Register from '../pages/authentication/Register';
+import MentorTable from '../pages/mentor-coordinator/mentor-coordinator-overview/components/MentorsTable';
 
 const router = createBrowserRouter([
     {
@@ -214,7 +214,7 @@ const router = createBrowserRouter([
                 path: '/mentor-coordinator/mentors',
                 element: (
                     <PrivateRoute role="coordinator">
-                        <Mentors />
+                        <MentorTable />
                     </PrivateRoute>
                 ),
             },

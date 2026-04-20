@@ -1,26 +1,33 @@
 import StatsCards from './components/StatsCards';
-import MentorsTable from './components/MentorsTable';
 import StudentDetails from './components/StudentDetails';
 import RecentActivity from './components/RecentActivity';
 import { useProfileQuery } from '../../../redux/apiSlices/authSlice';
 import Spinner from '../../../components/shared/Spinner';
+import MentorTable from './components/MentorsTable';
 
 const MentorCoordinatorOverview = () => {
-    const { data, isLoading } = useProfileQuery({});
+    const { data, isLoading, refetch } = useProfileQuery({});
     if (isLoading) {
         return <Spinner />
     }
     const mentors = data?.data?.assignedMentors || [];
+    const allStudents = mentors.reduce((acc: any[], mentor: any) => {
+        if (mentor.assignedStudents) {
+            return [...acc, ...mentor.assignedStudents];
+        }
+        return acc;
+    }, []);
+
     return (
         <div className="">
             <StatsCards />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2">
-                    <MentorsTable data={mentors} />
+                    <MentorTable />
                 </div>
                 <div className="lg:col-span-1 space-y-6">
-                    <StudentDetails />
+                    <StudentDetails students={allStudents} refetch={refetch} />
                     <RecentActivity />
                 </div>
             </div>

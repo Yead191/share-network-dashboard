@@ -9,12 +9,14 @@ const adminMaterialsApi = api.injectEndpoints({
                 searchTerm,
                 targeteAudience,
                 targertGroup,
+                type
             }: {
                 page: number;
                 limit: number;
                 searchTerm: string;
                 targeteAudience?: string;
                 targertGroup?: string;
+                type?: string;
             }) => {
                 const params = new URLSearchParams({
                     page: String(page),
@@ -24,7 +26,7 @@ const adminMaterialsApi = api.injectEndpoints({
 
                 if (targeteAudience) params.append('targeteAudience', targeteAudience);
                 if (targertGroup) params.append('targertGroup', targertGroup);
-
+                if (type && type !== 'ALL') params.append('type', type);
                 return {
                     url: `/learning/all?${params.toString()}`,
                     method: 'GET',

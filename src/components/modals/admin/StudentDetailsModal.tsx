@@ -141,15 +141,15 @@ const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ open, onCance
                 </div>
 
                 {/* Assigned Mentor Section */}
-                {student.mentorId && (
+                {student?.mentorId?.email && (
                     <>
                         <SectionHeader title="Assigned Mentor" />
                         <div className="border border-gray-100 rounded-xl overflow-hidden mb-6">
                             <InfoRow
                                 label="Mentor Name"
-                                value={`${student.mentorId.firstName} ${student.mentorId.lastName}`}
+                                value={`${student?.mentorId?.firstName} ${student?.mentorId?.lastName}`}
                             />
-                            <InfoRow label="Mentor Email" value={student.mentorId.email} />
+                            <InfoRow label="Mentor Email" value={student?.mentorId?.email} />
                             <div className="m-4 flex justify-end ">
                                 <Button
                                     type="primary"
@@ -181,8 +181,8 @@ const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ open, onCance
 
                 <SectionHeader title="Goals" />
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {initialGoals.length > 0 ? (
-                        initialGoals.map((goal: any) => <GoalCard key={goal._id} goal={goal} />)
+                    {initialGoals?.length > 0 ? (
+                        initialGoals?.map((goal: any) => <GoalCard key={goal._id} goal={goal} />)
                     ) : (
                         <div className="col-span-full py-20 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
                             <p className="text-gray-400 font-medium">No goals found. Create your first goal!</p>
