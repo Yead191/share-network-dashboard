@@ -22,6 +22,7 @@ const homeSlice = api.injectEndpoints({
                     url: '/class',
                     method: 'GET',
                     params,
+                    cache: 'no-store',
                 };
             },
             providesTags: ['Class'],

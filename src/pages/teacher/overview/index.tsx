@@ -13,8 +13,8 @@ function TeacherOverview() {
                     <UpcomingClasses />
                 </div>
                 <div className="h-full bg-white  p-4 rounded-2xl shadow-sm border border-gray-50 ">
-                    {/* <PendingReviews />  */} 
-                        <RecentActivity />
+                    {/* <PendingReviews />  */}
+                    <RecentActivity />
                 </div>
             </div>
 
