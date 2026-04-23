@@ -246,7 +246,7 @@ const AdminTeachers = () => {
                 onCancel={() => setIsFilterModalOpen(false)}
                 onFilter={(groupId) => {
                     setSelectedGroup(groupId);
-                    setPage(1); // Reset to first page on filter
+                    setPage(1);
                 }}
                 initialGroupId={selectedGroup}
             />

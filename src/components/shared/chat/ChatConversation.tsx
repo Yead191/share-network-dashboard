@@ -18,8 +18,7 @@ export function ChatConversation({ messageId, activeUser }: { messageId: any; ac
     const socket = useMemo(() => io(socketUrl), []);
 
     useEffect(() => {
-        socket.on(`getMessage::${messageId}`, (data) => {
-            console.log(data, 'socket msg');
+        socket.on(`getMessage::${messageId}`, () => {
             refetch();
         });
     }, [messageId, socket]);
@@ -98,11 +97,10 @@ export function ChatConversation({ messageId, activeUser }: { messageId: any; ac
                                 )}
                                 <div className="flex flex-col gap-1">
                                     <div
-                                        className={`px-4 py-3 rounded-2xl text-[14px] shadow-sm  ${
-                                            isMe
-                                                ? 'bg-[#055E6E] text-white rounded-br-none'
-                                                : 'bg-white text-gray-800 rounded-bl-none border border-gray-100 '
-                                        }`}
+                                        className={`px-4 py-3 rounded-2xl text-[14px] shadow-sm  ${isMe
+                                            ? 'bg-[#055E6E] text-white rounded-br-none'
+                                            : 'bg-white text-gray-800 rounded-bl-none border border-gray-100 '
+                                            }`}
                                     >
                                         <div className="flex flex-row flex-wrap">
                                             {msg.images &&

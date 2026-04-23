@@ -174,14 +174,7 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({
                 </Form.Item>
 
                 <Row gutter={24}>
-                    <Col span={12}>
-                        <Form.Item
-                            label={<span className="font-semibold text-gray-700">Phone</span>}
-                            name="mobileNumber"
-                        >
-                            <Input placeholder="Enter phone" className="h-11 rounded-md" />
-                        </Form.Item>
-                    </Col>
+
                     <Col span={12}>
                         {/* <Form.Item label={<span className="font-semibold text-gray-700">vNumber</span>} name="vNumber">
                             <Input placeholder="Enter vNumber" className="h-11 rounded-md" />
@@ -194,6 +187,17 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({
                                     { label: 'PENDING', value: 'PENDING' },
                                     { label: 'ACTIVE', value: 'ACTIVE' },
                                     { label: 'NON-ACTIVE', value: 'NON_ACTIVE' },
+                                ]}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item label={<span className="font-medium text-gray-700">Verified</span>} name="verified">
+                            <Select
+                                className="h-11 rounded-md"
+                                options={[
+                                    { label: 'Yes', value: true },
+                                    { label: 'No', value: false },
                                 ]}
                             />
                         </Form.Item>
@@ -212,6 +216,14 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({
                                     { label: 'Other', value: 'Other' },
                                 ]}
                             />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            label={<span className="font-semibold text-gray-700">Phone</span>}
+                            name="mobileNumber"
+                        >
+                            <Input placeholder="Enter phone" className="h-11 rounded-md" />
                         </Form.Item>
                     </Col>
                 </Row>
