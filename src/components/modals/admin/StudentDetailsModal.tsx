@@ -9,10 +9,11 @@ interface StudentDetailsModalProps {
     open: boolean;
     onCancel: () => void;
     student: any;
-    refetch: () => void;
+    refetch?: () => void;
+    isTeacherModal?: boolean;
 }
 
-const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ open, onCancel, student, refetch }) => {
+const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ open, onCancel, student, refetch, isTeacherModal = false }) => {
     const [removeAssign] = useRemoveAssignMutation();
     if (!student) return null;
 
@@ -150,7 +151,7 @@ const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ open, onCance
                                 value={`${student?.mentorId?.firstName} ${student?.mentorId?.lastName}`}
                             />
                             <InfoRow label="Mentor Email" value={student?.mentorId?.email} />
-                            <div className="m-4 flex justify-end ">
+                            <div className={`m-4 flex justify-end  ${isTeacherModal && 'hidden'}`}>
                                 <Button
                                     type="primary"
                                     danger
@@ -164,7 +165,7 @@ const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ open, onCance
                                             {
                                                 loading: 'Removing mentor...',
                                                 success: (res: any) => {
-                                                    refetch();
+                                                    refetch && refetch();
                                                     return res?.message || 'Mentor removed successfully';
                                                 },
                                                 error: (err: any) => err?.data?.message || 'Failed to remove mentor',

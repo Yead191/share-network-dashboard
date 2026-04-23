@@ -3,11 +3,11 @@ import { Table, Input, Button, Avatar, Select } from 'antd';
 import { IoEyeOutline } from 'react-icons/io5';
 import { FilterOutlined, SearchOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import StudentDetailsModal from '../../../components/modals/teacher/StudentDetailsModal';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
 import { useGetMyStudentsQuery } from '../../../redux/apiSlices/teacher/homeSlice';
 import { getImageUrl } from '../../../utils/getImageUrl';
 import { useGetUserGroupsQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
+import StudentDetailsModal from '../../../components/modals/admin/StudentDetailsModal';
 
 export interface StudentData {
     key: string;
@@ -25,15 +25,14 @@ const MyStudent = () => {
     const [searchText, setSearchText] = useState('');
     const [page, setPage] = useState(1);
     const [selectedGroup, setSelectedGroup] = useState<string | undefined>(undefined);
-    const { data, isLoading, isFetching } = useGetMyStudentsQuery({ page: page, limit: 10, searchTerm: searchText, userGroup: selectedGroup });
+
     const [selectedStudent, setSelectedStudent] = useState<StudentData | null>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const { data: userGroups } = useGetUserGroupsQuery({ page: 1, limit: 100 });
-
-
+    const { data, isLoading, isFetching } = useGetMyStudentsQuery({ page: page, limit: 10, searchTerm: searchText, userGroup: selectedGroup });
     const mockData = data?.data.map((student) => ({
         key: student._id,
-        name: student.name,
+        name: `${student.firstName} ${student.lastName}`,
         email: student.email,
         contact: student.mobileNumber,
         group: student.userGroup,
@@ -109,22 +108,6 @@ const MyStudent = () => {
             key: 'joined',
             render: (text) => <span className="text-gray-600 font-medium">{new Date(text).toLocaleDateString()}</span>,
         },
-        // {
-        //     title: 'STATUS',
-        //     dataIndex: 'status',
-        //     key: 'status',
-        //     render: (status: string) => (
-        //         <Select
-        //             defaultValue={status}
-        //             style={{ width: 100 }}
-        //             options={[
-        //                 { value: 'Active', label: 'Active' },
-        //                 { value: 'Inactive', label: 'Inactive' },
-        //             ]}
-        //             className={status === 'Active' ? 'text-green-600' : 'text-red-600'}
-        //         />
-        //     ),
-        // },
         {
             title: 'ACTION',
             key: 'action',
@@ -188,9 +171,10 @@ const MyStudent = () => {
             </div>
 
             <StudentDetailsModal
-                visible={isModalVisible}
-                onClose={() => setIsModalVisible(false)}
+                open={isModalVisible}
+                onCancel={() => setIsModalVisible(false)}
                 student={selectedStudent}
+                isTeacherModal={true}
             />
         </div>
     );
