@@ -11,9 +11,7 @@ import MentorCoordinatorProfile from '../pages/mentor-coordinator/profile';
 import GroupSchedule from '../pages/mentor-coordinator/group-schedule';
 import CoordinatorResources from '../pages/mentor-coordinator/resources';
 import TeacherOverview from '../pages/teacher/overview';
-import MyStudent from '../pages/teacher/my-student';
-import ClassSchedule from '../pages/teacher/class-schedule';
-import Resources from '../pages/teacher/resources';
+import MyStudent from '../pages/teacher/my-student';;
 import Assignment from '../pages/teacher/assignment';
 import StudentOverview from '../pages/student/overview';
 import StudentProfile from '../pages/student/settings';
@@ -45,6 +43,8 @@ import TakeAttendance from '../pages/admin/students/take-attendance/TakeAttendan
 import GoalIndex from '../pages/student/goal/GoalIndex';
 import Register from '../pages/authentication/Register';
 import MentorTable from '../pages/mentor-coordinator/mentor-coordinator-overview/components/MentorsTable';
+import TeacherClassSchedule from '../pages/teacher/class-schedule';
+import TeacherResources from '../pages/teacher/resources';
 
 const router = createBrowserRouter([
     {
@@ -164,7 +164,7 @@ const router = createBrowserRouter([
                 path: '/teacher/class-schedule',
                 element: (
                     <PrivateRoute role="teacher">
-                        <ClassSchedule />
+                        <TeacherClassSchedule />
                     </PrivateRoute>
                 ),
             },
@@ -172,7 +172,7 @@ const router = createBrowserRouter([
                 path: '/teacher/resources',
                 element: (
                     <PrivateRoute role="teacher">
-                        <Resources />
+                        <TeacherResources />
                     </PrivateRoute>
                 ),
             },

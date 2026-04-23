@@ -1,172 +1,97 @@
 import { useState } from 'react';
-import { Table, Button, Input, Select, Space, Tag } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { SearchOutlined, FilterOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { IoTimeOutline, IoLocationOutline } from 'react-icons/io5';
+import { Table, Button, Input, Modal, message } from 'antd';
+import { Search, Plus, Calendar, MapPin, Eye, Edit, Trash2, Clock, CheckCircle2, Video } from 'lucide-react';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
-import ClassDetailsModal from '../../../components/modals/teacher/ClassDetailsModal';
-import CreateClassModal from '../../../components/modals/teacher/CreateClassModal';
 import {
-    useAddClassTeacherMutation,
     useDeleteClassTeacherMutation,
     useGetTeacherClassesQuery,
-    useUpdateClassTeacherMutation,
 } from '../../../redux/apiSlices/teacher/homeSlice';
+import { useGetprofileQuery } from '../../../redux/apiSlices/students/overview.slice';
 import { toast } from 'sonner';
-import Swal from 'sweetalert2';
-import { useGetUserGroupsQuery } from '../../../redux/apiSlices/teacher/resourceSlice';
+import moment from 'moment';
+import TeacherClassDetailsModal from '../../../components/modals/teacher/TeacherClassDetailsModal';
+import TeacherCreateClassModal from '../../../components/modals/teacher/TeacherCreateClassModal';
 
-export interface ClassScheduleItem {
-    key: string;
-    title: string;
-    description: string;
-    date: string;
-    time: string;
-    location: string;
-    targets: string[];
-    status: string;
-}
+const TeacherClassSchedule = () => {
+    const { data: profile } = useGetprofileQuery({});
+    const userGroup = profile?.data?.userGroup?.[0]?._id;
+    const userGroupTrack = profile?.data?.userGroupTrack?._id;
 
-export interface ClassData {
-    title: string;
-    description: string;
-    date: any; // important ✅
-    location: string;
-    virtualClass: boolean;
-}
-
-const ClassSchedule = () => {
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedGroup, setSelectedGroup] = useState<string | undefined>(undefined);
-    const { data, isLoading, isFetching } = useGetTeacherClassesQuery({
-        page: page,
-        limit: 10,
-        searchTerm: searchTerm,
-        userGroup: selectedGroup
-    });
-    const [addClassTeacher, { isLoading: isAddingClass }] = useAddClassTeacherMutation();
-    const [updateClassTeacher, { isLoading: isUpdatingClass }] = useUpdateClassTeacherMutation();
-    const [deleteClassTeacher] = useDeleteClassTeacherMutation();
+    const [activeTab, setActiveTab] = useState<'upcoming' | 'completed'>('upcoming');
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [selectedClass, setSelectedClass] = useState<ClassScheduleItem | null>(null);
-    const { data: userGroups } = useGetUserGroupsQuery({ page: 1, limit: 100 });
-    const modifiedData: ClassScheduleItem[] =
-        data?.data.map((item) => ({
-            key: item._id,
-            title: item.title,
-            description: item.description,
-            date: item.classDate,
-            status: item.published ? 'Active' : 'Inactive',
-            time: item.classDate,
-            location: item.location,
-            targets: item.userGroup?.map((group) => group?.name) || [],
-        })) || [];
+    const [selectedClass, setSelectedClass] = useState<any>(null);
 
-    const handleView = (record: ClassScheduleItem) => {
-        setSelectedClass(record);
-        setIsDetailsModalOpen(true);
-    };
+    const { data, isLoading, isFetching, refetch } = useGetTeacherClassesQuery({
+        page,
+        limit: 10,
+        searchTerm,
+        filterType: activeTab,
+        userGroup,
+        ...(userGroupTrack && { userGroupTrack }),
+    });
 
-    const handleEdit = (record: ClassScheduleItem) => {
-        setSelectedClass(record);
-        setIsCreateModalOpen(true);
-    };
+    const [deleteClassTeacher] = useDeleteClassTeacherMutation();
 
-    const handleAdd = () => {
-        setSelectedClass(null);
-        setIsCreateModalOpen(true);
-    };
+    const scheduleData = data?.data?.map((item: any) => ({
+        _id: item._id,
+        key: item._id,
+        title: item.title,
+        description: item.description,
+        classDate: item.classDate,
+        date: moment(item.classDate).format('DD/MM/YYYY'),
+        time: moment(item.classDate).format('hh:mm A'),
+        userGroup: item.userGroup,
+        userGroupTrack: item.userGroupTrack,
+        virtualClass: item.virtualClass,
+        location: item.location,
+        slideUrl: item.slideUrl,
+        file: item.file,
+        status: item.published ? 'Active' : 'Inactive',
+    }));
 
-    const handleDelete = async (record: ClassScheduleItem) => {
-        await Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                const { error }: any = await deleteClassTeacher(record.key);
-                if (!error) {
-                    toast.success('Class deleted successfully');
-                    return;
+    const handleDelete = (id: string) => {
+        Modal.confirm({
+            title: 'Delete Class',
+            content: 'Are you sure you want to delete this class?',
+            okText: 'Yes, Delete',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk: async () => {
+                try {
+                    toast.promise(deleteClassTeacher(id).unwrap(), {
+                        loading: 'Deleting class...',
+                        success: (res: any) => {
+                            refetch();
+                            return res?.message || 'Class deleted successfully';
+                        },
+                        error: (err: any) => err?.message || 'Failed to delete class',
+                    });
+                } catch (error: any) {
+                    message.error(error?.data?.message || 'Something went wrong');
                 }
-                toast.error(error?.data?.message || 'Failed to delete class');
-            }
+            },
         });
     };
 
-    const handleStatusChange = (value: string, record: ClassScheduleItem) => {
-        if (value == 'Active') {
-            updateClassTeacher({
-                id: record.key,
-                data: {
-                    published: true,
-                },
-            });
-        } else {
-            updateClassTeacher({
-                id: record.key,
-                data: {
-                    published: false,
-                },
-            });
-        }
-    };
-
-    const handleSave = async (values: ClassData) => {
-        if (selectedClass) {
-            const { error, data }: any = await updateClassTeacher({
-                id: selectedClass.key,
-                data: {
-                    ...values,
-                    classDate: values?.date?.toISOString(),
-                },
-            });
-
-            if (!error) {
-                setIsCreateModalOpen(false);
-                toast.success(data?.message || 'Class updated successfully');
-                return;
-            }
-            toast.error(error?.data?.message || 'Failed to update class');
-        } else {
-            const { error }: any = await addClassTeacher({
-                title: values.title,
-                description: values.description,
-                classDate: values.date.toISOString(),
-                location: values.location,
-                virtualClass: values.virtualClass,
-                published: true,
-            });
-
-            if (!error) {
-                setIsCreateModalOpen(false);
-                toast.success('Class added successfully');
-                return;
-            }
-
-            toast.error(error?.data?.message || 'Failed to add class');
-        }
-    };
-
-    const columns: ColumnsType<ClassScheduleItem> = [
+    const columns = [
         {
             title: 'CLASS',
-            dataIndex: 'title',
-            key: 'title',
-            render: (text, record) => (
+            key: 'class',
+            render: (_: any, record: any) => (
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center border border-gray-100">
-                        <IoTimeOutline size={20} className="text-gray-400" />
+                    <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
+                        <Calendar size={18} />
                     </div>
                     <div>
-                        <div className="font-semibold text-gray-800">{text}</div>
-                        <div className="text-xs text-gray-400 truncate w-40">{record.description}</div>
+                        <p className="font-semibold text-gray-800">{record.title}</p>
+                        <p className="text-xs text-gray-400">
+                            {record.description?.length > 50
+                                ? `${record.description.slice(0, 50)}...`
+                                : record.description}
+                        </p>
                     </div>
                 </div>
             ),
@@ -174,38 +99,50 @@ const ClassSchedule = () => {
         {
             title: 'DATE & TIME',
             key: 'dateTime',
-            render: (_, record) => (
-                <div className="text-gray-600">
-                    <div className="font-medium">{new Date(record.date).toDateString()}</div>
-                    <div className="text-xs">{new Date(record.time).toLocaleTimeString()}</div>
-                </div>
-            ),
-        },
-        {
-            title: 'LOCATION',
-            dataIndex: 'location',
-            key: 'location',
-            render: (text) => (
-                <div className="flex items-center gap-2 text-gray-600">
-                    <IoLocationOutline size={16} className="text-gray-400" />
-                    <span className="text-sm">{text}</span>
+            render: (_: any, record: any) => (
+                <div className="text-sm">
+                    <p className="font-medium text-gray-800">{record.date}</p>
+                    <p className="text-gray-400">{record.time}</p>
                 </div>
             ),
         },
         {
             title: 'TARGET',
-            dataIndex: 'targets',
-            key: 'targets',
-            render: (targets: string[]) => (
-                <div className="flex flex-col gap-1">
-                    {targets.map((target, idx) => (
-                        <Tag
-                            key={idx}
-                            className="bg-green-50 text-green-600 border-none rounded-full px-3 py-1 text-xs font-medium w-fit"
+            key: 'target',
+            render: (_: any, record: any) => (
+                <div className="flex flex-wrap gap-1">
+                    {record.userGroupTrack?.name && (
+                        <span className="px-2.5 py-1 bg-purple-50 text-purple-500 text-[10px] rounded-full border border-purple-100 uppercase tracking-tighter">
+                            {record.userGroupTrack.name}
+                        </span>
+                    )}
+                    {record.userGroup?.map((g: any) => (
+                        <span
+                            key={g._id}
+                            className="px-2.5 py-1 bg-gray-50 text-gray-500 text-[10px] rounded-full border border-gray-100 uppercase tracking-tighter"
                         >
-                            {target}
-                        </Tag>
+                            {g.name}
+                        </span>
                     ))}
+                </div>
+            ),
+        },
+        {
+            title: 'LOCATION',
+            key: 'location',
+            render: (_: any, record: any) => (
+                <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                    {record.virtualClass ? (
+                        <>
+                            <Video size={14} className="text-blue-400" />
+                            <span className="text-blue-500">Virtual</span>
+                        </>
+                    ) : (
+                        <>
+                            <MapPin size={14} className="text-gray-400" />
+                            <span>{record.location || '—'}</span>
+                        </>
+                    )}
                 </div>
             ),
         },
@@ -213,115 +150,159 @@ const ClassSchedule = () => {
             title: 'STATUS',
             dataIndex: 'status',
             key: 'status',
-            render: (status, record) => (
-                <Select
-                    defaultValue={status}
-                    style={{ width: 100 }}
-                    onChange={(value) => handleStatusChange(value, record)}
-                    bordered={true}
-                    className="rounded-lg status-select"
-                    options={[
-                        { value: 'Active', label: <span className="text-green-600 font-medium">Active</span> },
-                        { value: 'Inactive', label: <span className="text-red-600 font-medium">Inactive</span> },
-                    ]}
-                />
+            render: (text: string) => (
+                <div className={`flex items-center gap-2 px-3 py-1 border rounded-lg text-xs font-medium cursor-pointer w-fit ${text === 'Active'
+                    ? 'border-green-200 bg-green-50 text-green-600'
+                    : 'border-gray-200 bg-gray-50 text-gray-500'
+                    }`}>
+                    {text}
+                </div>
             ),
         },
         {
             title: 'ACTION',
             key: 'action',
-            render: (_, record) => (
-                <Space size="small">
+            render: (_: any, record: any) => (
+                <div className="flex items-center gap-2">
                     <Button
-                        icon={<EyeOutlined />}
-                        onClick={() => handleView(record)}
-                        className="flex items-center gap-1 border-gray-200 text-gray-600 hover:text-blue-600"
+                        icon={<Eye size={16} />}
+                        className="flex items-center justify-center gap-1.5 text-sm text-gray-500 hover:text-blue-500 border-none shadow-none bg-transparent"
+                        onClick={() => {
+                            setSelectedClass(record);
+                            setIsDetailsModalOpen(true);
+                        }}
                     >
                         View
                     </Button>
                     <Button
-                        icon={<EditOutlined />}
-                        onClick={() => handleEdit(record)}
-                        className="flex items-center gap-1 border-gray-200 text-gray-600 hover:text-green-600"
+                        icon={<Edit size={16} />}
+                        className="flex items-center justify-center gap-1.5 text-sm text-gray-500 hover:text-green-500 border-none shadow-none bg-transparent"
+                        onClick={() => {
+                            setSelectedClass(record);
+                            setIsCreateModalOpen(true);
+                        }}
                     >
                         Edit
                     </Button>
                     <Button
-                        icon={<DeleteOutlined />}
-                        danger
-                        className="flex items-center gap-1 border-red-100 bg-red-50 text-red-500 hover:bg-red-100"
-                        onClick={() => handleDelete(record)}
+                        icon={<Trash2 size={16} />}
+                        className="flex items-center justify-center gap-1.5 text-sm text-red-500 hover:bg-red-50 border border-red-100 rounded-lg px-3 py-1.5 h-auto transition-colors"
+                        onClick={() => handleDelete(record._id)}
                     >
                         Delete
                     </Button>
-                </Space>
+                </div>
             ),
         },
     ];
 
     return (
-        <div className="">
-            <div className="flex justify-between items-center mb-6">
-                <HeaderTitle title="Class Schedule Management" />
+        <section className="space-y-6">
+            {/* Header */}
+            <div className="flex justify-between items-center">
+                <HeaderTitle title="Class Schedule" />
                 <div className="flex gap-3">
-                    <Input
-                        placeholder="Search student"
-                        prefix={<SearchOutlined className="text-gray-400" />}
-                        onChange={(v) => setSearchTerm(v.target.value)}
-                        className="w-72 h-[42px] rounded-lg border-gray-200"
-                    />
-                    <Select
-                        placeholder="Filter by Group"
-                        className="w-full md:w-48 h-10 rounded-lg"
-                        allowClear
-                        onChange={setSelectedGroup}
-                        suffixIcon={<FilterOutlined className="text-gray-400" />}
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+                        <Input
+                            placeholder="Search classes..."
+                            onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
+                            className="h-10 pl-10 bg-white border-gray-200 w-64"
+                        />
+                    </div>
+                    <Button
+                        icon={<Plus className="w-4 h-4" />}
+                        className="h-10 px-6 bg-[#22C55E] text-white hover:bg-[#1ea34d] border-none font-medium flex items-center gap-2 rounded-lg"
+                        onClick={() => {
+                            setSelectedClass(null);
+                            setIsCreateModalOpen(true);
+                        }}
                     >
-                        {userGroups?.data?.map((group: any) => (
-                            <Select.Option key={group._id} value={group._id}>
-                                {group.name}
-                            </Select.Option>
-                        ))}
-                    </Select>
-                    <button
-                        onClick={handleAdd}
-                        className="h-[42px] bg-[#22C55E] text-white text-sm border-none px-6 rounded-lg font-medium"
-                    >
-                        + Add Class Schedule
-                    </button>
+                        Add Class
+                    </Button>
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            {/* Upcoming / Completed Tabs */}
+            <div className="flex items-center gap-1 p-1 bg-gray-100/80 rounded-xl w-fit">
+                <button
+                    onClick={() => { setActiveTab('upcoming'); setPage(1); }}
+                    className={`
+                        relative flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold
+                        transition-all duration-300 ease-out cursor-pointer
+                        ${activeTab === 'upcoming'
+                            ? 'bg-white text-blue-600 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
+                            : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                        }
+                    `}
+                >
+                    <Clock size={15} className={activeTab === 'upcoming' ? 'text-blue-500' : 'text-gray-400'} />
+                    Upcoming
+                    {activeTab === 'upcoming' && data?.pagination?.total != null && (
+                        <span className="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                            {data.pagination.total}
+                        </span>
+                    )}
+                </button>
+                <button
+                    onClick={() => { setActiveTab('completed'); setPage(1); }}
+                    className={`
+                        relative flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold
+                        transition-all duration-300 ease-out cursor-pointer
+                        ${activeTab === 'completed'
+                            ? 'bg-white text-emerald-600 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
+                            : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                        }
+                    `}
+                >
+                    <CheckCircle2 size={15} className={activeTab === 'completed' ? 'text-emerald-500' : 'text-gray-400'} />
+                    Completed
+                    {activeTab === 'completed' && data?.pagination?.total != null && (
+                        <span className="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+                            {data.pagination.total}
+                        </span>
+                    )}
+                </button>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <Table
-                    loading={isLoading || isFetching}
                     columns={columns}
-                    dataSource={modifiedData}
+                    dataSource={scheduleData}
+                    loading={isLoading || isFetching}
                     pagination={{
-                        pageSize: 10,
                         current: page,
-                        onChange: (page) => setPage(page),
-                        total: data?.pagination.total,
+                        pageSize: 10,
+                        total: data?.pagination?.total,
+                        showSizeChanger: false,
+                        onChange: (p) => setPage(p),
                     }}
-                    className=""
+                    className="schedule-table"
                 />
             </div>
 
-            <ClassDetailsModal
-                visible={isDetailsModalOpen}
-                onClose={() => setIsDetailsModalOpen(false)}
-                classData={selectedClass}
+            {/* Details Modal */}
+            <TeacherClassDetailsModal
+                open={isDetailsModalOpen}
+                onCancel={() => setIsDetailsModalOpen(false)}
+                data={selectedClass}
             />
 
-            <CreateClassModal
-                visible={isCreateModalOpen}
-                onClose={() => setIsCreateModalOpen(false)}
-                onSave={handleSave}
-                initialValues={selectedClass}
-                isLoading={isAddingClass || isUpdatingClass}
+            {/* Create / Edit Modal */}
+            <TeacherCreateClassModal
+                open={isCreateModalOpen}
+                onCancel={() => {
+                    setIsCreateModalOpen(false);
+                    setSelectedClass(null);
+                }}
+                refetch={refetch}
+                selectedSchedule={selectedClass}
+                teacherUserGroup={userGroup}
+                teacherUserGroupTrack={userGroupTrack}
             />
-        </div>
+        </section>
     );
 };
 
-export default ClassSchedule;
+export default TeacherClassSchedule;

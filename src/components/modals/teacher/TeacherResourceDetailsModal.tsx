@@ -1,14 +1,15 @@
 import { Modal, Tag } from 'antd';
 import { X } from 'lucide-react';
-import { imageUrl } from '../../../redux/api/baseApi';
+import { getImageUrl } from '../../../utils/getImageUrl';
 
-interface LearningMaterialDetailsModalProps {
+interface TeacherResourceDetailsModalProps {
     open: boolean;
     onCancel: () => void;
     data: any;
 }
 
-const LearningMaterialDetailsModal = ({ open, onCancel, data }: LearningMaterialDetailsModalProps) => {
+const TeacherResourceDetailsModal = ({ open, onCancel, data }: TeacherResourceDetailsModalProps) => {
+    // console.log(data)
     return (
         <Modal
             title={null}
@@ -40,7 +41,7 @@ const LearningMaterialDetailsModal = ({ open, onCancel, data }: LearningMaterial
                                 Title
                             </td>
                             <td className="px-5 py-4 text-gray-800 font-medium text-[13px]">
-                                {data?.title || 'Java Script'}
+                                {data?.title || '—'}
                             </td>
                         </tr>
                         <tr>
@@ -48,20 +49,14 @@ const LearningMaterialDetailsModal = ({ open, onCancel, data }: LearningMaterial
                                 Description
                             </td>
                             <td className="px-5 py-4 text-gray-800 text-[12px] leading-relaxed">
-                                {data?.description || 'This is for beginners'}
+                                {data?.description || '—'}
                             </td>
                         </tr>
                         <tr>
-                            <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px] flex items-center gap-2">
+                            <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">
                                 Date
                             </td>
-                            <td className="px-5 py-4 text-gray-800 text-[13px]">{data?.date || '12 Oct, 2025'}</td>
-                        </tr>
-                        <tr>
-                            <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">Location</td>
-                            <td className="px-5 py-4 text-gray-800 text-[13px]">
-                                {data?.location || '12 Street, USA'}
-                            </td>
+                            <td className="px-5 py-4 text-gray-800 text-[13px]">{data?.date || '—'}</td>
                         </tr>
                         <tr>
                             <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">Type</td>
@@ -71,24 +66,30 @@ const LearningMaterialDetailsModal = ({ open, onCancel, data }: LearningMaterial
                             <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">
                                 Content URL
                             </td>
-                            <td className="px-5 py-4 text-gray-400 text-[13px] italic">
-                                {data?.url || 'https://example'}
+                            <td className="px-5 py-4 text-blue-500 text-[13px] italic truncate max-w-[400px]">
+                                {data?.url ? (
+                                    <a href={data.url} target="_blank" rel="noopener noreferrer">
+                                        {data.url}
+                                    </a>
+                                ) : (
+                                    '—'
+                                )}
                             </td>
                         </tr>
                         <tr>
-                            <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">PDF</td>
+                            <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">PDF / File</td>
                             <td className="px-5 py-4 text-gray-800 text-[13px]">
-                                {data?.pdf ? (
+                                {data?.file ? (
                                     <a
-                                        href={`${imageUrl}${data.pdf}`}
+                                        href={getImageUrl(data.file)}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-blue-500 underline"
                                     >
-                                        View PDF
+                                        View File
                                     </a>
                                 ) : (
-                                    'No PDF available'
+                                    'No file available'
                                 )}
                             </td>
                         </tr>
@@ -96,7 +97,7 @@ const LearningMaterialDetailsModal = ({ open, onCancel, data }: LearningMaterial
                             <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">
                                 Target Audience
                             </td>
-                            <td className="px-5 py-4 text-gray-800 text-[13px]">{data?.targetAudience || 'All'}</td>
+                            <td className="px-5 py-4 text-gray-800 text-[13px]">{data?.targetAudience || '—'}</td>
                         </tr>
                         <tr>
                             <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">
@@ -104,17 +105,17 @@ const LearningMaterialDetailsModal = ({ open, onCancel, data }: LearningMaterial
                             </td>
                             <td className="px-5 py-4 text-gray-800 text-[13px]">
                                 {data?.target?.map((item: any) => (
-                                    <Tag color="blue" key={item?._id}>{item?.name}</Tag>
+                                    <Tag color="blue" key={item._id}>{item.name}</Tag>
                                 )) || '—'}
                             </td>
                         </tr>
-                        {data?.targetTrack && (
+                        {data?.targetTrack?.name && (
                             <tr>
                                 <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">
                                     Target Track
                                 </td>
-                                <td className="px-5 py-4 text-purple-600 font-medium text-[13px]">
-                                    {data?.targetTrack?.name}
+                                <td className="px-5 py-4 text-[13px]">
+                                    <Tag color="purple">{data.targetTrack.name}</Tag>
                                 </td>
                             </tr>
                         )}
@@ -123,7 +124,7 @@ const LearningMaterialDetailsModal = ({ open, onCancel, data }: LearningMaterial
                             <td className="px-5 py-4">
                                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${data?.status === 'Active' ? 'bg-green-50 text-green-500' : 'bg-red-50 text-red-500'
                                     }`}>
-                                    {data?.status || 'Active'}
+                                    {data?.status || 'Inactive'}
                                 </span>
                             </td>
                         </tr>
@@ -136,11 +137,11 @@ const LearningMaterialDetailsModal = ({ open, onCancel, data }: LearningMaterial
                     onClick={onCancel}
                     className="px-8 py-2.5 rounded-lg border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 transition-colors text-sm shadow-sm"
                 >
-                    Cancel
+                    Close
                 </button>
             </div>
         </Modal>
     );
 };
 
-export default LearningMaterialDetailsModal;
+export default TeacherResourceDetailsModal;
