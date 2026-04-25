@@ -25,6 +25,8 @@ const StudentSchedule = () => {
         searchTerm: searchTerm,
         userGroup: userGroup,
         filterType: activeTab,
+    }, {
+        skip: !userGroup,
     });
     const pagination = scheduleApi?.pagination;
 

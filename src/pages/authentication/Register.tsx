@@ -1,4 +1,4 @@
-import { Button, ConfigProvider, Form, FormProps, Input, Select } from 'antd';
+import { Button, ConfigProvider, Form, FormProps, Input, Select, DatePicker, Checkbox } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthSidebar from '../../components/ui/AuthSidebar';
 import { useSignupMutation } from '../../redux/apiSlices/authSlice';
@@ -10,6 +10,17 @@ interface RegisterFormValues {
     email: string;
     contactNumber: string;
     gender: string;
+    dob: any;
+    highestEducation: string;
+    vNumber: string;
+    about: string;
+    careerDirections: string[];
+    havealaptop: boolean;
+    linkedInProfile: string;
+    githubProfile: string;
+    PortfolioWebsite: string;
+    address: string;
+    zip_code: string;
     password?: string;
     confirmPassword?: string;
 }
@@ -25,14 +36,18 @@ const Register = () => {
             return;
         }
 
+        const { dob, confirmPassword, ...rest } = values;
+
         const data = {
-            ...values,
+            ...rest,
+            dob: dob ? dob.format('YYYY-MM-DD') : undefined,
             role: "STUDENT",
             status: "PENDING",
             verified: true,
         };
 
         try {
+            // console.log(data)
             toast.promise(signup(data).unwrap(), {
                 loading: 'Creating account...',
                 success: (res) => {
@@ -47,11 +62,11 @@ const Register = () => {
     };
 
     return (
-        <section className="min-h-screen grid lg:grid-cols-2 items-center bg-[#F8FAFC]">
+        <section className="h-screen grid lg:grid-cols-2 items-center bg-[#F8FAFC]">
             <AuthSidebar backgroundImage="/assets/images/auth/login.jpg" />
 
             {/* Right Side: Register Form */}
-            <div className="flex items-center justify-center p-10 overflow-y-auto max-h-screen">
+            <div className="flex items-center justify-center ">
                 <ConfigProvider
                     theme={{
                         token: {
@@ -70,14 +85,23 @@ const Register = () => {
                                 colorBorder: '#E2E8F0',
                                 borderRadius: 10,
                             },
+                            DatePicker: {
+                                controlHeight: 48,
+                                colorBorder: '#E2E8F0',
+                                borderRadius: 10,
+                            },
                             Button: {
                                 controlHeight: 48,
                                 borderRadius: 10,
                             },
+                            Checkbox: {
+                                colorPrimary: '#66D978',
+                                borderRadius: 4,
+                            }
                         },
                     }}
                 >
-                    <div className="bg-white w-[540px] rounded-2xl shadow-xl p-12 my-8">
+                    <div className="bg-white w-[720px] rounded-2xl shadow-xl p-10 overflow-y-auto max-h-[calc(100vh-4rem)]">
                         <div className="text-center mb-10">
                             <h1 className="text-[32px] text-[#000000] font-bold mb-2">Create Account</h1>
                             <p className="text-[#64748B] text-lg font-normal">Join the Share Network App as a Student</p>
@@ -94,7 +118,8 @@ const Register = () => {
                             <input type="text" style={{ display: 'none' }} name="dummy-email" />
                             <input type="password" style={{ display: 'none' }} name="dummy-password" />
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <h3 className="text-lg font-bold text-[#1E293B] mb-4 border-b pb-2">Personal Information</h3>
+                            <div className="grid grid-cols-2 gap-x-6">
                                 <Form.Item
                                     label={<span className="text-[#1E293B] font-semibold text-base">First Name</span>}
                                     name="firstName"
@@ -110,64 +135,170 @@ const Register = () => {
                                 >
                                     <Input placeholder="Enter Last Name" autoComplete="off" />
                                 </Form.Item>
+
+                                <Form.Item
+                                    label={<span className="text-[#1E293B] font-semibold text-base">Email</span>}
+                                    name="email"
+                                    rules={[
+                                        { required: true, message: 'Email is required!' },
+                                        { type: 'email', message: 'Please enter a valid email!' }
+                                    ]}
+                                >
+                                    <Input placeholder="Enter Email" />
+                                </Form.Item>
+
+                                <Form.Item
+                                    label={<span className="text-[#1E293B] font-semibold text-base">Contact Number</span>}
+                                    name="contactNumber"
+                                    rules={[{ required: true, message: 'Contact number is required!' }]}
+                                >
+                                    <Input placeholder="Enter Contact Number" autoComplete="off" />
+                                </Form.Item>
+
+                                <Form.Item
+                                    label={<span className="text-[#1E293B] font-semibold text-base">Gender</span>}
+                                    name="gender"
+                                    rules={[{ required: true, message: 'Please select gender!' }]}
+                                >
+                                    <Select placeholder="Select Gender">
+                                        <Select.Option value="Male">Male</Select.Option>
+                                        <Select.Option value="Female">Female</Select.Option>
+                                        <Select.Option value="Other">Other</Select.Option>
+                                    </Select>
+                                </Form.Item>
+
+                                <Form.Item
+                                    label={<span className="text-[#1E293B] font-semibold text-base">Date of Birth</span>}
+                                    name="dob"
+                                    rules={[{ required: true, message: 'Date of birth is required!' }]}
+                                >
+                                    <DatePicker className="w-full" placeholder="Select DOB" />
+                                </Form.Item>
+
+                                <Form.Item
+                                    label={<span className="text-[#1E293B] font-semibold text-base">Highest Education</span>}
+                                    name="highestEducation"
+                                    rules={[{ required: true, message: 'Education is required!' }]}
+                                >
+                                    <Select placeholder="Select Education">
+                                        <Select.Option value="High School">High School</Select.Option>
+                                        <Select.Option value="Bachelor">Bachelor's Degree</Select.Option>
+                                        <Select.Option value="Master">Master's Degree</Select.Option>
+                                        <Select.Option value="PhD">PhD</Select.Option>
+                                        <Select.Option value="Other">Other</Select.Option>
+                                    </Select>
+                                </Form.Item>
+
+                                <Form.Item
+                                    label={<span className="text-[#1E293B] font-semibold text-base">V-Number</span>}
+                                    name="vNumber"
+                                    rules={[{ required: true, message: 'V-Number is required!' }]}
+                                >
+                                    <Input placeholder="Enter V-Number" />
+                                </Form.Item>
                             </div>
 
-                            <Form.Item
-                                label={<span className="text-[#1E293B] font-semibold text-base">Email</span>}
-                                name="email"
-                                rules={[
-                                    { required: true, message: 'Email is required!' },
-                                    { type: 'email', message: 'Please enter a valid email!' }
-                                ]}
-                            >
-                                <Input placeholder="Enter Email" />
-                            </Form.Item>
+                            <h3 className="text-lg font-bold text-[#1E293B] mt-8 mb-4 border-b pb-2">Motivation & Profile</h3>
+                            <div className="grid grid-cols-1 gap-y-2">
+                                <Form.Item
+                                    label={<span className="text-[#1E293B] font-semibold text-base">About</span>}
+                                    name="about"
+                                    rules={[{ required: true, message: 'About is required!' }]}
+                                >
+                                    <Input.TextArea placeholder="Tell us about yourself" rows={4} />
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="text-[#1E293B] font-semibold text-base">Contact Number</span>}
-                                name="contactNumber"
-                                rules={[{ required: true, message: 'Contact number is required!' }]}
-                            >
-                                <Input placeholder="Enter Contact Number" autoComplete="off" />
-                            </Form.Item>
+                                <Form.Item
+                                    label={<span className="text-[#1E293B] font-semibold text-base">Career Directions</span>}
+                                    name="careerDirections"
+                                    rules={[{ required: true, message: 'At least one career direction is required!' }]}
+                                >
+                                    <Select mode="tags" placeholder="Enter career directions (e.g. Web Development, UI/UX)" />
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="text-[#1E293B] font-semibold text-base">Gender</span>}
-                                name="gender"
-                                rules={[{ required: true, message: 'Please select gender!' }]}
-                            >
-                                <Select placeholder="Select Gender">
-                                    <Select.Option value="Male">Male</Select.Option>
-                                    <Select.Option value="Female">Female</Select.Option>
-                                </Select>
-                            </Form.Item>
+                                <Form.Item name="havealaptop" valuePropName="checked">
+                                    <Checkbox>
+                                        <span className="text-[#1E293B] font-semibold text-base">I have a laptop</span>
+                                    </Checkbox>
+                                </Form.Item>
+                            </div>
 
-                            <Form.Item
-                                label={<span className="text-[#1E293B] font-semibold text-base">Password</span>}
-                                name="password"
-                                rules={[{ required: true, message: 'Password is required!' }]}
-                            >
-                                <Input.Password placeholder="*************" autoComplete="new-password" />
-                            </Form.Item>
+                            <h3 className="text-lg font-bold text-[#1E293B] mt-8 mb-4 border-b pb-2">Portfolio & Socials</h3>
+                            <div className="grid grid-cols-2 gap-x-6">
+                                <Form.Item
+                                    label={<span className="text-[#1E293B] font-semibold text-base">LinkedIn Profile</span>}
+                                    name="linkedInProfile"
+                                    rules={[{ required: true, message: 'LinkedIn profile is required!' }]}
+                                >
+                                    <Input placeholder="https://linkedin.com/in/..." />
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="text-[#1E293B] font-semibold text-base">Confirm Password</span>}
-                                name="confirmPassword"
-                                dependencies={['password']}
-                                rules={[
-                                    { required: true, message: 'Confirm password is required!' },
-                                    ({ getFieldValue }) => ({
-                                        validator(_, value) {
-                                            if (!value || getFieldValue('password') === value) {
-                                                return Promise.resolve();
-                                            }
-                                            return Promise.reject(new Error('The two passwords do not match!'));
-                                        },
-                                    }),
-                                ]}
-                            >
-                                <Input.Password placeholder="*************" autoComplete="new-password" />
-                            </Form.Item>
+                                <Form.Item
+                                    label={<span className="text-[#1E293B] font-semibold text-base">GitHub Profile</span>}
+                                    name="githubProfile"
+                                    rules={[{ required: true, message: 'GitHub profile is required!' }]}
+                                >
+                                    <Input placeholder="https://github.com/..." />
+                                </Form.Item>
+
+                                <Form.Item
+                                    label={<span className="text-[#1E293B] font-semibold text-base">Portfolio Website</span>}
+                                    name="PortfolioWebsite"
+                                    className="col-span-2"
+                                >
+                                    <Input placeholder="https://yourportfolio.com" />
+                                </Form.Item>
+                            </div>
+
+                            <h3 className="text-lg font-bold text-[#1E293B] mt-8 mb-4 border-b pb-2">Address</h3>
+                            <div className="grid grid-cols-2 gap-x-6">
+                                <Form.Item
+                                    label={<span className="text-[#1E293B] font-semibold text-base">Address</span>}
+                                    name="address"
+                                    className="col-span-2"
+                                    rules={[{ required: true, message: 'Address is required!' }]}
+                                >
+                                    <Input.TextArea placeholder="Enter full address" rows={2} />
+                                </Form.Item>
+
+                                <Form.Item
+                                    label={<span className="text-[#1E293B] font-semibold text-base">Zip Code</span>}
+                                    name="zip_code"
+                                    rules={[{ required: true, message: 'Zip code is required!' }]}
+                                >
+                                    <Input placeholder="Enter Zip Code" />
+                                </Form.Item>
+                            </div>
+
+                            <h3 className="text-lg font-bold text-[#1E293B] mt-8 mb-4 border-b pb-2">Security</h3>
+                            <div className="grid grid-cols-2 gap-x-6">
+                                <Form.Item
+                                    label={<span className="text-[#1E293B] font-semibold text-base">Password</span>}
+                                    name="password"
+                                    rules={[{ required: true, message: 'Password is required!' }]}
+                                >
+                                    <Input.Password placeholder="*************" autoComplete="new-password" />
+                                </Form.Item>
+
+                                <Form.Item
+                                    label={<span className="text-[#1E293B] font-semibold text-base">Confirm Password</span>}
+                                    name="confirmPassword"
+                                    dependencies={['password']}
+                                    rules={[
+                                        { required: true, message: 'Confirm password is required!' },
+                                        ({ getFieldValue }) => ({
+                                            validator(_, value) {
+                                                if (!value || getFieldValue('password') === value) {
+                                                    return Promise.resolve();
+                                                }
+                                                return Promise.reject(new Error('The two passwords do not match!'));
+                                            },
+                                        }),
+                                    ]}
+                                >
+                                    <Input.Password placeholder="*************" autoComplete="new-password" />
+                                </Form.Item>
+                            </div>
 
                             <Form.Item className="mb-4">
                                 <Button
