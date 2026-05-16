@@ -13,8 +13,9 @@ export default function ChangePassword() {
 
         try {
             const res = await changePassword({
-                oldPassword: values.oldPassword,
+                currentPassword: values.oldPassword,
                 newPassword: values.newPassword,
+                confirmPassword: values.confirmPassword,
             }).unwrap();
             toast.success(res.message || 'Password changed successfully');
             form.resetFields();

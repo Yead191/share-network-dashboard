@@ -146,7 +146,7 @@ const router = createBrowserRouter([
                 path: '/admin/profile',
                 element: (
                     <PrivateRoute role={['admin', 'super_admin']}>
-                        <MentorCoordinatorProfile />
+                        <StudentProfile />
                     </PrivateRoute>
                 ),
             },
@@ -191,6 +191,7 @@ const router = createBrowserRouter([
                         <Assignment />
                     </PrivateRoute>
                 ),
+
             },
             {
                 path: '/teacher/chat',
@@ -205,6 +206,14 @@ const router = createBrowserRouter([
                 element: (
                     <PrivateRoute role="teacher">
                         <TakeAttendance />
+                    </PrivateRoute>
+                ),
+            },
+            {
+                path: '/teacher/profile',
+                element: (
+                    <PrivateRoute role="teacher">
+                        <StudentProfile />
                     </PrivateRoute>
                 ),
             },
@@ -386,7 +395,7 @@ const router = createBrowserRouter([
                 path: '/mentor/profile',
                 element: (
                     <PrivateRoute role="mentor">
-                        <MentorSetting />
+                        <StudentProfile />
                     </PrivateRoute>
                 ),
             },
