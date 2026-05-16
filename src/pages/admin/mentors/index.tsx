@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Table, Button, Input, Space, Tag, Avatar } from 'antd';
+import { Table, Button, Input, Space, Tag, Avatar, } from 'antd';
 import { Search, Filter, Download, Eye, Edit2, Trash2, User, Plus } from 'lucide-react';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
 import ImportMentorsModal from '../../../components/modals/admin/ImportMentorsModal';
@@ -30,13 +30,14 @@ const AdminMentors = () => {
     const [selectedGroup, setSelectedGroup] = useState<string | undefined>(undefined);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
 
     // API CALLS
     const {
         data: mentorsApi,
         isLoading: isMentorLoading,
         refetch,
-    } = useGetAdminMentorsQuery({ page, searchTerm, userGroup: selectedGroup, limit: 10 });
+    } = useGetAdminMentorsQuery({ page, searchTerm, userGroup: selectedGroup, status: selectedStatus, limit: 10 });
     const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({});
     const { data: userTracksApi, isLoading: isUserTracksLoading } = useGetUserTracksQuery({});
     const [deleteMentor] = useDeleteAdminMentorMutation();
@@ -217,10 +218,10 @@ const AdminMentors = () => {
                     </Button>
                     <Button
                         icon={<Filter size={16} />}
-                        className={`flex items-center gap-2 h-10 border-gray-100 rounded-lg px-4 ${selectedGroup ? 'bg-green-50 text-green-600 border-green-200' : 'bg-white text-gray-600'}`}
+                        className={`flex items-center gap-2 h-10 border-gray-100 rounded-lg px-4 ${selectedGroup || selectedStatus ? 'bg-green-50 text-green-600 border-green-200' : 'bg-white text-gray-600'}`}
                         onClick={() => setIsFilterModalOpen(true)}
                     >
-                        Filter {selectedGroup && <span className="ml-1 w-2 h-2 bg-green-500 rounded-full"></span>}
+                        Filter {(selectedGroup || selectedStatus) && <span className="ml-1 w-2 h-2 bg-green-500 rounded-full"></span>}
                     </Button>
                     <Button
                         icon={<Download size={16} />}
@@ -270,11 +271,13 @@ const AdminMentors = () => {
             <FilterMentorModal
                 open={isFilterModalOpen}
                 onCancel={() => setIsFilterModalOpen(false)}
-                onFilter={(groupId) => {
+                onFilter={({ groupId, status }) => {
                     setSelectedGroup(groupId);
+                    setSelectedStatus(status);
                     setPage(1); // Reset to first page on filter
                 }}
                 initialGroupId={selectedGroup}
+                initialStatus={selectedStatus}
             />
             <AddMentorModal
                 open={isAddMentorModalOpen}

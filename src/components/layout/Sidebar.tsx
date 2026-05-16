@@ -66,7 +66,7 @@ const Sidebar = () => {
     return (
         <div className="container py-2 px-1.5">
             <nav className="w-full bg-white rounded-xl">
-                <ul className="flex flex-wrap items-center gap-2 custom-sidebar-menu p-2">
+                <ul className="flex flex-wrap items-center gap-2 custom-sidebar-menu px-1 py-2">
                     {sidebarItems.map((item: TSidebarItem) => {
                         const active = isActive(item.path);
 
@@ -74,11 +74,10 @@ const Sidebar = () => {
                             <li key={item.key}>
                                 <Link
                                     to={`/${item.path}`}
-                                    className={`flex items-center gap-2 px-4 py-2 transition-all duration-300 rounded-lg text-sm font-semibold
-                                        ${
-                                            active
-                                                ? 'text-[#3BB77E] bg-[#3BB77E]/10 border border-[#3BB77E]'
-                                                : 'text-[#7A7D85] hover:text-[#3BB77E] hover:bg-[#3BB77E]/10 border border-transparent'
+                                    className={`flex items-center gap-1 px-2 md:px-2 py-2 transition-all duration-300 rounded-lg text-xs md:text-sm font-semibold
+                                        ${active
+                                            ? 'text-[#3BB77E] bg-[#3BB77E]/10 border border-[#3BB77E]'
+                                            : 'text-[#7A7D85] hover:text-[#3BB77E] hover:bg-[#3BB77E]/10 border border-transparent'
                                         }`}
                                 >
                                     {item.icon}

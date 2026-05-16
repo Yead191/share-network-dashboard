@@ -7,16 +7,19 @@ const adminMentorsApi = api.injectEndpoints({
                 page,
                 searchTerm,
                 userGroup,
+                status,
                 limit,
             }: {
                 page?: number;
                 searchTerm?: string;
                 userGroup?: string;
+                status?: string;
                 limit?: number;
             }) => {
                 const params = new URLSearchParams();
                 if (userGroup) params.append('userGroup', userGroup);
                 if (searchTerm) params.append('searchTerm', searchTerm);
+                if (status) params.append('status', status);
                 params.append('page', (page ?? 0).toString());
                 params.append('limit', (limit ?? 0).toString());
                 return {

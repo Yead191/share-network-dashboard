@@ -6,24 +6,25 @@ import { useGetUserGroupsQuery } from '../../../redux/apiSlices/admin/adminStude
 interface FilterMentorModalProps {
     open: boolean;
     onCancel: () => void;
-    onFilter: (groupId: string | undefined) => void;
+    onFilter: (filters: { groupId: string | undefined; status: string | undefined }) => void;
     initialGroupId?: string;
+    initialStatus?: string;
 }
 
-const FilterMentorModal: React.FC<FilterMentorModalProps> = ({ open, onCancel, onFilter, initialGroupId }) => {
+const FilterMentorModal: React.FC<FilterMentorModalProps> = ({ open, onCancel, onFilter, initialGroupId, initialStatus }) => {
     const [form] = Form.useForm();
     const { data: groupsApi, isLoading } = useGetUserGroupsQuery({});
     const groups = groupsApi?.data || [];
 
-    const onFinish = (values: { userGroup: string | undefined }) => {
+    const onFinish = (values: { userGroup: string | undefined; status: string | undefined }) => {
         // console.log(values);
-        onFilter(values.userGroup);
+        onFilter({ groupId: values.userGroup, status: values.status });
         onCancel();
     };
 
     const handleReset = () => {
         form.resetFields();
-        onFilter(undefined);
+        onFilter({ groupId: undefined, status: undefined });
         onCancel();
     };
 
@@ -42,7 +43,7 @@ const FilterMentorModal: React.FC<FilterMentorModalProps> = ({ open, onCancel, o
                 layout="vertical"
                 onFinish={onFinish}
                 className="mt-4"
-                initialValues={{ userGroup: initialGroupId }}
+                initialValues={{ userGroup: initialGroupId, status: initialStatus }}
             >
                 <Form.Item label={<span className="font-semibold text-gray-700">Group</span>} name="userGroup">
                     <Select
@@ -58,6 +59,21 @@ const FilterMentorModal: React.FC<FilterMentorModalProps> = ({ open, onCancel, o
                         filterOption={(input, option) =>
                             (option?.label ? String(option.label) : '').toLowerCase().includes(input.toLowerCase())
                         }
+                    />
+                </Form.Item>
+
+                <Form.Item label={<span className="font-semibold text-gray-700">Status</span>} name="status">
+                    <Select
+                        placeholder="Select a status"
+                        className="w-full"
+                        allowClear
+                        style={{ height: '44px' }}
+                        options={[
+                            { label: 'Pending', value: 'PENDING' },
+                            { label: 'Active', value: 'ACTIVE' },
+                            { label: 'Non-active', value: 'NON-ACTIVE' },
+                            { label: 'Reserve', value: 'RESERVE' },
+                        ]}
                     />
                 </Form.Item>
 

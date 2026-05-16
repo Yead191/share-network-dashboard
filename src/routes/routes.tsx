@@ -142,6 +142,14 @@ const router = createBrowserRouter([
                     </PrivateRoute>
                 ),
             },
+            {
+                path: '/admin/profile',
+                element: (
+                    <PrivateRoute role={['admin', 'super_admin']}>
+                        <MentorCoordinatorProfile />
+                    </PrivateRoute>
+                ),
+            },
 
             //Teacher
             {
