@@ -3,9 +3,10 @@ import { api } from '../../api/baseApi';
 const adminTeachersApi = api.injectEndpoints({
     endpoints: (build) => ({
         getTeachers: build.query({
-            query: ({ page, searchTerm, userGroup }: { page: number; searchTerm: string; userGroup?: string }) => {
+            query: ({ page, searchTerm, userGroup, status }: { page: number; searchTerm: string; userGroup?: string; status?: string }) => {
                 const params = new URLSearchParams();
                 if (userGroup) params.append('userGroup', userGroup);
+                if (status) params.append('status', status);
                 if (searchTerm) params.append('searchTerm', searchTerm);
                 params.append('limit', '10');
                 params.append('page', page.toString());

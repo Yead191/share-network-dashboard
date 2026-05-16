@@ -26,11 +26,14 @@ const AdminTeachers = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [selectedGroup, setSelectedGroup] = useState<string | undefined>(undefined);
+    const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
+
     // API CALLS
     const { data: teachersApi, refetch } = useGetTeachersQuery({
         page: page,
         searchTerm: searchTerm,
         userGroup: selectedGroup,
+        status: selectedStatus,
     });
     const { data: studentsApi } = useGetAllStudentsQuery({});
     const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({});
@@ -244,11 +247,13 @@ const AdminTeachers = () => {
             <FilterMentorModal
                 open={isFilterModalOpen}
                 onCancel={() => setIsFilterModalOpen(false)}
-                onFilter={(groupId) => {
+                onFilter={({ groupId, status }) => {
                     setSelectedGroup(groupId);
-                    setPage(1);
+                    setSelectedStatus(status);
+                    setPage(1); // Reset to first page on filter
                 }}
                 initialGroupId={selectedGroup}
+                initialStatus={selectedStatus}
             />
             <EditTeacherModal
                 refetch={refetch}

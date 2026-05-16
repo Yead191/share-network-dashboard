@@ -21,7 +21,6 @@ import StudentAssignment from '../pages/student/assignment';
 import StudentResources from '../pages/student/resources';
 import MentorOverview from '../pages/mentor/overview';
 import Students from '../pages/mentor/students';
-import MentorSetting from '../pages/mentor/setting';
 import WeeklyReport from '../pages/mentor/weekly-report';
 import TimeTracking from '../pages/mentor/time-tracking';
 import LearningMaterials from '../pages/mentor/learning-materials';
