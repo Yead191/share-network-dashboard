@@ -148,11 +148,22 @@ const AdminLearningMaterials = () => {
             title: 'AUDIENCE',
             dataIndex: 'targetAudience',
             key: 'targetAudience',
-            render: (text: string) => (
-                <div className="flex gap-2">
-                    <span className="px-3 py-1 bg-blue-50 text-blue-500 text-[10px] rounded-full border border-blue-100 uppercase tracking-tight font-medium">
-                        {text || 'N/A'}
-                    </span>
+            render: (audiences: string[]) => (
+                <div className="flex flex-wrap gap-2">
+                    {audiences?.length ? (
+                        audiences.map((audience, index) => (
+                            <span
+                                key={index}
+                                className="px-3 py-1 bg-blue-50 text-blue-500 text-[10px] rounded-full border border-blue-100 uppercase tracking-tight font-medium"
+                            >
+                                {audience}
+                            </span>
+                        ))
+                    ) : (
+                        <span className="px-3 py-1 bg-gray-50 text-gray-400 text-[10px] rounded-full border border-gray-100 uppercase tracking-tight font-medium">
+                            N/A
+                        </span>
+                    )}
                 </div>
             ),
         },

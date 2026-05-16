@@ -230,7 +230,7 @@ const AddLearningMaterialModal = ({
                         name="targeteAudience" // Corrected to match backend
                         label={<span className="text-sm font-semibold text-gray-700">Target Audience</span>}
                     >
-                        <Select placeholder="Select" className="w-full h-11">
+                        <Select placeholder="Select" className="w-full h-11" mode='multiple'>
                             <Select.Option value="STUDENT">STUDENT</Select.Option>
                             <Select.Option value="MENTOR">MENTOR</Select.Option>
                             <Select.Option value="TEACHER">TEACHER</Select.Option>

@@ -96,7 +96,24 @@ const LearningMaterialDetailsModal = ({ open, onCancel, data }: LearningMaterial
                             <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">
                                 Target Audience
                             </td>
-                            <td className="px-5 py-4 text-gray-800 text-[13px]">{data?.targetAudience || 'All'}</td>
+                            <td className="px-5 py-4 text-gray-800 text-[13px]">
+                                <div className="flex flex-wrap gap-2">
+                                    {data?.targetAudience?.length ? (
+                                        data?.targetAudience.map((audience: string, index: number) => (
+                                            <span
+                                                key={index}
+                                                className="px-3 py-1 bg-blue-50 text-blue-500 text-[10px] rounded-full border border-blue-100 uppercase tracking-tight font-medium"
+                                            >
+                                                {audience}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span className="px-3 py-1 bg-gray-50 text-gray-400 text-[10px] rounded-full border border-gray-100 uppercase tracking-tight font-medium">
+                                            N/A
+                                        </span>
+                                    )}
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td className="px-5 py-4 bg-gray-50/50 font-medium text-gray-500 text-[13px]">

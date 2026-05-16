@@ -210,7 +210,7 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({
                     </Form.Item>
                 </div>
 
-                <div className="grid grid-cols-2 gap-x-6">
+                <div className="grid grid-cols-3 gap-x-6">
                     <Form.Item label={<span className="font-semibold text-gray-700">Gender</span>} name="gender">
                         <Select
                             placeholder="Select gender"
@@ -231,6 +231,16 @@ const EditMentorModal: React.FC<EditMentorModalProps> = ({
                                 { label: 'Active', value: 'ACTIVE' },
                                 { label: 'Non-active', value: 'NON-ACTIVE' },
                                 { label: 'Reserve', value: 'RESERVE' },
+                            ]}
+                        />
+                    </Form.Item>
+                    <Form.Item label={<span className="font-medium text-gray-700">Verified</span>} name="verified">
+                        <Select
+                            placeholder="Select status"
+                            className="h-11 rounded-md"
+                            options={[
+                                { label: 'Verified', value: true },
+                                { label: 'Not Verified', value: false },
                             ]}
                         />
                     </Form.Item>

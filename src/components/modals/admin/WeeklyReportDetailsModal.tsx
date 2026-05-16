@@ -121,7 +121,7 @@ const WeeklyReportDetailsModal = ({ open, onCancel, data }: WeeklyReportDetailsM
                             className="w-full h-full bg-transparent border-none outline-none resize-none text-gray-800 text-sm placeholder:italic"
                             placeholder="Enter concerns or comments here..."
                             readOnly
-                            value={data?.comments}
+                            value={data?.comments ?? "N/A"}
                         ></textarea>
                     </div>
                 </section>

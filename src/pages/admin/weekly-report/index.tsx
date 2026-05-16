@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Table, Button, Input, Popconfirm } from 'antd';
+import { Table, Button, Input, Popconfirm, Tooltip } from 'antd';
 import { Eye, Search, Edit, Trash2 } from 'lucide-react';
 import WeeklyReportDetailsModal from '../../../components/modals/admin/WeeklyReportDetailsModal';
 import EditReportModal from '../../../components/modals/mentor/EditReportModal';
@@ -77,19 +77,36 @@ const AdminWeeklyReport = () => {
             key: 'attendance',
             render: (text: string) => <span className="text-[#666]">{text}</span>,
         },
+        // {
+        //     title: 'Hard Outcomes',
+        //     dataIndex: 'hardOutcomesCount',
+        //     key: 'hardOutcomes',
+        //     align: 'center' as const,
+        //     render: (val: number) => <span className="text-[#666] font-semibold">{val}</span>,
+        // },
+        // {
+        //     title: 'Improvements',
+        //     dataIndex: 'improvementsCount',
+        //     key: 'improvements',
+        //     align: 'center' as const,
+        //     render: (val: number) => <span className="text-[#666] font-semibold">{val}</span>,
+        // },
         {
-            title: 'Hard Outcomes',
-            dataIndex: 'hardOutcomesCount',
-            key: 'hardOutcomes',
-            align: 'center' as const,
-            render: (val: number) => <span className="text-[#666] font-semibold">{val}</span>,
-        },
-        {
-            title: 'Improvements',
-            dataIndex: 'improvementsCount',
-            key: 'improvements',
-            align: 'center' as const,
-            render: (val: number) => <span className="text-[#666] font-semibold">{val}</span>,
+            title: 'Comments',
+            dataIndex: 'comments',
+            key: 'comments',
+            render: (text: string) => {
+                const truncatedText =
+                    text?.length > 50 ? `${text.slice(0, 50)}.....` : text;
+
+                return (
+                    <Tooltip title={text}>
+                        <span className="text-[#666] cursor-pointer">
+                            {truncatedText}
+                        </span>
+                    </Tooltip>
+                );
+            },
         },
         {
             title: 'Skills Tracked',
@@ -179,7 +196,10 @@ const AdminWeeklyReport = () => {
 
             <WeeklyReportDetailsModal
                 open={isDetailsModalOpen}
-                onCancel={() => setIsDetailsModalOpen(false)}
+                onCancel={() => {
+                    setSelectedReport(null);
+                    setIsDetailsModalOpen(false)
+                }}
                 data={selectedReport}
             />
 
