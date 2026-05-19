@@ -55,4 +55,5 @@ export const {
     useUpdateCoordinatorMutation,
     useDeleteCoordinatorMutation,
     useGetMentorsQuery,
+    useLazyGetMentorsQuery,
 } = adminCoordinatorApi;

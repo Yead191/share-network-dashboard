@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, Select, Button, Spin } from 'antd';
+import { Modal, Form, Input, Select, Button, Spin, Checkbox } from 'antd';
 import { X } from 'lucide-react';
-import { useGetMentorsQuery, useUpdateCoordinatorMutation } from '../../../redux/apiSlices/admin/adminCoordinatorApi';
+import { useGetMentorsQuery, useUpdateCoordinatorMutation, useLazyGetMentorsQuery } from '../../../redux/apiSlices/admin/adminCoordinatorApi';
 import { toast } from 'sonner';
 
 interface EditCoordinatorModalProps {
@@ -23,8 +23,11 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
 }) => {
     const [form] = Form.useForm();
     const [updateCoordinator, { isLoading }] = useUpdateCoordinatorMutation();
+    const [triggerGetMentors] = useLazyGetMentorsQuery();
 
     const [allMentors, setAllMentors] = useState<any[]>([]);
+    const [mentorsCache, setMentorsCache] = useState<Record<string, any>>({});
+    const [isFetchingAll, setIsFetchingAll] = useState(false);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [hasMore, setHasMore] = useState(true);
@@ -36,6 +39,10 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
         company: coordinator?.company,
     }, { skip: !open });
 
+    const assignedMentors = Form.useWatch('assignedMentors', form) || [];
+    const totalMentorsCount = mentorsApi?.data?.pagination?.total || 0;
+    const isAllSelected = totalMentorsCount > 0 && assignedMentors.length === totalMentorsCount;
+
     // Reset state when modal opens/closes
     useEffect(() => {
         if (open) {
@@ -43,11 +50,31 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
             setSearchTerm('');
             if (coordinator?.assignedMentors) {
                 setAllMentors(coordinator.assignedMentors);
+                const initialCache: Record<string, any> = {};
+                coordinator.assignedMentors.forEach((m: any) => {
+                    initialCache[m._id] = m;
+                });
+                setMentorsCache(initialCache);
             } else {
                 setAllMentors([]);
+                setMentorsCache({});
             }
         }
     }, [open, coordinator]);
+
+    // Cache newly loaded mentors
+    useEffect(() => {
+        if (mentorsApi?.data?.mentors) {
+            const newMentors = mentorsApi.data.mentors;
+            setMentorsCache(prev => {
+                const next = { ...prev };
+                newMentors.forEach((m: any) => {
+                    next[m._id] = m;
+                });
+                return next;
+            });
+        }
+    }, [mentorsApi]);
 
     // Handle incoming data
     useEffect(() => {
@@ -56,13 +83,13 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
             setAllMentors(prev => {
                 if (page === 1) {
                     const combined = [...newMentors];
-                    if (coordinator?.assignedMentors) {
-                        coordinator.assignedMentors.forEach((m: any) => {
-                            if (!combined.some(item => item._id === m._id)) {
-                                combined.unshift(m);
-                            }
-                        });
-                    }
+                    const currentSelectedIds = form.getFieldValue('assignedMentors') || [];
+                    currentSelectedIds.forEach((id: string) => {
+                        const m = mentorsCache[id] || coordinator?.assignedMentors?.find((item: any) => item._id === id);
+                        if (m && !combined.some(item => item._id === id)) {
+                            combined.unshift(m);
+                        }
+                    });
                     return combined;
                 }
                 const existingIds = new Set(prev.map(m => m._id));
@@ -70,7 +97,7 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
                 return [...prev, ...uniqueNew];
             });
         }
-    }, [mentorsApi, page, coordinator]);
+    }, [mentorsApi, page, coordinator, mentorsCache, form]);
 
     // Update hasMore separately
     useEffect(() => {
@@ -89,6 +116,51 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
         const { scrollTop, scrollHeight, clientHeight } = e.target;
         if (scrollHeight - scrollTop <= clientHeight + 10 && hasMore && !isMentorsLoading) {
             setPage(prev => prev + 1);
+        }
+    };
+
+    const handleSelectAllChange = async (e: any) => {
+        const checked = e.target.checked;
+        if (checked) {
+            setIsFetchingAll(true);
+            try {
+                const res = await triggerGetMentors({
+                    page: 1,
+                    limit: 10000,
+                    company: coordinator?.company,
+                }).unwrap();
+
+                if (res?.data?.mentors) {
+                    const fetchedMentors = res.data.mentors;
+                    const mentorIds = fetchedMentors.map((m: any) => m._id);
+
+                    setMentorsCache(prev => {
+                        const next = { ...prev };
+                        fetchedMentors.forEach((m: any) => {
+                            next[m._id] = m;
+                        });
+                        return next;
+                    });
+
+                    setAllMentors(prev => {
+                        const existingIds = new Set(prev.map(m => m._id));
+                        const uniqueNew = fetchedMentors.filter((m: any) => !existingIds.has(m._id));
+                        return [...prev, ...uniqueNew];
+                    });
+
+                    form.setFieldsValue({
+                        assignedMentors: mentorIds,
+                    });
+                }
+            } catch (error) {
+                toast.error('Failed to fetch all mentors');
+            } finally {
+                setIsFetchingAll(false);
+            }
+        } else {
+            form.setFieldsValue({
+                assignedMentors: [],
+            });
         }
     };
 
@@ -223,7 +295,18 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
                     />
                 </Form.Item>
                 <div className="w-full">
-                    <Form.Item name="assignedMentors" label="Assign Mentors">
+                    <div className="flex justify-between items-center mb-2">
+                        <span className="font-semibold text-gray-700">Assign Mentors</span>
+                        <Checkbox
+                            checked={isAllSelected}
+                            onChange={handleSelectAllChange}
+                            disabled={isMentorsLoading || isFetchingAll}
+                            className="font-normal text-sm text-gray-600"
+                        >
+                            Select All Mentors ({coordinator?.company ? coordinator?.company : ''} {totalMentorsCount}) {isFetchingAll && <Spin size="small" className="ml-2" />}
+                        </Checkbox>
+                    </div>
+                    <Form.Item name="assignedMentors">
                         <Select
                             mode="multiple"
                             size="large"
