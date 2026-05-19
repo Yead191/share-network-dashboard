@@ -120,6 +120,7 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({
                         rules={[{ required: false, message: 'Please select at least one group' }]}
                     >
                         <Select
+                            mode="multiple"
                             placeholder="Choose groups"
                             className="h-11 rounded-md"
                             variant="filled"

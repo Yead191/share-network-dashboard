@@ -22,9 +22,48 @@ const adminStudentApi = api.injectEndpoints({
                 params.append('page', (page ?? 0).toString());
                 params.append('limit', (limit ?? 0).toString());
                 if (selectedGroup) params.append('userGroup', selectedGroup);
+
                 if (selectedStatus) params.append('status', selectedStatus);
                 return {
                     url: `/student-admin?${params.toString()}`,
+                    method: 'GET',
+                };
+            },
+        }),
+        getStudentsForTeacher: build.query({
+            query: ({
+                page,
+                searchTerm,
+                limit,
+                selectedGroup,
+                selectedStatus,
+            }: {
+                page?: number;
+                searchTerm?: string;
+                limit?: number;
+                selectedGroup?: string;
+                selectedStatus?: string;
+            }) => {
+                // console.log('Query hit', page, limit, searchTerm);
+                const params = new URLSearchParams();
+                if (searchTerm) params.append('searchTerm', searchTerm);
+                params.append('page', (page ?? 0).toString());
+                params.append('limit', (limit ?? 0).toString());
+                // if (selectedGroup) params.append('userGroup', selectedGroup);
+                if (selectedGroup?.length) {
+                    if (selectedGroup) {
+                        const groups = Array.isArray(selectedGroup)
+                            ? selectedGroup
+                            : [selectedGroup];
+
+                        groups.forEach((id: string, index: number) => {
+                            params.append(`userGroup[${index}]`, id);
+                        });
+                    }
+                }
+                if (selectedStatus) params.append('status', selectedStatus);
+                return {
+                    url: `/student-admin/for-teacher?${params.toString()}`,
                     method: 'GET',
                 };
             },
@@ -148,4 +187,5 @@ export const {
     useUpdateIndividualAttendanceMutation,
     useGetStudentsQuery,
     useRemoveAssignMutation,
+    useGetStudentsForTeacherQuery,
 } = adminStudentApi;
