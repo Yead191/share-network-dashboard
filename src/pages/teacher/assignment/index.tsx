@@ -25,7 +25,7 @@ function Assignment() {
     const { data: profile, isLoading: profileLoading } = useGetprofileQuery({});
 
     const myGroups = profile?.data?.userGroup;
-    console.log("userGroups", myGroups)
+    // console.log("userGroups", myGroups)
     const [page, setPage] = useState(1);
     const [createAssignment] = useCreateAssignmentMutation();
     const [updateAssignment] = useUpdateAssignmentMutation();

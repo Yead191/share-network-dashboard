@@ -16,7 +16,7 @@ import { useGetprofileQuery } from '../../../../redux/apiSlices/students/overvie
 const TakeAttendance = () => {
     const { data: profile, isLoading: profileLoading } = useGetprofileQuery({});
     const isAdmin = profile?.data?.role === 'SUPER_ADMIN';
-    console.log("isAdmin", profile)
+    // console.log("isAdmin", profile)
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedClass, setSelectedClass] = useState<string | null>(null);
     const [selectedDate, setSelectedDate] = useState<string>(dayjs().format('YYYY-MM-DD'));

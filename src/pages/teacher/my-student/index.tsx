@@ -36,7 +36,7 @@ const MyStudent = () => {
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
     const userGroups = user?.data?.userGroup || [];
-    console.log(userGroups)
+    // console.log(userGroups)
     // const { data, isLoading, isFetching } = useGetMyStudentsQuery({ page: page, limit: 10, searchTerm: searchText, userGroup: selectedGroup });
     const {
         data: studentsApi,
