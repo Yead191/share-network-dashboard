@@ -41,9 +41,9 @@ const MentorDetailsPage: React.FC = () => {
         searchTerm: '',
         id: students[0]?._id
     }, { skip: !students?.length });
-    console.log("Student data::", students)
     const reports = reportsRes?.data?.reports || [];
     const reportPagination = reportsRes?.data?.pagination;
+    // console.log("reports::", reports)
 
     const reportColumns = [
         {
