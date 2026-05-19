@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Tag, Typography, Avatar, Spin, Button, Row, Col, Table, Divider, Drawer, Descriptions, } from 'antd';
-import { UserOutlined, ArrowLeftOutlined, EditOutlined, MailOutlined, PhoneOutlined, LinkedinOutlined, GithubOutlined, GlobalOutlined, BookOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { Card, Tag, Typography, Avatar, Spin, Button, Row, Col, Table, Divider } from 'antd';
+import { UserOutlined, ArrowLeftOutlined, EditOutlined, MailOutlined, PhoneOutlined, LinkedinOutlined, GithubOutlined, EyeOutlined } from '@ant-design/icons';
 import HeaderTitle from '../../../../components/shared/HeaderTitle';
 import CoordinatorEditMentorModal from '../../../../components/modals/mentor-coordinator/CoordinatorEditMentorModal';
+import StudentDetailsDrawer from '../../../../components/modals/mentor-coordinator/StudentDetailsDrawer';
+import ReportDetailsModal from '../../../../components/modals/mentor/ReportDetailsModal';
 import { imageUrl } from '../../../../redux/api/baseApi';
 import moment from 'moment';
 import { useGetprofileByIdQuery } from '../../../../redux/apiSlices/students/overview.slice';
@@ -21,6 +23,10 @@ const MentorDetailsPage: React.FC = () => {
     // Student Details Drawer State
     const [selectedStudent, setSelectedStudent] = useState<any>(null);
     const [isStudentDrawerOpen, setIsStudentDrawerOpen] = useState(false);
+
+    // Report Details Modal State
+    const [selectedReport, setSelectedReport] = useState<any>(null);
+    const [isReportDetailsModalOpen, setIsReportDetailsModalOpen] = useState(false);
 
     // APIs
     const { data: profileRes, isLoading: isProfileLoading, refetch } = useGetprofileByIdQuery(id, { skip: !id });
@@ -40,12 +46,6 @@ const MentorDetailsPage: React.FC = () => {
     const reportPagination = reportsRes?.data?.pagination;
 
     const reportColumns = [
-        {
-            title: 'Report Title',
-            dataIndex: 'title',
-            key: 'title',
-            render: (text: string) => <span className="font-medium text-gray-700">{text}</span>,
-        },
         {
             title: 'Week Period',
             key: 'weekPeriod',
@@ -70,6 +70,21 @@ const MentorDetailsPage: React.FC = () => {
             dataIndex: 'createdAt',
             key: 'createdAt',
             render: (date: string) => <span className="text-gray-500">{moment(date).format('MMMM D, YYYY h:mm A')}</span>,
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: (_: any, record: any) => (
+                <Button
+                    icon={<EyeOutlined />}
+                    onClick={() => {
+                        setSelectedReport(record);
+                        setIsReportDetailsModalOpen(true);
+                    }}
+                    type="text"
+                    className="flex items-center justify-center text-gray-500 hover:text-blue-600 h-8 w-8 rounded-full hover:bg-gray-100"
+                />
+            ),
         }
     ];
 
@@ -110,7 +125,7 @@ const MentorDetailsPage: React.FC = () => {
                     type="primary"
                     icon={<EditOutlined />}
                     onClick={() => setIsEditModalOpen(true)}
-                    className="bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm"
+                    className="bg-primary hover:bg-primary/80 rounded-lg shadow-sm"
                 >
                     Edit Information
                 </Button>
@@ -269,7 +284,7 @@ const MentorDetailsPage: React.FC = () => {
                         <Card
                             title={<span className="text-lg font-semibold text-gray-800">Weekly Reports</span>}
                             className="rounded-2xl border-gray-100 shadow-sm"
-                            bodyStyle={{ padding: 0 }}
+                            styles={{ body: { padding: 0 } }}
                         >
                             <Table
                                 columns={reportColumns}
@@ -296,104 +311,17 @@ const MentorDetailsPage: React.FC = () => {
                 refetch={refetch}
             />
 
-            <Drawer
-                title={<span className="text-xl font-bold">Student Profile Details</span>}
-                placement="right"
-                width={650}
-                onClose={() => setIsStudentDrawerOpen(false)}
+            <StudentDetailsDrawer
                 open={isStudentDrawerOpen}
-            >
-                {selectedStudent && (
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-6 pb-6 border-b border-gray-100">
-                            <Avatar
-                                src={selectedStudent.profile ? `${imageUrl}${selectedStudent.profile}` : undefined}
-                                icon={!selectedStudent.profile && <UserOutlined />}
-                                size={84}
-                                className="border-4 border-gray-50 shadow-sm"
-                            />
-                            <div>
-                                <Title level={4} className="m-0 mb-1">{selectedStudent.firstName} {selectedStudent.lastName}</Title>
-                                <Text className="text-gray-500 block">{selectedStudent.professionalTitle || 'Student'}</Text>
-                                <div className="mt-2 flex gap-2">
-                                    <Tag color={selectedStudent.status === 'ACTIVE' ? 'success' : 'error'} className="rounded-full m-0">{selectedStudent.status || 'ACTIVE'}</Tag>
-                                </div>
-                            </div>
-                        </div>
+                onClose={() => setIsStudentDrawerOpen(false)}
+                student={selectedStudent}
+            />
 
-                        {selectedStudent.about && (
-                            <div>
-                                <Title level={5} className="mb-2 text-gray-800">About</Title>
-                                <Paragraph className="text-gray-600">{selectedStudent.about}</Paragraph>
-                            </div>
-                        )}
-
-                        <Descriptions title="Contact Information" column={1} size="small" bordered className="bg-white">
-                            <Descriptions.Item label={<span className="flex items-center gap-2"><MailOutlined /> Email</span>}>{selectedStudent.email}</Descriptions.Item>
-                            <Descriptions.Item label={<span className="flex items-center gap-2"><PhoneOutlined /> Phone</span>}>{selectedStudent.mobileNumber || 'N/A'}</Descriptions.Item>
-                            <Descriptions.Item label={<span className="flex items-center gap-2"><EnvironmentOutlined /> Location</span>}>{selectedStudent.address || 'N/A'}</Descriptions.Item>
-                        </Descriptions>
-
-                        <Descriptions title="Academics & Tracks" column={1} size="small" bordered className="bg-white">
-                            <Descriptions.Item label="Highest Education">{selectedStudent.highestEducation || 'N/A'}</Descriptions.Item>
-                            <Descriptions.Item label="Group">{selectedStudent.userGroup?.map((g: any) => g.name).join(', ') || 'N/A'}</Descriptions.Item>
-                            <Descriptions.Item label="Track">{selectedStudent.userGroupTrack?.name || 'N/A'}</Descriptions.Item>
-                            <Descriptions.Item label="Career Directions">
-                                {selectedStudent.careerDirections?.length ? (
-                                    <div className="flex gap-1 flex-wrap">
-                                        {selectedStudent.careerDirections.map((dir: string) => <Tag key={dir} className="m-0 text-xs text-blue-600 bg-blue-50 border-blue-100 rounded-full">{dir}</Tag>)}
-                                    </div>
-                                ) : 'None selected'}
-                            </Descriptions.Item>
-                            <Descriptions.Item label="Available Hours">{selectedStudent.aviliableHours || 'N/A'}</Descriptions.Item>
-                        </Descriptions>
-
-                        {(selectedStudent.linkedInProfile || selectedStudent.githubProfile || selectedStudent.PortfolioWebsite) && (
-                            <Descriptions title="Social Links" column={1} size="small" bordered className="bg-white">
-                                {selectedStudent.linkedInProfile && <Descriptions.Item label={<span className="flex items-center gap-2 text-blue-700"><LinkedinOutlined /> LinkedIn</span>}><a href={selectedStudent.linkedInProfile} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">View Profile</a></Descriptions.Item>}
-                                {selectedStudent.githubProfile && <Descriptions.Item label={<span className="flex items-center gap-2 text-gray-800"><GithubOutlined /> GitHub</span>}><a href={selectedStudent.githubProfile} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">View Profile</a></Descriptions.Item>}
-                                {selectedStudent.PortfolioWebsite && <Descriptions.Item label={<span className="flex items-center gap-2 text-indigo-600"><GlobalOutlined /> Website</span>}><a href={selectedStudent.PortfolioWebsite} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">View Website</a></Descriptions.Item>}
-                            </Descriptions>
-                        )}
-
-                        {/* {selectedStudent.Goals && selectedStudent.Goals.length > 0 && (
-                            <div>
-                                <Title level={5} className="mb-2 text-gray-800"><AimOutlined className="text-blue-600 mr-2" /> Current Goals</Title>
-                                <List
-                                    itemLayout="horizontal"
-                                    dataSource={selectedStudent.Goals}
-                                    renderItem={(goal: any) => (
-                                        <List.Item className="bg-blue-50 rounded-lg p-4 mb-3 border border-blue-100">
-                                            <List.Item.Meta
-                                                title={<span className="font-semibold text-gray-800">{goal.title}</span>}
-                                                description={<span className="text-gray-600 whitespace-pre-line mt-1 block">{goal.description}</span>}
-                                            />
-                                        </List.Item>
-                                    )}
-                                />
-                            </div>
-                        )} */}
-
-                        {selectedStudent.Onboarding && (
-                            <div>
-                                <Title level={5} className="mb-2 text-gray-800"><BookOutlined className="text-indigo-600 mr-2" /> Onboarding Details</Title>
-                                <Descriptions column={1} size="small" bordered className="bg-white">
-                                    <Descriptions.Item label="Computer Comfort">{selectedStudent.Onboarding.computer_comfort}</Descriptions.Item>
-                                    <Descriptions.Item label="Curious Activities">{selectedStudent.Onboarding.curious_activities}</Descriptions.Item>
-                                    <Descriptions.Item label="Hardest to Learn">{selectedStudent.Onboarding.hardest_to_learn}</Descriptions.Item>
-                                </Descriptions>
-                            </div>
-                        )}
-
-                        {selectedStudent.readBooks && (
-                            <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-100 mt-4">
-                                <Text strong className="text-indigo-800 block mb-1">Reading Habits</Text>
-                                <Text className="text-indigo-600">{selectedStudent.readBooks}</Text>
-                            </div>
-                        )}
-                    </div>
-                )}
-            </Drawer>
+            <ReportDetailsModal
+                open={isReportDetailsModalOpen}
+                onCancel={() => setIsReportDetailsModalOpen(false)}
+                data={selectedReport}
+            />
         </div>
     );
 };
