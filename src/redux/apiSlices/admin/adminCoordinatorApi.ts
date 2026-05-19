@@ -29,7 +29,7 @@ const adminCoordinatorApi = api.injectEndpoints({
         }),
         deleteCoordinator: builder.mutation({
             query: (id: string) => ({
-                url: `/admin/coordinator/${id}`,
+                url: `/admin/${id}`,
                 method: 'DELETE',
             }),
         }),

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Table, Button, Input, Tag, Tooltip } from 'antd';
-import { Search, Calendar, MapPin, Eye, Clock, CheckCircle2, ExternalLink, Download } from 'lucide-react';
+import { Table, Button, Input, Tag, Tooltip, Popover, Select } from 'antd';
+import { Search, Calendar, MapPin, Eye, Clock, CheckCircle2, ExternalLink, Download, FilterIcon } from 'lucide-react';
 import moment from 'moment';
 
 import GroupScheduleModal from '../../../components/modals/mentor-coordinator/GroupScheduleModal';
@@ -15,16 +15,18 @@ const GroupSchedulePage = () => {
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState<'upcoming' | 'completed'>('upcoming');
+    const [filterGroup, setFilterGroup] = useState<string | undefined>(undefined);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
     const { data: userProfile, isLoading: isProfileLoading } = useGetprofileQuery({});
     const user = userProfile?.data?.data ?? userProfile?.data ?? userProfile;
 
+    // console.log(filterGroup);
     const { data: scheduleApi, isLoading, isFetching } = useGetClassesScheduleQuery({
         page: page,
         limit: 10,
         searchTerm: searchTerm,
-        userGroup: user?.userGroup?.map((group: any) => group._id),
+        userGroup: filterGroup ?? user?.userGroup?.map((group: any) => group._id),
         filterType: activeTab,
     });
 
@@ -171,6 +173,7 @@ const GroupSchedulePage = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <HeaderTitle title="Group Schedule" />
+
             </div>
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -217,16 +220,68 @@ const GroupSchedulePage = () => {
                 </div>
 
                 {/* Search */}
-                <div className="relative w-full md:w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
-                    <Input
-                        placeholder="Search Schedule"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="h-10 pl-10 bg-white border-gray-200 rounded-xl hover:border-blue-400 focus:border-blue-500 transition-all shadow-sm"
-                        allowClear
-                    />
+
+                <div className="flex gap-3">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+                        <Input
+                            placeholder="Search materials"
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="h-10 pl-10 bg-[#F9FAFB] border-none shadow-none w-64"
+                            style={{ backgroundColor: 'white' }}
+                        />
+                    </div>
+                    <Popover
+                        content={
+                            <div className="w-64 space-y-4 p-2">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                        Target Group
+                                    </label>
+                                    <Select
+                                        placeholder="Select Group"
+                                        className="w-full h-10"
+                                        value={filterGroup}
+                                        onChange={(v) => setFilterGroup(v)}
+                                        allowClear
+                                        options={user?.userGroup?.map((group: any) => ({
+                                            value: group._id,
+                                            label: group.name,
+                                        }))}
+                                    />
+                                </div>
+
+                                <div className="pt-2 flex justify-between gap-3">
+                                    <Button
+                                        className="flex-1 h-9 rounded-lg text-xs font-medium border-gray-200"
+                                        onClick={() => {
+                                            setFilterGroup(undefined);
+                                        }}
+                                    >
+                                        Reset
+                                    </Button>
+                                </div>
+                            </div>
+                        }
+                        title={
+                            <div className="px-2 py-1.5 border-b border-gray-100 mb-2">
+                                <span className="font-bold text-gray-800">Filter Schedule</span>
+                            </div>
+                        }
+                        trigger="click"
+                        placement="bottomRight"
+                        overlayClassName="filter-popover"
+                    >
+                        <Button
+                            icon={<FilterIcon className="w-4 h-4" />}
+                            className={`h-10 px-6 border-gray-200 text-gray-600 font-semibold flex items-center gap-2 rounded-lg shadow-sm transition-all ${filterGroup ? 'bg-blue-50 border-blue-200 text-blue-600' : ''
+                                }`}
+                        >
+                            Filter
+                        </Button>
+                    </Popover>
                 </div>
+
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">

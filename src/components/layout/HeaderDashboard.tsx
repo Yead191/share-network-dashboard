@@ -46,10 +46,15 @@ const HeaderDashboard = () => {
                             <div className="flex items-center gap-2">
                                 <p className="text-2xl font-bold font-heading"> Share Network App </p>
                                 <Tag color="#4f46e5">{ShareNetwork}</Tag>
+                                {(role === 'coordinator' || role === 'mentor-coordinator') && user?.data?.company && (
+                                    <Tag color="#0284c7">
+                                        {user?.data?.company}
+                                    </Tag>
+                                )}
                                 <Tag color={
-                                    user?.data?.userGroup[0]?.name?.toUpperCase() === 'BEGINNERS' ? "#ff6347" :  // Red for BEGINNERS
-                                        user?.data?.userGroup[0]?.name?.toUpperCase() === 'EXPEDITION' ? "#32cd32" :  // Green for EXPEDITION
-                                            user?.data?.userGroup[0]?.name?.toUpperCase() === 'SKILL PATH' ? "#1e90ff" :  // Blue for SKILL PATH
+                                    user?.data?.userGroup?.[0]?.name?.toUpperCase() === 'BEGINNERS' ? "#ff6347" :  // Red for BEGINNERS
+                                        user?.data?.userGroup?.[0]?.name?.toUpperCase() === 'EXPEDITION' ? "#32cd32" :  // Green for EXPEDITION
+                                            user?.data?.userGroup?.[0]?.name?.toUpperCase() === 'SKILL PATH' ? "#1e90ff" :  // Blue for SKILL PATH
                                                 "#d3d3d3"  // Default color if group doesn't match
                                 }>
                                     {user?.data?.userGroup?.map((item: any) => item?.name).join(', ')}

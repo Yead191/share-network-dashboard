@@ -9,10 +9,21 @@ const groupScheduleSlice = api.injectEndpoints({
                     limit: limit.toString(),
                     searchTerm: searchTerm,
                 });
+                // if (userGroup?.length) {
+                //     userGroup.forEach((id: string, index: number) => {
+                //         params.append(`userGroup[${index}]`, id);
+                //     });
+                // }
                 if (userGroup?.length) {
-                    userGroup.forEach((id: string, index: number) => {
-                        params.append(`userGroup[${index}]`, id);
-                    });
+                    if (userGroup) {
+                        const groups = Array.isArray(userGroup)
+                            ? userGroup
+                            : [userGroup];
+
+                        groups.forEach((id: string, index: number) => {
+                            params.append(`userGroup[${index}]`, id);
+                        });
+                    }
                 }
                 if (filterType) params.append('filterType', filterType);
 
