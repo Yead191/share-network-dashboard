@@ -18,7 +18,6 @@ const StudentSchedule = () => {
     const { data } = useGetprofileQuery({});
     const user = data?.data?.data ?? data?.data ?? data;
     const userGroup = user?.userGroup?.[0]?._id;
-    // console.log(userGroup);
     const { data: scheduleApi, isLoading, isFetching } = useGetStudentClassScheduleQuery({
         page: page,
         limit: 10,

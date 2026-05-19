@@ -48,7 +48,7 @@ const MentorOverviewResources = ({ mentor }: { mentor: any }) => {
                     <div className="p-2 bg-indigo-500 rounded-lg text-white">
                         <BookOpen size={20} />
                     </div>
-                    Resources
+                    Resources <span className='text-sm text-gray-500 font-normal'>(for mentors)</span>
                 </h3>
             </div>
 

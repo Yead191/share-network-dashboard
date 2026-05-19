@@ -385,6 +385,14 @@ const router = createBrowserRouter([
                 ),
             },
             {
+                path: '/mentor/schedule',
+                element: (
+                    <PrivateRoute role="mentor">
+                        <StudentSchedule />
+                    </PrivateRoute>
+                ),
+            },
+            {
                 path: '/mentor/woops',
                 element: (
                     <PrivateRoute role="mentor">

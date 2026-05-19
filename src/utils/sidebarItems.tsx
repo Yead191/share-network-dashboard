@@ -254,6 +254,12 @@ export const mentorSidebarItems: TSidebarItem[] = [
         icon: <AiOutlineSchedule size={20} />,
     },
     {
+        key: 'schedule',
+        label: 'Schedule',
+        path: 'mentor/schedule',
+        icon: <AiOutlineSchedule size={20} />,
+    },
+    {
         key: 'learning-materials',
         label: 'Resources',
         path: 'mentor/learning-materials',
