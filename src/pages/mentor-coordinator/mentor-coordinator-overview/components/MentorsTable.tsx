@@ -31,7 +31,7 @@ const MentorTable = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
   const mentors = data?.data?.assignedMentors || [];
-
+  console.log(mentors)
   const handleViewDetails = (mentor: any) => {
     setSelectedMentor(mentor);
     setModalOpen(true);
