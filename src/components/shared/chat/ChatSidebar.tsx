@@ -1,17 +1,27 @@
-import { Empty } from 'antd';
+import { Empty, Button } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import { getImageUrl } from '../../../utils/getImageUrl';
 
 interface ChatSidebarProps {
     messageId: string | null;
     onSelect: (room: any) => void;
     chatRooms: any[];
+    onNewChat?: () => void;
 }
 
-export function ChatSidebar({ messageId, onSelect, chatRooms }: ChatSidebarProps) {
+export function ChatSidebar({ messageId, onSelect, chatRooms, onNewChat }: ChatSidebarProps) {
     return (
         <div className="space-y-2 p-2">
-            <div className="p-2 mb-4">
+            <div className="p-2 mb-4 flex justify-between items-center border-b border-gray-50 pb-3">
                 <h2 className="text-xl font-bold text-gray-800">Messages</h2>
+                {onNewChat && (
+                    <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={onNewChat}
+                        className="bg-[#055E6E] hover:bg-[#055E6E]/90 border-none rounded-full flex items-center justify-center h-8 w-8 p-0"
+                    />
+                )}
             </div>
             {chatRooms.length === 0 ? (
                 <div className="flex justify-center items-center ">

@@ -53,7 +53,7 @@ const StudentProfile = ({ student }: { student: any }) => {
                     {student.userGroup && student.userGroup.length > 0 ? (
                         student.userGroup.map((group: any) => (
                             <Tag
-                                key={group.id}
+                                key={group._id}
                                 icon={<UsergroupAddOutlined />}
                                 color="blue"
                             >

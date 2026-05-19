@@ -2,11 +2,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { ChatSidebar } from './ChatSidebar';
 import { Grid } from 'antd';
 import { ChatConversation } from './ChatConversation';
-import { useGetChatRoomsQuery } from '../../../redux/apiSlices/chatSlice';
+import { useGetChatRoomsQuery, useCreateChatRoomMutation } from '../../../redux/apiSlices/chatSlice';
 import Spinner from '../../../components/shared/Spinner';
 import { socketUrl } from '../../../redux/api/baseApi';
 import { io } from 'socket.io-client';
 import { useProfileQuery } from '../../../redux/apiSlices/authSlice';
+import NewChatModal from '../../modals/chat/NewChatModal';
+import { toast } from 'sonner';
 
 export default function ChatLayout() {
     const { data: userData } = useProfileQuery({});
@@ -14,7 +16,11 @@ export default function ChatLayout() {
     const { lg } = Grid.useBreakpoint();
     const [activeRoom, setActiveRoom] = useState<any>(null);
     const [messageId, setMessageId] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const { data, isLoading, refetch } = useGetChatRoomsQuery(undefined);
+    const [createChatRoom, { isLoading: isCreatingChatRoom }] = useCreateChatRoomMutation();
+
     const chatRooms = data?.data || [];
     // console.log(chatRooms);
 
@@ -35,11 +41,35 @@ export default function ChatLayout() {
             setActiveRoom(chatRooms[0]);
             setMessageId(chatRooms[0]._id);
         }
-    }, [lg, messageId]);
+    }, [lg, messageId, chatRooms]);
 
     const selectRoom = (room: any) => {
         setActiveRoom(room);
         setMessageId(room._id);
+    };
+
+    const handleSelectUser = async (participantId: string) => {
+        toast.promise(
+            createChatRoom({
+                participants: [participantId],
+            }).unwrap(),
+            {
+                loading: 'Creating chat room...',
+                success: (res) => {
+                    refetch();
+                    setIsModalOpen(false);
+                    const room = res?.data;
+                    if (room) {
+                        setActiveRoom(room);
+                        setMessageId(room._id);
+                    }
+                    return res?.message || 'Chat room created successfully';
+                },
+                error: (err) => {
+                    return err?.data?.message || 'Failed to create chat room';
+                },
+            }
+        );
     };
 
     if (isLoading) {
@@ -66,7 +96,19 @@ export default function ChatLayout() {
         }
         return (
             <div className="p-4">
-                <ChatSidebar messageId={null} onSelect={selectRoom} chatRooms={chatRooms} />
+                <ChatSidebar
+                    messageId={null}
+                    onSelect={selectRoom}
+                    chatRooms={chatRooms}
+                    onNewChat={() => setIsModalOpen(true)}
+                />
+                <NewChatModal
+                    open={isModalOpen}
+                    onCancel={() => setIsModalOpen(false)}
+                    user={user}
+                    onSelectUser={handleSelectUser}
+                    loading={isCreatingChatRoom}
+                />
             </div>
         );
     }
@@ -75,11 +117,24 @@ export default function ChatLayout() {
     return (
         <div className="flex gap-6 h-[calc(100vh-210px)] ">
             <div className="w-[320px] shrink-0 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-y-auto">
-                <ChatSidebar messageId={messageId} onSelect={selectRoom} chatRooms={chatRooms} />
+                <ChatSidebar
+                    messageId={messageId}
+                    onSelect={selectRoom}
+                    chatRooms={chatRooms}
+                    onNewChat={() => setIsModalOpen(true)}
+                />
             </div>
             <div className="grow">
                 <ChatConversation messageId={messageId} activeUser={activeRoom} />
             </div>
+
+            <NewChatModal
+                open={isModalOpen}
+                onCancel={() => setIsModalOpen(false)}
+                user={user}
+                onSelectUser={handleSelectUser}
+                loading={isCreatingChatRoom}
+            />
         </div>
     );
 }
