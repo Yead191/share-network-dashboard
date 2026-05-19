@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import StudentDetailsModal from '../../../../components/modals/admin/StudentDetailsModal';
+import { getImageUrl } from '../../../../utils/getImageUrl';
 
 const StudentDetails = ({ students, refetch }: { students: any[], refetch: any }) => {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -24,7 +25,7 @@ const StudentDetails = ({ students, refetch }: { students: any[], refetch: any }
                             >
                                 <div className="flex items-center space-x-3">
                                     <img
-                                        src={student.profile || 'https://res.cloudinary.com/ddqovbzxy/image/upload/v1736572642/avatar_ziy9mp.jpg'}
+                                        src={getImageUrl(student?.profile)}
                                         alt={student.firstName}
                                         className="w-10 h-10 rounded-full object-cover border border-gray-100 shadow-sm"
                                     />

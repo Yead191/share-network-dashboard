@@ -17,11 +17,15 @@ import {
     useGiveMarksOfSubmissionMutation,
     useUpdateAssignmentMutation,
 } from '../../../redux/apiSlices/teacher/assignmentSlice';
-import { useGetUserGroupsQuery } from '../../../redux/apiSlices/teacher/resourceSlice';
 import { toast } from 'sonner';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
+import { useGetprofileQuery } from '../../../redux/apiSlices/students/overview.slice';
 
 function Assignment() {
+    const { data: profile, isLoading: profileLoading } = useGetprofileQuery({});
+
+    const myGroups = profile?.data?.userGroup;
+    console.log("userGroups", myGroups)
     const [page, setPage] = useState(1);
     const [createAssignment] = useCreateAssignmentMutation();
     const [updateAssignment] = useUpdateAssignmentMutation();
@@ -34,9 +38,10 @@ function Assignment() {
         isLoading,
         isFetching,
         refetch,
-    } = useGetAssignmentQuery({ page: page, limit: 10, searchTerm: searchText, userGroup: selectedGroup });
+    } = useGetAssignmentQuery({ page: page, limit: 10, searchTerm: searchText, userGroup: selectedGroup ?? myGroups?.map((group: any) => group._id) }, {
+        skip: !myGroups || profileLoading
+    });
     const { data: submissionData } = useGetAllSubmissionOfAssignmentQuery({ page: 1, limit: 10 });
-    const { data: userGroups } = useGetUserGroupsQuery({ page: 1, limit: 100 });
     const [reviewSubmission] = useGiveMarksOfSubmissionMutation();
     const [file, setFile] = useState<any | null>(null);
     // Modal States
@@ -197,9 +202,10 @@ function Assignment() {
                         className="w-full md:w-48 h-10 rounded-lg"
                         allowClear
                         onChange={setSelectedGroup}
+                        loading={profileLoading}
                         suffixIcon={<FilterOutlined className="text-gray-400" />}
                     >
-                        {userGroups?.data?.map((group: any) => (
+                        {myGroups?.map((group: any) => (
                             <Select.Option key={group._id} value={group._id}>
                                 {group.name}
                             </Select.Option>

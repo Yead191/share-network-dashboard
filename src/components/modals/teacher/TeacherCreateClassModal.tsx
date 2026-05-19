@@ -1,4 +1,4 @@
-import { Modal, Input, DatePicker, TimePicker, Checkbox, Form, Spin, Upload, Button } from 'antd';
+import { Modal, Input, DatePicker, TimePicker, Checkbox, Form, Spin, Upload, Button, Select } from 'antd';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { X, Upload as UploadIcon } from 'lucide-react';
@@ -14,11 +14,12 @@ interface TeacherCreateClassModalProps {
     onCancel: () => void;
     refetch: () => void;
     selectedSchedule?: any;
-    teacherUserGroup?: string;
+    teacherUserGroup?: any[];
     teacherUserGroupTrack?: string;
 }
 
 const TeacherCreateClassModal = ({ open, onCancel, refetch, selectedSchedule, teacherUserGroup, teacherUserGroupTrack }: TeacherCreateClassModalProps) => {
+    // console.log(teacherUserGroupTrack)
     const [form] = Form.useForm();
     const [addClass, { isLoading }] = useAddClassTeacherMutation();
     const [editClass, { isLoading: isEditLoading }] = useUpdateClassTeacherMutation();
@@ -26,6 +27,9 @@ const TeacherCreateClassModal = ({ open, onCancel, refetch, selectedSchedule, te
 
     useEffect(() => {
         if (open && selectedSchedule) {
+            const initialGroup = selectedSchedule?.userGroup?.[0];
+            const groupId = typeof initialGroup === 'object' ? initialGroup?._id : initialGroup;
+
             form.setFieldsValue({
                 title: selectedSchedule?.title,
                 description: selectedSchedule?.description,
@@ -34,6 +38,7 @@ const TeacherCreateClassModal = ({ open, onCancel, refetch, selectedSchedule, te
                 virtualClass: selectedSchedule?.virtualClass,
                 location: selectedSchedule?.location,
                 slideUrl: selectedSchedule?.slideUrl,
+                userGroup: groupId,
             });
             if (selectedSchedule?.file) {
                 setFileList([
@@ -50,13 +55,18 @@ const TeacherCreateClassModal = ({ open, onCancel, refetch, selectedSchedule, te
         } else if (open && !selectedSchedule) {
             form.resetFields();
             setFileList([]);
+            if (teacherUserGroup && teacherUserGroup.length > 0) {
+                form.setFieldsValue({
+                    userGroup: teacherUserGroup[0]._id
+                });
+            }
         }
-    }, [open, selectedSchedule, form]);
+    }, [open, selectedSchedule, form, teacherUserGroup]);
 
     const onFinish = async (values: any) => {
         try {
-            const { date, time, slideUrl, file: ignoreFileField, ...rest } = values;
-            
+            const { date, time, slideUrl, userGroup, file: ignoreFileField, ...rest } = values;
+
             let classDate;
             if (date && time) {
                 const combined = dayjs(date)
@@ -80,11 +90,11 @@ const TeacherCreateClassModal = ({ open, onCancel, refetch, selectedSchedule, te
             if (slideUrl) {
                 formData.append('slideUrl', slideUrl);
             }
-            
-            if (teacherUserGroup) {
-                formData.append('userGroup[0]', teacherUserGroup);
+
+            if (userGroup) {
+                formData.append('userGroup[0]', userGroup);
             }
-            
+
             if (teacherUserGroupTrack) {
                 formData.append('userGroupTrack', teacherUserGroupTrack);
             }
@@ -204,46 +214,62 @@ const TeacherCreateClassModal = ({ open, onCancel, refetch, selectedSchedule, te
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                     <Form.Item
+                        name="userGroup"
+                        label={<span className="text-sm font-semibold text-gray-700">User Group</span>}
+                        rules={[{ required: true, message: 'Please select a user group' }]}
+                    >
+                        <Select
+                            placeholder="Select User Group"
+                            className="w-full h-11 rounded-lg border-gray-200 shadow-none"
+                            options={teacherUserGroup?.map((group: any) => ({
+                                label: group.name,
+                                value: group._id,
+                            }))}
+                            allowClear
+                        />
+                    </Form.Item>
+
+                    <Form.Item
                         name="slideUrl"
                         label={<span className="text-sm font-semibold text-gray-700">Slide / Content URL</span>}
                     >
                         <Input placeholder="https://..." className="h-11 rounded-lg border-gray-200" />
                     </Form.Item>
-
-                    <Form.Item
-                        name="file"
-                        label={<span className="text-sm font-semibold text-gray-700">Lecture Material</span>}
-                    >
-                        <Upload
-                            accept=".pdf,.doc,.docx"
-                            fileList={fileList}
-                            onChange={({ fileList }) => {
-                                setFileList(fileList.slice(-1));
-                            }}
-                            beforeUpload={(uploadedFile) => {
-                                const isValidType =
-                                    uploadedFile.type === "application/pdf" ||
-                                    uploadedFile.type === "application/msword" ||
-                                    uploadedFile.type ===
-                                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-
-                                if (!isValidType) {
-                                    toast.error("Only PDF and DOC/DOCX files are allowed!");
-                                    return Upload.LIST_IGNORE;
-                                }
-                                return false;
-                            }}
-                            maxCount={1}
-                            className="w-full"
-                        >
-                            {fileList.length < 1 && (
-                                <Button className="w-full h-11 rounded-lg border-gray-200 flex items-center justify-center gap-2">
-                                    <UploadIcon size={16} /> Select File
-                                </Button>
-                            )}
-                        </Upload>
-                    </Form.Item>
                 </div>
+
+                <Form.Item
+                    name="file"
+                    label={<span className="text-sm font-semibold text-gray-700">Lecture Material</span>}
+                >
+                    <Upload
+                        accept=".pdf,.doc,.docx"
+                        fileList={fileList}
+                        onChange={({ fileList }) => {
+                            setFileList(fileList.slice(-1));
+                        }}
+                        beforeUpload={(uploadedFile) => {
+                            const isValidType =
+                                uploadedFile.type === "application/pdf" ||
+                                uploadedFile.type === "application/msword" ||
+                                uploadedFile.type ===
+                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+                            if (!isValidType) {
+                                toast.error("Only PDF and DOC/DOCX files are allowed!");
+                                return Upload.LIST_IGNORE;
+                            }
+                            return false;
+                        }}
+                        maxCount={1}
+                        className="w-full"
+                    >
+                        {fileList.length < 1 && (
+                            <Button className="w-full h-11 rounded-lg border-gray-200 flex items-center justify-center gap-2">
+                                <UploadIcon size={16} /> Select File
+                            </Button>
+                        )}
+                    </Upload>
+                </Form.Item>
 
                 <div className="flex justify-end pt-4">
                     <button

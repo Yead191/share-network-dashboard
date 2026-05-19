@@ -17,7 +17,26 @@ const homeSlice = api.injectEndpoints({
         }),
 
         getTeacherClasses: build.query<IGetAllClassesResponse, any>({
-            query: (params) => {
+            query: ({ page, limit, searchTerm, userGroup, filterType }) => {
+                const params = new URLSearchParams({
+                    page: page.toString(),
+                    limit: limit.toString(),
+                    searchTerm: searchTerm,
+                });
+                if (userGroup?.length) {
+                    if (userGroup) {
+                        const groups = Array.isArray(userGroup)
+                            ? userGroup
+                            : [userGroup];
+
+                        groups.forEach((id: string, index: number) => {
+                            params.append(`userGroup[${index}]`, id);
+                        });
+                    }
+                }
+                if (filterType) {
+                    params.append('filterType', filterType);
+                }
                 return {
                     url: '/class',
                     method: 'GET',

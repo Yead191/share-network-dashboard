@@ -6,10 +6,10 @@ import HeaderTitle from '../../../../components/shared/HeaderTitle';
 import CoordinatorEditMentorModal from '../../../../components/modals/mentor-coordinator/CoordinatorEditMentorModal';
 import StudentDetailsDrawer from '../../../../components/modals/mentor-coordinator/StudentDetailsDrawer';
 import ReportDetailsModal from '../../../../components/modals/mentor/ReportDetailsModal';
-import { imageUrl } from '../../../../redux/api/baseApi';
 import moment from 'moment';
 import { useGetprofileByIdQuery } from '../../../../redux/apiSlices/students/overview.slice';
 import { useGetWeeklyReportsQuery } from '../../../../redux/apiSlices/mentor/weeklyReportApi';
+import { getImageUrl } from '../../../../utils/getImageUrl';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -137,7 +137,7 @@ const MentorDetailsPage: React.FC = () => {
                     <Card className="rounded-2xl border-gray-100 shadow-sm overflow-hidden" bodyStyle={{ padding: 0 }}>
                         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 flex flex-col items-center justify-center text-center">
                             <Avatar
-                                src={mentor.profile ? `${imageUrl}${mentor.profile}` : undefined}
+                                src={mentor.profile ? getImageUrl(mentor.profile) : undefined}
                                 icon={!mentor.profile && <UserOutlined />}
                                 size={120}
                                 className="border-4 border-white shadow-md mb-4"
@@ -247,7 +247,7 @@ const MentorDetailsPage: React.FC = () => {
                                             className="flex items-start gap-4 p-4 rounded-xl border border-gray-100 bg-white hover:border-blue-300 hover:shadow-md cursor-pointer transition-all duration-300"
                                         >
                                             <Avatar
-                                                src={student.profile ? `${imageUrl}${student.profile}` : undefined}
+                                                src={student.profile ? getImageUrl(student.profile) : undefined}
                                                 icon={!student.profile && <UserOutlined />}
                                                 size={48}
                                                 className="border-2 border-blue-50 flex-shrink-0"

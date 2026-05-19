@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Table, Button, Input, Modal, message } from 'antd';
+import { Table, Button, Input, Modal, message, Select } from 'antd';
 import { Search, Plus, Calendar, MapPin, Eye, Edit, Trash2, Clock, CheckCircle2, Video } from 'lucide-react';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
 import {
@@ -13,10 +13,10 @@ import TeacherClassDetailsModal from '../../../components/modals/teacher/Teacher
 import TeacherCreateClassModal from '../../../components/modals/teacher/TeacherCreateClassModal';
 
 const TeacherClassSchedule = () => {
-    const { data: profile } = useGetprofileQuery({});
-    const userGroup = profile?.data?.userGroup?.[0]?._id;
+    const { data: profile, isLoading: profileLoading } = useGetprofileQuery({});
+    const userGroup = profile?.data?.userGroup;
     const userGroupTrack = profile?.data?.userGroupTrack?._id;
-
+    const [filterGroup, setFilterGroup] = useState<string | undefined>(undefined);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState<'upcoming' | 'completed'>('upcoming');
@@ -24,33 +24,33 @@ const TeacherClassSchedule = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [selectedClass, setSelectedClass] = useState<any>(null);
 
-    const { data, isLoading, isFetching, refetch } = useGetTeacherClassesQuery({
+    const { data: classesData, isLoading, isFetching, refetch } = useGetTeacherClassesQuery({
         page,
         limit: 10,
         searchTerm,
         filterType: activeTab,
-        userGroup,
+        userGroup: filterGroup ?? userGroup?.map((group: any) => group._id),
         ...(userGroupTrack && { userGroupTrack }),
     });
 
     const [deleteClassTeacher] = useDeleteClassTeacherMutation();
 
-    const scheduleData = data?.data?.map((item: any) => ({
-        _id: item._id,
-        key: item._id,
-        title: item.title,
-        description: item.description,
-        classDate: item.classDate,
-        date: moment(item.classDate).format('DD/MM/YYYY'),
-        time: moment(item.classDate).format('hh:mm A'),
-        userGroup: item.userGroup,
-        userGroupTrack: item.userGroupTrack,
-        virtualClass: item.virtualClass,
-        location: item.location,
-        slideUrl: item.slideUrl,
-        file: item.file,
-        status: item.published ? 'Active' : 'Inactive',
-    }));
+    // const scheduleData = data?.data?.map((item: any) => ({
+    //     _id: item._id,
+    //     key: item._id,
+    //     title: item.title,
+    //     description: item.description,
+    //     classDate: item.classDate,
+    //     date: moment(item.classDate).format('DD/MM/YYYY'),
+    //     time: moment(item.classDate).format('hh:mm A'),
+    //     userGroup: item.userGroup,
+    //     userGroupTrack: item.userGroupTrack,
+    //     virtualClass: item.virtualClass,
+    //     location: item.location,
+    //     slideUrl: item.slideUrl,
+    //     file: item.file,
+    //     status: item.published ? 'Active' : 'Inactive',
+    // }));
 
     const handleDelete = (id: string) => {
         Modal.confirm({
@@ -101,8 +101,8 @@ const TeacherClassSchedule = () => {
             key: 'dateTime',
             render: (_: any, record: any) => (
                 <div className="text-sm">
-                    <p className="font-medium text-gray-800">{record.date}</p>
-                    <p className="text-gray-400">{record.time}</p>
+                    <p className="font-medium text-gray-800">{moment(record.classDate).format('DD/MM/YYYY')}</p>
+                    <p className="text-gray-400">{moment(record.classDate).format('hh:mm A')}</p>
                 </div>
             ),
         },
@@ -150,12 +150,12 @@ const TeacherClassSchedule = () => {
             title: 'STATUS',
             dataIndex: 'status',
             key: 'status',
-            render: (text: string) => (
-                <div className={`flex items-center gap-2 px-3 py-1 border rounded-lg text-xs font-medium cursor-pointer w-fit ${text === 'Active'
+            render: (_: any, record: any) => (
+                <div className={`flex items-center gap-2 px-3 py-1 border rounded-lg text-xs font-medium cursor-pointer w-fit ${record.status === true
                     ? 'border-green-200 bg-green-50 text-green-600'
                     : 'border-gray-200 bg-gray-50 text-gray-500'
                     }`}>
-                    {text}
+                    {record.status === true ? 'Active' : 'Inactive'}
                 </div>
             ),
         },
@@ -210,9 +210,21 @@ const TeacherClassSchedule = () => {
                             className="h-10 pl-10 bg-white border-gray-200 w-64"
                         />
                     </div>
+                    <Select
+                        placeholder="Select Group"
+                        className="w-44 h-10"
+                        value={filterGroup}
+                        onChange={(v) => setFilterGroup(v)}
+                        allowClear
+                        loading={profileLoading}
+                        options={userGroup?.map((group: any) => ({
+                            value: group._id,
+                            label: group.name,
+                        }))}
+                    />
                     <Button
                         icon={<Plus className="w-4 h-4" />}
-                        className="h-10 px-6 bg-[#22C55E] text-white hover:bg-[#1ea34d] border-none font-medium flex items-center gap-2 rounded-lg"
+                        className="h-10 px-6 bg-[#22C55E] text-white hover:!bg-[#1ea34d] border-none font-medium flex items-center gap-2 rounded-lg"
                         onClick={() => {
                             setSelectedClass(null);
                             setIsCreateModalOpen(true);
@@ -238,9 +250,9 @@ const TeacherClassSchedule = () => {
                 >
                     <Clock size={15} className={activeTab === 'upcoming' ? 'text-blue-500' : 'text-gray-400'} />
                     Upcoming
-                    {activeTab === 'upcoming' && data?.pagination?.total != null && (
+                    {activeTab === 'upcoming' && classesData?.pagination?.total != null && (
                         <span className="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-blue-50 text-blue-600 border border-blue-100">
-                            {data.pagination.total}
+                            {classesData.pagination.total}
                         </span>
                     )}
                 </button>
@@ -257,9 +269,9 @@ const TeacherClassSchedule = () => {
                 >
                     <CheckCircle2 size={15} className={activeTab === 'completed' ? 'text-emerald-500' : 'text-gray-400'} />
                     Completed
-                    {activeTab === 'completed' && data?.pagination?.total != null && (
+                    {activeTab === 'completed' && classesData?.pagination?.total != null && (
                         <span className="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
-                            {data.pagination.total}
+                            {classesData.pagination.total}
                         </span>
                     )}
                 </button>
@@ -269,12 +281,12 @@ const TeacherClassSchedule = () => {
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <Table
                     columns={columns}
-                    dataSource={scheduleData}
+                    dataSource={classesData?.data}
                     loading={isLoading || isFetching}
                     pagination={{
                         current: page,
                         pageSize: 10,
-                        total: data?.pagination?.total,
+                        total: classesData?.pagination?.total,
                         showSizeChanger: false,
                         onChange: (p) => setPage(p),
                     }}

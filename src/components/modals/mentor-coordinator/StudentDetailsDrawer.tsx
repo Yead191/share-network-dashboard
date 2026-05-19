@@ -10,7 +10,7 @@ import {
     GlobalOutlined,
     AimOutlined,
 } from '@ant-design/icons';
-import { imageUrl } from '../../../redux/api/baseApi';
+import { getImageUrl } from '../../../utils/getImageUrl';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -34,7 +34,7 @@ const StudentDetailsDrawer: React.FC<StudentDetailsDrawerProps> = ({ open, onClo
                 <div className="space-y-6">
                     <div className="flex items-center gap-6 pb-6 border-b border-gray-100">
                         <Avatar
-                            src={student.profile ? `${imageUrl}${student.profile}` : undefined}
+                            src={student.profile ? getImageUrl(student.profile) : undefined}
                             icon={!student.profile && <UserOutlined />}
                             size={84}
                             className="border-4 border-gray-50 shadow-sm"

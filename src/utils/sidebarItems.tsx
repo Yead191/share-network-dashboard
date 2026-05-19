@@ -118,12 +118,12 @@ export const teacherSidebarItems: TSidebarItem[] = [
         path: 'teacher/assignment',
         icon: <MdOutlineAssignment size={20} />,
     },
-    {
-        key: 'chat',
-        label: 'Chat',
-        path: 'teacher/chat',
-        icon: <LuMessageSquare size={20} />,
-    },
+    // {
+    //     key: 'chat',
+    //     label: 'Chat',
+    //     path: 'teacher/chat',
+    //     icon: <LuMessageSquare size={20} />,
+    // },
     {
         key: 'attendance',
         label: 'Attendance',

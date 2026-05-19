@@ -19,6 +19,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../../../components/shared/Spinner";
 import { useProfileQuery } from "../../../../redux/apiSlices/authSlice";
+import { getImageUrl } from "../../../../utils/getImageUrl";
 
 const { Text } = Typography;
 
@@ -59,7 +60,7 @@ const MentorTable = () => {
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <Avatar
             src={
-              record.profile?.startsWith("http") ? record.profile : undefined
+              getImageUrl(record?.profile)
             }
             icon={<UserOutlined />}
             size={40}

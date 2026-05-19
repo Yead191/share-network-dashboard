@@ -11,8 +11,12 @@ import dayjs from 'dayjs';
 import { imageUrl } from '../../../../redux/api/baseApi';
 import Spinner from '../../../../components/shared/Spinner';
 import { useGetUserGroupsQuery } from '../../../../redux/apiSlices/teacher/resourceSlice';
+import { useGetprofileQuery } from '../../../../redux/apiSlices/students/overview.slice';
 
 const TakeAttendance = () => {
+    const { data: profile, isLoading: profileLoading } = useGetprofileQuery({});
+    const isAdmin = profile?.data?.role === 'SUPER_ADMIN';
+    console.log("isAdmin", profile)
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedClass, setSelectedClass] = useState<string | null>(null);
     const [selectedDate, setSelectedDate] = useState<string>(dayjs().format('YYYY-MM-DD'));
@@ -354,9 +358,9 @@ const TakeAttendance = () => {
                     <Select
                         placeholder="Select Group"
                         value={selectedClass}
-                        loading={isUserGroupsLoading}
+                        loading={isUserGroupsLoading || profileLoading}
                         className="w-64 h-11"
-                        options={classOptions}
+                        options={!isAdmin ? profile?.data?.userGroup.map((group: any) => ({ label: group.name, value: group._id })) : classOptions}
                         onChange={handleClassChange}
                         allowClear
                     />

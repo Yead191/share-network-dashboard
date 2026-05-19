@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { Button, Avatar } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 import EditProfile from './components/EditProfile';
-import { imageUrl } from '../../../redux/api/baseApi';
 import { useProfileQuery as useGetProfileQuery } from '../../../redux/apiSlices/authSlice';
 import Spinner from '../../../components/shared/Spinner';
+import { getImageUrl } from '../../../utils/getImageUrl';
 
 export default function MentorCoordinatorProfile() {
     const { data, isLoading, refetch } = useGetProfileQuery({});
@@ -39,14 +39,6 @@ export default function MentorCoordinatorProfile() {
 
     const displayName = user?.firstName + ' ' + user?.lastName || 'N/A';
 
-    // Resolve profile image URL safely
-    const profileSrc = user?.profile
-        ? user.profile.startsWith('http')
-            ? user?.profile
-            : `${imageUrl}${user.profile}`
-        : undefined;
-    // console.log('User Profile Data:', profileSrc);
-
     if (isLoading) {
         return <Spinner />;
     }
@@ -76,7 +68,7 @@ export default function MentorCoordinatorProfile() {
                     <Avatar
                         shape="square"
                         size={80}
-                        src={profileSrc}
+                        src={getImageUrl(user?.profile)}
                         className="rounded-lg shadow-sm"
                     />
 

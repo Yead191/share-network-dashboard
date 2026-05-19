@@ -32,21 +32,21 @@ const MyStudent = () => {
 
     const [selectedStudent, setSelectedStudent] = useState<StudentData | null>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    
+
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
-    
+
     const userGroups = user?.data?.userGroup || [];
     console.log(userGroups)
     // const { data, isLoading, isFetching } = useGetMyStudentsQuery({ page: page, limit: 10, searchTerm: searchText, userGroup: selectedGroup });
     const {
         data: studentsApi,
         isLoading: isStudentsLoading,
-    } = useGetStudentsForTeacherQuery({ 
-        page, 
-        searchTerm: debouncedSearchTerm, 
-        limit: 10, 
-        selectedGroup: selectedGroup ?? userGroups?.map((group: any) => group._id), 
-        selectedStatus 
+    } = useGetStudentsForTeacherQuery({
+        page,
+        searchTerm: debouncedSearchTerm,
+        limit: 10,
+        selectedGroup: selectedGroup ?? userGroups?.map((group: any) => group._id),
+        selectedStatus
     },
         { skip: !userGroups?.length }
     );
@@ -78,19 +78,43 @@ const MyStudent = () => {
             dataIndex: 'group',
             key: 'group',
             render: (_, record) => {
-                const groupName = Array.isArray(record?.userGroup) && record?.userGroup?.length > 0 ? record?.userGroup : [];
+                const groupName =
+                    Array.isArray(record?.userGroup) && record?.userGroup?.length > 0
+                        ? record?.userGroup
+                        : [];
 
-                return groupName?.length ? groupName.map((group: any, index: number) => (
-                    <span
-                        key={index}
-                        className="px-3 py-1 rounded-full text-xs font-medium bg-[#F3F4F6] text-[#6B7280]"
-                    >
-                        {group?.name}
-                    </span>
-                )) : (
+                const getGroupStyle = (name: string) => {
+                    switch (name) {
+                        case 'Beginners':
+                            return 'bg-green-100 text-green-700';
+
+                        case 'Skill Path':
+                            return 'bg-blue-100 text-blue-700';
+
+                        case 'Expedition':
+                            return 'bg-purple-100 text-purple-700';
+
+                        default:
+                            return 'bg-gray-100 text-gray-600';
+                    }
+                };
+
+                return groupName?.length ? (
+                    <div className="flex flex-wrap gap-2">
+                        {groupName.map((group: any, index: number) => (
+                            <span
+                                key={index}
+                                className={`px-3 py-1 rounded-full text-xs font-medium ${getGroupStyle(
+                                    group?.name
+                                )}`}
+                            >
+                                {group?.name}
+                            </span>
+                        ))}
+                    </div>
+                ) : (
                     <span className="text-gray-400 text-xs">N/A</span>
-                )
-
+                );
             },
         },
         {
@@ -202,7 +226,7 @@ const MyStudent = () => {
                     columns={columns}
                     loading={isStudentsLoading}
                     dataSource={studentsApi?.data}
-                    pagination={{ pageSize: 10, onChange: (page) => setPage(page), total: studentsApi?.data?.pagination?.total, current: studentsApi?.data?.pagination?.page }}
+                    pagination={{ pageSize: 10, onChange: (page) => setPage(page), total: studentsApi?.pagination?.total, current: studentsApi?.data?.pagination?.page }}
                     className="student-table"
                     rowClassName="hover:bg-gray-50/50 transition-colors"
                     onRow={() => ({
