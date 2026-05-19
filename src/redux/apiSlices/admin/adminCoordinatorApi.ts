@@ -34,11 +34,12 @@ const adminCoordinatorApi = api.injectEndpoints({
             }),
         }),
         getMentors: builder.query({
-            query: ({ page, searchTerm, limit }: { page?: number; searchTerm?: string; limit?: number }) => {
+            query: ({ page, searchTerm, limit, company }: { page?: number; searchTerm?: string; limit?: number; company?: string }) => {
                 const params = new URLSearchParams();
                 if (searchTerm) params.append('searchTerm', searchTerm);
                 params.append('page', (page ?? 1).toString());
                 params.append('limit', (limit ?? 10).toString());
+                if (company) params.append('company', company);
                 return {
                     url: `/admin-mentor?${params.toString()}`,
                     method: 'GET',

@@ -83,6 +83,7 @@ const CoordinatorDetailsModal: React.FC<CoordinatorDetailsModalProps> = ({ open,
                         </div>
                         <span className="font-medium">{coordinator.location || 'N/A'}</span>
                     </div>
+
                 </div>
 
                 {/* Professional Info */}
@@ -118,6 +119,12 @@ const CoordinatorDetailsModal: React.FC<CoordinatorDetailsModalProps> = ({ open,
                         <span className="font-medium">
                             Joined: {dayjs(coordinator.createdAt).format('MMMM D, YYYY')}
                         </span>
+                    </div>
+                    <div className="flex items-center gap-3 text-gray-600">
+                        <div className="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center text-purple-500">
+                            <Building size={16} />
+                        </div>
+                        <span className="font-medium">{coordinator?.company || 'N/A'}</span>
                     </div>
                 </div>
             </div>

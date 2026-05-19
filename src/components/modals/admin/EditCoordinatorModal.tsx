@@ -32,7 +32,8 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
     const { data: mentorsApi, isFetching: isMentorsLoading } = useGetMentorsQuery({
         page,
         limit: 10,
-        searchTerm
+        searchTerm,
+        company: coordinator?.company,
     }, { skip: !open });
 
     // Reset state when modal opens/closes
@@ -102,6 +103,7 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
                 status: coordinator.status,
                 assignedMentors: coordinator.assignedMentors?.map((m: any) => m._id) || [],
                 userGroup: coordinator.userGroup?.map((g: any) => g._id) || [],
+                company: coordinator.company,
             });
         }
     }, [open, coordinator, form]);
@@ -198,6 +200,9 @@ const EditCoordinatorModal: React.FC<EditCoordinatorModalProps> = ({
                         </Select>
                     </Form.Item>
                 </div>
+                <Form.Item label={<span className="font-semibold text-gray-700">Company Name</span>} name="company">
+                    <Input placeholder="Enter Company Name" className="h-11 rounded-md" />
+                </Form.Item>
                 <Form.Item
                     label={<span className="font-bold text-gray-700">Select Group</span>}
                     name="userGroup"

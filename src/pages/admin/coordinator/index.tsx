@@ -60,6 +60,12 @@ export default function AdminCoordinator() {
             render: (contact: string) => <span className="text-gray-500 font-medium">{contact || 'N/A'}</span>,
         },
         {
+            title: 'COMPANY',
+            dataIndex: 'company',
+            key: 'company',
+            render: (company: string) => <span className="text-gray-500 font-medium">{company ?? 'N/A'}</span>,
+        },
+        {
             title: 'ROLE',
             dataIndex: 'role',
             key: 'role',
