@@ -41,7 +41,7 @@ const Mentors = () => {
     const [isViewStudentsModalOpen, setIsViewStudentsModalOpen] = useState(false);
     const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
 
-    console.log(data?.data, 'all mentors')
+    // console.log(data?.data, 'all mentors')
     const mentorsData: Mentor[] =
         data?.data?.mentors?.map((mentor: any) => ({
             key: mentor._id,

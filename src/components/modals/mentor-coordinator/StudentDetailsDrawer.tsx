@@ -1,5 +1,5 @@
 import React from 'react';
-import { Drawer, Avatar, Typography, Tag, Descriptions } from 'antd';
+import { Drawer, Avatar, Typography, Tag, Descriptions, List } from 'antd';
 import {
     UserOutlined,
     MailOutlined,
@@ -8,6 +8,7 @@ import {
     LinkedinOutlined,
     GithubOutlined,
     GlobalOutlined,
+    AimOutlined,
 } from '@ant-design/icons';
 import { imageUrl } from '../../../redux/api/baseApi';
 
@@ -20,6 +21,7 @@ interface StudentDetailsDrawerProps {
 }
 
 const StudentDetailsDrawer: React.FC<StudentDetailsDrawerProps> = ({ open, onClose, student }) => {
+    // console.log(student)
     return (
         <Drawer
             title={<span className="text-xl font-bold">Student Profile Details</span>}
@@ -79,6 +81,23 @@ const StudentDetailsDrawer: React.FC<StudentDetailsDrawerProps> = ({ open, onClo
                             {student.githubProfile && <Descriptions.Item label={<span className="flex items-center gap-2 text-gray-800"><GithubOutlined /> GitHub</span>}><a href={student.githubProfile} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">View Profile</a></Descriptions.Item>}
                             {student.PortfolioWebsite && <Descriptions.Item label={<span className="flex items-center gap-2 text-indigo-600"><GlobalOutlined /> Website</span>}><a href={student.PortfolioWebsite} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">View Website</a></Descriptions.Item>}
                         </Descriptions>
+                    )}
+                    {student?.Goals && student?.Goals.length > 0 && (
+                        <div >
+                            <Title level={5} className="mb-2 text-gray-800"><AimOutlined className="text-blue-600 mr-2" /> Current Goals</Title>
+                            <List
+                                itemLayout="horizontal"
+                                dataSource={student?.Goals}
+                                renderItem={(goal: any) => (
+                                    <List.Item className="bg-blue-50 rounded-lg p-4 mb-3 border border-blue-100 !pl-4">
+                                        <List.Item.Meta
+                                            title={<span className="font-semibold text-gray-800">{goal.title}</span>}
+                                            description={<span className="text-gray-600 whitespace-pre-line mt-1 block">{goal.description}</span>}
+                                        />
+                                    </List.Item>
+                                )}
+                            />
+                        </div>
                     )}
 
                     {student.readBooks && (

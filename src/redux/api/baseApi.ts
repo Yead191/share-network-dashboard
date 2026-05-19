@@ -34,5 +34,5 @@ export const api = createApi({
 
 export const imageUrl = 'https://api.share-network.org/uploads';
 export const socketUrl = 'https://api.share-network.org';
-// export const imageUrl = 'http://10.10.7.11:8000/uploads';
-// export const socketUrl = 'http://10.10.7.11:8000';
+// export const imageUrl = 'http://10.10.7.50:8000/uploads';
+// export const socketUrl = 'http://10.10.7.50:8000';

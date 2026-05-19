@@ -16,7 +16,6 @@ import {
   UserOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
-import MentorDetailsModal from "./MentorDetailsModal";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../../../components/shared/Spinner";
 import { useProfileQuery } from "../../../../redux/apiSlices/authSlice";
@@ -26,11 +25,10 @@ const { Text } = Typography;
 const MentorTable = () => {
   const [searchText, setSearchText] = useState("");
   const { data, isLoading } = useProfileQuery({});
-  
+
   const navigate = useNavigate();
 
   const mentors = data?.data?.assignedMentors || [];
-  
   const handleViewDetails = (mentor: any) => {
     navigate(`/mentor-coordinator/mentors/${mentor._id}`);
   };
