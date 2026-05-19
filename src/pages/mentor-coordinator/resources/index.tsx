@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Table, Button, Input, Tag } from 'antd';
+import { Table, Button, Input, Tag, Select } from 'antd';
 import { Eye, BookOpen, ExternalLink, Download as DownloadIcon, Search } from 'lucide-react';
 import ResourceDetailsModal from '../../../components/modals/mentor/learning-materials/ResourceDetailsModal';
 import { useGetprofileQuery } from '../../../redux/apiSlices/students/overview.slice';
@@ -13,6 +13,7 @@ const CoordinatorResources = () => {
     const [selectedResource, setSelectedResource] = useState<any>();
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+    const [filterGroup, setFilterGroup] = useState<string | undefined>(undefined);
 
     // API CALLS
     const { data: userProfile, isLoading: isProfileLoading } = useGetprofileQuery({});
@@ -23,7 +24,7 @@ const CoordinatorResources = () => {
         isLoading: materialsLoading,
     } = useGetCoordinatorResourcesQuery(
         {
-            targertGroup: user?.userGroup?.map((group: any) => group._id),
+            targertGroup: filterGroup ?? user?.userGroup?.map((group: any) => group._id),
             page,
             searchTerm,
         },
@@ -182,17 +183,32 @@ const CoordinatorResources = () => {
         <section className="">
             <div className="flex justify-between items-center mb-6">
                 <HeaderTitle title="Coordinator Resources" />
-                <Input
-                    placeholder="Search resources..."
-                    value={searchTerm}
-                    onChange={(e) => {
-                        setSearchTerm(e.target.value);
-                        setPage(1);
-                    }}
-                    className="w-72 h-[42px] rounded-xl border-gray-100 shadow-sm"
-                    suffix={<Search size={18} className="text-gray-400" />}
-                    allowClear
-                />
+                <div className='flex items-center gap-4'>
+                    <Select
+                        placeholder="Select Group"
+                        className="w-full h-10"
+                        value={filterGroup}
+                        onChange={(v) => setFilterGroup(v)}
+                        allowClear
+                        options={user?.userGroup?.map((group: any) => ({
+                            value: group._id,
+                            label: group.name,
+                        }))}
+                        loading={isProfileLoading}
+                    />
+                    <Input
+                        placeholder="Search resources..."
+                        value={searchTerm}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            setPage(1);
+                        }}
+                        className="w-72 h-[42px] rounded-xl border-gray-100 shadow-sm"
+                        suffix={<Search size={18} className="text-gray-400" />}
+                        allowClear
+                    />
+
+                </div>
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">

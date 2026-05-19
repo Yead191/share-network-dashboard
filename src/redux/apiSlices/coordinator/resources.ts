@@ -7,10 +7,21 @@ const resourcesDetails = api.injectEndpoints({
       query: ({ targertGroup, page = 1, limit = 10, searchTerm, targetTrack, targeteAudience }: any) => {
         const params = new URLSearchParams();
         if (targeteAudience) params.append('targeteAudience', targeteAudience);
+        // if (targertGroup?.length) {
+        //   targertGroup.forEach((id: string, index: number) => {
+        //     params.append(`targertGroup[${index}]`, id);
+        //   });
+        // }
         if (targertGroup?.length) {
-          targertGroup.forEach((id: string, index: number) => {
-            params.append(`targertGroup[${index}]`, id);
-          });
+          if (targertGroup) {
+            const groups = Array.isArray(targertGroup)
+              ? targertGroup
+              : [targertGroup];
+
+            groups.forEach((id: string, index: number) => {
+              params.append(`targertGroup[${index}]`, id);
+            });
+          }
         }
         params.append('page', page.toString());
         params.append('limit', limit.toString());
