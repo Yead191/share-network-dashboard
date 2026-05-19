@@ -3,7 +3,7 @@ import { api } from '../../api/baseApi';
 const learningApi = api.injectEndpoints({
     endpoints: (build) => ({
         getLearningMaterials: build.query<any, any>({
-            query: ({ targertGroup, page = 1, limit = 10, searchTerm, targetTrack, targeteAudience }) => {
+            query: ({ targertGroup, page = 1, limit = 10, searchTerm, targetTrack, targeteAudience, sort }) => {
                 const params = new URLSearchParams();
                 if (targeteAudience) params.append('targeteAudience', targeteAudience);
                 if (targertGroup) params.append('targertGroup', targertGroup);
@@ -11,6 +11,7 @@ const learningApi = api.injectEndpoints({
                 params.append('limit', limit.toString());
                 if (searchTerm) params.append('searchTerm', searchTerm);
                 if (targetTrack) params.append('targetTrack', targetTrack);
+                if (sort) params.append('sort', sort);
 
                 return {
                     url: `/learning/all?${params.toString()}`,

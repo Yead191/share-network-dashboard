@@ -9,7 +9,8 @@ const adminMaterialsApi = api.injectEndpoints({
                 searchTerm,
                 targeteAudience,
                 targertGroup,
-                type
+                type,
+                sort
             }: {
                 page: number;
                 limit: number;
@@ -17,6 +18,7 @@ const adminMaterialsApi = api.injectEndpoints({
                 targeteAudience?: string;
                 targertGroup?: string;
                 type?: string;
+                sort?: string;
             }) => {
                 const params = new URLSearchParams({
                     page: String(page),
@@ -27,6 +29,8 @@ const adminMaterialsApi = api.injectEndpoints({
                 if (targeteAudience) params.append('targeteAudience', targeteAudience);
                 if (targertGroup) params.append('targertGroup', targertGroup);
                 if (type && type !== 'ALL') params.append('type', type);
+                if (sort) params.append('sort', sort);
+
                 return {
                     url: `/learning/all?${params.toString()}`,
                     method: 'GET',

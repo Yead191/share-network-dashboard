@@ -16,19 +16,21 @@ const AdminLearningMaterials = () => {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [selectedMaterial, setSelectedMaterial] = useState<any>(null);
     const [type, setType] = useState('ALL');
+    const [sortBy, setSortBy] = useState<string>('-createdAt');
 
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterAudience, setFilterAudience] = useState<string | undefined>(undefined);
     const [filterGroup, setFilterGroup] = useState<string | undefined>(undefined);
     // API CALLS
-    const { data: materialApi, refetch } = useGetMaterialsQuery({
+    const { data: materialApi, refetch, isLoading: materialsLoading } = useGetMaterialsQuery({
         page: page,
         limit: 10,
         searchTerm: searchTerm,
         targeteAudience: filterAudience,
         targertGroup: filterGroup,
         type,
+        sort: sortBy,
     });
     const { data: userGroupsApi } = useGetUserGroupsQuery({});
     const { data: userTracksApi } = useGetUserTracksQuery({});
@@ -274,12 +276,23 @@ const AdminLearningMaterials = () => {
                             setType(value);
                             setPage(1);
                         }}
-                        className="w-40 h-[40px]"
+                        className="w-28 2xl:w-40 h-[40px]"
                         options={[
                             { value: 'ALL', label: 'All Types' },
                             { value: 'LECTURE', label: 'Lectures' },
                             { value: 'SLIDES', label: 'Slides' },
                             { value: 'MATERIAL', label: 'Materials' },
+                        ]}
+                    />
+                    <Select
+                        value={sortBy}
+                        onChange={(val) => setSortBy(val)}
+                        className="w-44 2xl:w-48 h-[40px]"
+                        options={[
+                            { value: '-createdAt', label: 'Sort by: Newest' },
+                            { value: 'createdAt', label: 'Sort by: Oldest' },
+                            { value: 'title', label: 'Sort by: Name (A-Z)' },
+                            { value: '-title', label: 'Sort by: Name (Z-A)' },
                         ]}
                     />
                     <Popover
@@ -363,6 +376,7 @@ const AdminLearningMaterials = () => {
                 <Table
                     columns={columns}
                     dataSource={materialsData}
+                    loading={materialsLoading}
                     pagination={{
                         current: page,
                         pageSize: 10,

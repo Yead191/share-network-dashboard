@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Table, Button, Input, Tag } from 'antd';
+import { Table, Button, Input, Tag, Tabs, Select } from 'antd';
 import { Eye, BookOpen, ExternalLink, Download as DownloadIcon, Search } from 'lucide-react';
 import AddResourceModal from '../../../components/modals/mentor/learning-materials/AddResourceModal';
 import ResourceDetailsModal from '../../../components/modals/mentor/learning-materials/ResourceDetailsModal';
@@ -16,6 +16,9 @@ const LearningMaterials = () => {
     const [selectedResource, setSelectedResource] = useState();
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+    const [activeTab, setActiveTab] = useState<'MENTOR' | 'STUDENT'>('MENTOR');
+    const [sortBy, setSortBy] = useState<string>('-createdAt');
+
     // API CALLS
     const { data: userProfile, isLoading } = useGetprofileQuery({});
 
@@ -28,9 +31,10 @@ const LearningMaterials = () => {
     } = useGetLearningMaterialsQuery(
         {
             targertGroup: user?.userGroup?.[0]?._id,
-            targeteAudience: 'MENTOR',
+            targeteAudience: activeTab,
             page,
             searchTerm,
+            sort: sortBy,
             ...(user?.userGroupTrack?._id && {
                 targetTrack: user.userGroupTrack._id,
             }),
@@ -185,20 +189,52 @@ const LearningMaterials = () => {
     }
     return (
         <section className="">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">Mentor Resources</h1>
+                    <h1 className="text-2xl font-bold text-gray-800">Learning Materials</h1>
                     <p className="text-gray-500 mt-1">Access curriculum guides, roadmaps, and templates.</p>
                 </div>
-                <Input
-                    placeholder="Search materials"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-64 h-[40px]"
-                    suffix={<Search size={16} className="text-gray-400" />}
-                    allowClear
-                />
+                <div className="flex items-center gap-3">
+                    <Select
+                        value={sortBy}
+                        onChange={(val) => setSortBy(val)}
+                        className="w-48 h-[40px]"
+                        options={[
+                            { value: '-createdAt', label: 'Sort by: Newest' },
+                            { value: 'createdAt', label: 'Sort by: Oldest' },
+                            { value: 'title', label: 'Sort by: Name (A-Z)' },
+                            { value: '-title', label: 'Sort by: Name (Z-A)' },
+                        ]}
+                    />
+                    <Input
+                        placeholder="Search materials"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-64 h-[40px]"
+                        suffix={<Search size={16} className="text-gray-400" />}
+                        allowClear
+                    />
+                </div>
             </div>
+
+            <Tabs
+                activeKey={activeTab}
+                onChange={(key) => {
+                    setActiveTab(key as 'MENTOR' | 'STUDENT');
+                    setPage(1);
+                }}
+                className="mb-4"
+                items={[
+                    {
+                        key: 'MENTOR',
+                        label: <span className="font-semibold px-2">Mentor Materials</span>,
+                    },
+                    {
+                        key: 'STUDENT',
+                        label: <span className="font-semibold px-2">Student Materials</span>,
+                    },
+                ]}
+            />
 
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
                 <Table
@@ -213,6 +249,7 @@ const LearningMaterials = () => {
                             setPage(page);
                         },
                     }}
+                    loading={materialsLoading}
                     className="custom-table"
                 />
             </div>
