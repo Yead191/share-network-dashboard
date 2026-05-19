@@ -56,4 +56,4 @@ const overviewAnalytics = api.injectEndpoints({
 });
 
 
-export const { useGetstudentOverviewQuery, useGetprofileQuery, useGetUpcomingSessionsQuery, useGetActiveAssignmentsQuery } = overviewAnalytics;
+export const { useGetstudentOverviewQuery, useGetprofileQuery, useGetUpcomingSessionsQuery, useGetActiveAssignmentsQuery, useGetprofileByIdQuery } = overviewAnalytics;

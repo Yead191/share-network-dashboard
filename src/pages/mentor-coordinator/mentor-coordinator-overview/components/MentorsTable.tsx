@@ -17,29 +17,22 @@ import {
   EyeOutlined,
 } from "@ant-design/icons";
 import MentorDetailsModal from "./MentorDetailsModal";
+import { useNavigate } from "react-router-dom";
 import Spinner from "../../../../components/shared/Spinner";
 import { useProfileQuery } from "../../../../redux/apiSlices/authSlice";
 
 const { Text } = Typography;
 
-
-
 const MentorTable = () => {
   const [searchText, setSearchText] = useState("");
   const { data, isLoading } = useProfileQuery({});
-  const [selectedMentor, setSelectedMentor] = useState<any | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  
+  const navigate = useNavigate();
 
   const mentors = data?.data?.assignedMentors || [];
-  console.log(mentors)
+  
   const handleViewDetails = (mentor: any) => {
-    setSelectedMentor(mentor);
-    setModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
-    setSelectedMentor(null);
+    navigate(`/mentor-coordinator/mentors/${mentor._id}`);
   };
 
   const filteredData = mentors?.filter((mentor: any) => {
@@ -237,13 +230,6 @@ const MentorTable = () => {
           }}
         />
       </Card>
-
-      {/* Details Modal */}
-      <MentorDetailsModal
-        mentor={selectedMentor}
-        open={modalOpen}
-        onClose={handleCloseModal}
-      />
     </>
   );
 };

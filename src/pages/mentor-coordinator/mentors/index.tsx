@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Table, Button, Select, Space, Input } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { FilterOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
-import MentorDetailsModal from '../../../components/modals/mentor-coordinator/MentorDetailsModal';
 import StudentDetailsModal from '../../../components/modals/mentor-coordinator/StudentDetailsModal';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
 import { useGetAllMentorsQuery } from '../../../redux/apiSlices/coordinator/overViewSlice';
@@ -39,7 +39,6 @@ const Mentors = () => {
     });
 
     const [isViewStudentsModalOpen, setIsViewStudentsModalOpen] = useState(false);
-    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
 
     console.log(data?.data, 'all mentors')
@@ -55,14 +54,15 @@ const Mentors = () => {
             assignedStudents: mentor.assignedStudents || [],
         })) || [];
 
+    const navigate = useNavigate();
+
     const handleViewStudents = (mentor: Mentor) => {
         setSelectedMentor(mentor);
         setIsViewStudentsModalOpen(true);
     };
 
     const handleDetails = (mentor: Mentor) => {
-        setSelectedMentor(mentor);
-        setIsDetailsModalOpen(true);
+        navigate(`/mentor-coordinator/mentors/${mentor.key}`);
     };
 
     const columns: ColumnsType<Mentor> = [
@@ -186,11 +186,6 @@ const Mentors = () => {
             </div>
 
             {/* ===== Mentor Details Modal ===== */}
-            <MentorDetailsModal
-                isOpen={isDetailsModalOpen}
-                onClose={() => setIsDetailsModalOpen(false)}
-                mentor={selectedMentor}
-            />
             <StudentDetailsModal
                 isOpen={isViewStudentsModalOpen}
                 onClose={() => setIsViewStudentsModalOpen(false)}

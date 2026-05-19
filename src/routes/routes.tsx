@@ -45,6 +45,8 @@ import MentorTable from '../pages/mentor-coordinator/mentor-coordinator-overview
 import TeacherClassSchedule from '../pages/teacher/class-schedule';
 import TeacherResources from '../pages/teacher/resources';
 
+import MentorDetailsPage from '../pages/mentor-coordinator/mentors/details/index';
+
 const router = createBrowserRouter([
     {
         path: '/',
@@ -231,6 +233,14 @@ const router = createBrowserRouter([
                 element: (
                     <PrivateRoute role="coordinator">
                         <MentorTable />
+                    </PrivateRoute>
+                ),
+            },
+            {
+                path: '/mentor-coordinator/mentors/:id',
+                element: (
+                    <PrivateRoute role="coordinator">
+                        <MentorDetailsPage />
                     </PrivateRoute>
                 ),
             },
