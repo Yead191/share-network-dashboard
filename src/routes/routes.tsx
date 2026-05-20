@@ -46,6 +46,7 @@ import TeacherClassSchedule from '../pages/teacher/class-schedule';
 import TeacherResources from '../pages/teacher/resources';
 
 import MentorDetailsPage from '../pages/mentor-coordinator/mentors/details/index';
+import PrivacyPolicy from '../pages/authentication/PrivacyPolicy';
 
 const router = createBrowserRouter([
     {
@@ -423,6 +424,7 @@ const router = createBrowserRouter([
     { path: '/forget-password', element: <ForgetPassword /> },
     { path: '/verify-otp', element: <VerifyOtp /> },
     { path: '/new-password', element: <NewPassword /> },
+    { path: '/privacy-policy', element: <PrivacyPolicy /> },
 ]);
 
 export default router;

@@ -1,5 +1,6 @@
 import React from 'react';
 import { HiOutlineShieldCheck } from 'react-icons/hi2';
+import { Link } from 'react-router-dom';
 
 interface AuthSidebarProps {
     backgroundImage: string;
@@ -26,6 +27,16 @@ const AuthSidebar: React.FC<AuthSidebarProps> = ({ backgroundImage }) => {
                         Secure access to manage users, content, and platform settings. Monitor analytics and oversee the
                         entire Share Network ecosystem
                     </p>
+                </div>
+                {/* Privacy Policy Link */}
+                <div className="absolute bottom-8 text-sm text-white/70">
+                    By continuing, you agree to our{" "}
+                    <Link
+                        to="/privacy-policy"
+                        className="text-white underline underline-offset-2 hover:text-white/90 transition-colors"
+                    >
+                        Privacy Policy
+                    </Link>
                 </div>
             </div>
         </div>
