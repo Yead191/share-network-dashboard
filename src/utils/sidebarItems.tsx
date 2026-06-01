@@ -13,7 +13,7 @@ import {
 import { PiStudent, PiChalkboardTeacher } from 'react-icons/pi';
 import { GiTeacher } from 'react-icons/gi';
 import { MdOutlineEventNote, MdOutlineAssignment } from 'react-icons/md';
-import { TbReportAnalytics } from 'react-icons/tb';
+import { TbBriefcase, TbReportAnalytics } from 'react-icons/tb';
 import { AiOutlineSchedule } from 'react-icons/ai';
 import { ShieldCheck } from 'lucide-react';
 
@@ -77,6 +77,12 @@ export const adminSidebarItems: TSidebarItem[] = [
         label: 'Weekly Report',
         path: 'admin/weekly-report',
         icon: <TbReportAnalytics size={20} />,
+    },
+    {
+        key: 'internships',
+        label: 'Internships',
+        path: 'admin/internships',
+        icon: <TbBriefcase size={20} />,
     },
     {
         key: 'profile',

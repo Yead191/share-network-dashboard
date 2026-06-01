@@ -48,6 +48,8 @@ const Student = () => {
     const userTracks = userTracksApi?.data;
     const pagination = studentsApi?.data?.pagination;
 
+    // console.log(studentsApi)
+
     const handleDeleteStudent = async () => {
         if (!selectedStudent?._id) return;
 

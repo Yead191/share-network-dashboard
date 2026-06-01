@@ -47,6 +47,7 @@ import TeacherResources from '../pages/teacher/resources';
 
 import MentorDetailsPage from '../pages/mentor-coordinator/mentors/details/index';
 import PrivacyPolicy from '../pages/authentication/PrivacyPolicy';
+import InternshipPage from '../pages/admin/Internship/InternshipPage';
 
 const router = createBrowserRouter([
     {
@@ -141,6 +142,14 @@ const router = createBrowserRouter([
                 element: (
                     <PrivateRoute role={['admin', 'super_admin']}>
                         <AdminWeeklyReport />
+                    </PrivateRoute>
+                ),
+            },
+            {
+                path: '/admin/internships',
+                element: (
+                    <PrivateRoute role={['admin', 'super_admin']}>
+                        <InternshipPage />
                     </PrivateRoute>
                 ),
             },
