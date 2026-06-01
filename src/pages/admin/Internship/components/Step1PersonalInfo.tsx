@@ -45,22 +45,55 @@ export const Step1PersonalInfo: React.FC<Step1Props> = ({
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [page, setPage] = useState(1);
+  const [allStudents, setAllStudents] = useState<StudentFromApi[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+
   useEffect(() => {
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(() => setDebouncedSearch(search), 350);
+    debounceTimer.current = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 350);
     return () => { if (debounceTimer.current) clearTimeout(debounceTimer.current); };
   }, [search]);
 
   const { data, isFetching } = useGetStudentsQuery({
     searchTerm: debouncedSearch,
     limit: 20,
-    page: 1,
+    page,
   });
 
-  const students: StudentFromApi[] = data?.data?.data ?? [];
+  useEffect(() => {
+    if (data?.data?.data) {
+      const newStudents = data.data.data;
+      setAllStudents((prev) => {
+        if (page === 1) {
+          return newStudents;
+        }
+        const existingIds = new Set(prev.map(s => s._id));
+        const uniqueNew = newStudents.filter((s: StudentFromApi) => !existingIds.has(s._id));
+        return [...prev, ...uniqueNew];
+      });
+    }
+  }, [data, page]);
+
+  useEffect(() => {
+    if (data?.data?.pagination) {
+      const { total } = data.data.pagination;
+      setHasMore(allStudents.length < total);
+    }
+  }, [allStudents.length, data]);
+
+  const handlePopupScroll = (e: any) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    if (scrollHeight - scrollTop <= clientHeight + 10 && hasMore && !isFetching) {
+      setPage(prev => prev + 1);
+    }
+  };
 
   const handleStudentChange = (value: string) => {
-    const student = students.find((s) => s._id === value || s.id === value);
+    const student = allStudents.find((s) => s._id === value || s.id === value);
     if (student) onStudentSelect(student);
   };
 
@@ -90,13 +123,24 @@ export const Step1PersonalInfo: React.FC<Step1Props> = ({
           filterOption={false}
           onSearch={setSearch}
           onChange={handleStudentChange}
-          notFoundContent={isFetching ? <Spin size="small" /> : 'No students found'}
+          notFoundContent={isFetching && page === 1 ? <Spin size="small" /> : 'No students found'}
           value={selectedStudent?._id ?? undefined}
           size="large"
-          suffixIcon={isFetching ? <Spin size="small" /> : <SearchOutlined />}
+          suffixIcon={isFetching && page === 1 ? <Spin size="small" /> : <SearchOutlined />}
           optionLabelProp="label"
+          onPopupScroll={handlePopupScroll}
+          dropdownRender={(menu) => (
+            <>
+              {menu}
+              {isFetching && page > 1 && (
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '8px' }}>
+                  <Spin size="small" />
+                </div>
+              )}
+            </>
+          )}
         >
-          {students.map((s) => (
+          {allStudents.map((s) => (
             <Select.Option
               key={s._id}
               value={s._id}
