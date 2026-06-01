@@ -154,7 +154,8 @@ export const InternshipFormPage: React.FC<InternshipFormPageProps> = ({
 
   const handleFinish = async () => {
     try {
-      const allValues = await form.validateFields();
+      await form.validateFields();
+      const allValues = form.getFieldsValue(true);
 
       // Build FormData-compatible object (serialize dates, handle file)
       const cvFile = cvFileList[0]?.originFileObj;
@@ -384,7 +385,7 @@ export const InternshipFormPage: React.FC<InternshipFormPageProps> = ({
           </Tag>
         </div>
 
-        <Form form={form} layout="vertical" size="middle" requiredMark="optional">
+        <Form form={form} layout="vertical" size="middle" requiredMark="optional" preserve={true}>
           {renderStep()}
         </Form>
       </div>
