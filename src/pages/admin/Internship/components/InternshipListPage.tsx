@@ -27,6 +27,7 @@ import {
 } from '@ant-design/icons';
 import type { InternshipRecord } from '../../../../types/internship.types';
 import { getImageUrl } from '../../../../utils/getImageUrl';
+import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 
 const { Title, Text } = Typography;
 
@@ -51,6 +52,8 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
 }) => {
   const [search, setSearch] = useState('');
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [recordToDelete, setRecordToDelete] = useState<InternshipRecord | null>(null);
 
 
 
@@ -64,10 +67,28 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
     );
   });
 
-  const handleDelete = async (id: string) => {
+  const handleDeleteClick = (record: InternshipRecord) => {
+    setRecordToDelete(record);
+    setDeleteModalVisible(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!recordToDelete) return;
+
+    const id = recordToDelete.id || recordToDelete._id || '';
     setDeleteLoadingId(id);
-    await onDelete(id);
-    setDeleteLoadingId(null);
+    try {
+      await onDelete(id);
+      setDeleteModalVisible(false);
+      setRecordToDelete(null);
+    } finally {
+      setDeleteLoadingId(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteModalVisible(false);
+    setRecordToDelete(null);
   };
 
   const columns: ColumnsType<InternshipRecord> = [
@@ -246,7 +267,7 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
                 icon: <DeleteOutlined style={{ fontSize: 14 }} />,
                 label: deleteLoadingId === (r.id || r._id) ? 'Deleting…' : 'Delete Profile',
                 danger: true,
-                onClick: () => handleDelete(r.id || r._id || ''),
+                onClick: () => handleDeleteClick(r),
               },
             ]
             : []),
@@ -414,6 +435,19 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
           })}
         />
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {recordToDelete && (
+        <DeleteConfirmationModal
+          open={deleteModalVisible}
+          recordName={recordToDelete.studentName}
+          recordEmail={recordToDelete.email}
+          recordAvatar={recordToDelete.studentAvatar}
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+          loading={deleteLoadingId === (recordToDelete.id || recordToDelete._id)}
+        />
+      )}
     </div>
   );
 };
