@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Form,
   Input,
@@ -6,7 +6,6 @@ import {
   DatePicker,
   Divider,
   Button,
-  Tag,
   Space,
   Typography,
 } from 'antd';
@@ -82,7 +81,6 @@ export const Step2Education: React.FC<{ form: ReturnType<typeof Form.useForm>[0]
 const LANGUAGE_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'Native'];
 
 export const Step3Skills: React.FC = () => {
-  const [skillInput, setSkillInput] = useState('');
 
   return (
     <div>

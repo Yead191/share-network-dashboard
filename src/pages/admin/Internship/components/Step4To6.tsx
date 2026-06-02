@@ -35,6 +35,7 @@ export const Step4Evaluation: React.FC = () => {
           label="Overall Score (out of 10)"
           name="overallScore"
           extra={<Text type="secondary" style={{ fontSize: 12 }}>Enter a score from 1 to 10</Text>}
+          rules={[{ required: true, message: 'Overall score is required' }]}
         >
           <InputNumber
             min={1}
@@ -47,7 +48,7 @@ export const Step4Evaluation: React.FC = () => {
         </Form.Item>
 
         <div>
-          <Form.Item label="Performance Rating" name="performanceRating" style={{ marginBottom: 4 }}>
+          <Form.Item label="Performance Rating" name="performanceRating" style={{ marginBottom: 4 }} rules={[{ required: true, message: 'Performance rating is required' }]}>
             <Rate
               count={5}
               style={{ fontSize: 28, color: '#f59e0b' }}

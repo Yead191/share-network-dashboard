@@ -62,8 +62,16 @@ const InternshipPage: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (!isAdmin) return;
     try {
-      await deleteInternship({ id }).unwrap();
-      refetch();
+      toast.promise(deleteInternship({ id }).unwrap(), {
+        loading: "Deleting internship profile...",
+        success: (res) => {
+          refetch();
+          return res?.message || "Internship profile deleted successfully!";
+        },
+        error: (err) => {
+          return err?.message || "Failed to delete internship profile!";
+        },
+      });
     } catch (err) {
       console.error('Delete failed:', err);
     }
@@ -71,6 +79,7 @@ const InternshipPage: React.FC = () => {
 
   const handleSubmit = async (formData: FormData) => {
     setSubmitting(true);
+
     try {
       if (view === 'create') {
         toast.promise(createInternship(formData).unwrap(), {
@@ -82,11 +91,28 @@ const InternshipPage: React.FC = () => {
             return res?.message || "Internship created successfully!";
           },
           error: (err) => {
-            return err?.message || "Failed to create internship!";
+            // Enhanced error handling for validation errors
+            if (err?.errorMessages?.length > 0) {
+              const errorList = err.errorMessages
+                .map((e: any) => e.message)
+                .join("\n");
+
+              return `${err.message || "Validation Error"}\n${errorList}`;
+            }
+
+            if (err?.message) {
+              return err.message;
+            }
+
+            return "Failed to create internship!";
           },
-        })
-      } else if (view === 'edit' && editingRecord) {
-        toast.promise(updateInternship({ id: editingRecord.id || editingRecord._id || '', data: formData }).unwrap(), {
+        });
+      }
+      else if (view === 'edit' && editingRecord) {
+        toast.promise(updateInternship({
+          id: editingRecord.id || editingRecord._id || '',
+          data: formData
+        }).unwrap(), {
           loading: "Updating internship...",
           success: (res) => {
             refetch();
@@ -94,11 +120,26 @@ const InternshipPage: React.FC = () => {
             setEditingRecord(null);
             return res?.message || "Internship updated successfully!";
           },
-          error: "Failed to update internship!",
-        })
+          error: (err) => {
+            if (err?.errorMessages?.length > 0) {
+              const errorList = err.errorMessages
+                .map((e: any) => e.message)
+                .join("\n");
+
+              return `${err.message || "Validation Error"}\n${errorList}`;
+            }
+
+            if (err?.message) {
+              return err.message;
+            }
+
+            return "Failed to update internship!";
+          },
+        });
       }
     } catch (err) {
       console.error('Submit failed:', err);
+      toast.error("An unexpected error occurred");
     } finally {
       setSubmitting(false);
     }

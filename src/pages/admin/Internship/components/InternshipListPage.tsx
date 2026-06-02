@@ -7,14 +7,13 @@ import {
   Tag,
   Space,
   Typography,
-  Popconfirm,
   Rate,
-  Tooltip,
   Badge,
   Empty,
-  message,
+  Dropdown,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
+import type { MenuProps } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -24,6 +23,7 @@ import {
   UserOutlined,
   FilePdfOutlined,
   DownloadOutlined,
+  MoreOutlined,
 } from '@ant-design/icons';
 import type { InternshipRecord } from '../../../../types/internship.types';
 import { getImageUrl } from '../../../../utils/getImageUrl';
@@ -68,7 +68,6 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
     setDeleteLoadingId(id);
     await onDelete(id);
     setDeleteLoadingId(null);
-    message.success('Internship profile deleted.');
   };
 
   const columns: ColumnsType<InternshipRecord> = [
@@ -202,64 +201,88 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
     {
       title: 'Actions',
       key: 'actions',
-      width: 150,
+      width: 90,
       fixed: 'right',
-      render: (_, r) => (
-        <Space size={4}>
-          <Tooltip title="View Profile">
+      align: 'center',
+      render: (_, r) => {
+        const items: MenuProps['items'] = [
+          {
+            key: 'view',
+            icon: <EyeOutlined style={{ fontSize: 14 }} />,
+            label: 'View Profile',
+            onClick: () => onView(r),
+          },
+          ...(r.cv || r.cvFileUrl
+            ? [
+              {
+                key: 'download',
+                icon: <DownloadOutlined style={{ fontSize: 14 }} />,
+                label: (
+                  <a
+                    href={getImageUrl(r.cv || r.cvFileUrl || '')}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ color: 'inherit', textDecoration: 'none' }}
+                  >
+                    Download CV
+                  </a>
+                ),
+              },
+            ]
+            : []),
+          ...(isAdmin
+            ? [
+              { type: 'divider' as const },
+              {
+                key: 'edit',
+                icon: <EditOutlined style={{ fontSize: 14 }} />,
+                label: 'Edit Profile',
+                onClick: () => onEdit(r),
+              },
+              {
+                key: 'delete',
+                icon: <DeleteOutlined style={{ fontSize: 14 }} />,
+                label: deleteLoadingId === (r.id || r._id) ? 'Deleting…' : 'Delete Profile',
+                danger: true,
+                onClick: () => handleDelete(r.id || r._id || ''),
+              },
+            ]
+            : []),
+        ];
+
+        return (
+          <Dropdown
+            menu={{
+              items,
+              style: {
+                minWidth: 180,
+                borderRadius: 10,
+                padding: '6px 0',
+                boxShadow: '0 6px 24px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)',
+              },
+            }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
             <Button
               type="text"
-              icon={<EyeOutlined />}
+              icon={<MoreOutlined style={{ fontSize: 18, fontWeight: 700 }} />}
               size="small"
-              onClick={() => onView(r)}
+              style={{
+                borderRadius: 8,
+                width: 32,
+                height: 32,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease',
+              }}
             />
-          </Tooltip>
-
-          {(r.cv || r.cvFileUrl) && (
-            <Tooltip title="Download CV">
-              <Button
-                type="text"
-                icon={<DownloadOutlined />}
-                size="small"
-                href={getImageUrl(r.cv || r.cvFileUrl || '')}
-                target="_blank"
-                download
-              />
-            </Tooltip>
-          )}
-
-          {isAdmin && (
-            <>
-              <Tooltip title="Edit">
-                <Button
-                  type="text"
-                  icon={<EditOutlined />}
-                  size="small"
-                  onClick={() => onEdit(r)}
-                />
-              </Tooltip>
-              <Tooltip title="Delete">
-                <Popconfirm
-                  title="Delete this internship profile?"
-                  description="This action cannot be undone."
-                  onConfirm={() => handleDelete(r.id || r._id || '')}
-                  okText="Delete"
-                  okButtonProps={{ danger: true }}
-                  cancelText="Cancel"
-                >
-                  <Button
-                    type="text"
-                    danger
-                    icon={<DeleteOutlined />}
-                    size="small"
-                    loading={deleteLoadingId === (r.id || r._id)}
-                  />
-                </Popconfirm>
-              </Tooltip>
-            </>
-          )}
-        </Space>
-      ),
+          </Dropdown>
+        );
+      },
     },
   ];
 
