@@ -407,12 +407,11 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
         <Table
           columns={columns}
           dataSource={filtered}
-          rowKey="id"
+          rowKey="_id"
           loading={loading}
           scroll={{ x: 1200 }}
           pagination={{
             pageSize: 10,
-            showSizeChanger: true,
             showTotal: (total) => `Total ${total} profiles`,
           }}
           locale={{
