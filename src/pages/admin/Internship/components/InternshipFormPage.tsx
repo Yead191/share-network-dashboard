@@ -241,8 +241,8 @@ export const InternshipFormPage: React.FC<InternshipFormPageProps> = ({
       if (studentAvatar) formData.append('studentAvatar', studentAvatar);
 
       // Log formData entries for debugging
-      console.log('=== InternshipFormData ===');
-      formData.forEach((v, k) => console.log(`${k}:`, v));
+      // console.log('=== InternshipFormData ===');
+      // formData.forEach((v, k) => console.log(`${k}:`, v));
 
       await onSubmit(formData);
     } catch (err) {

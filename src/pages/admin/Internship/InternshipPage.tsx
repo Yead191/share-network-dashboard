@@ -89,19 +89,21 @@ const InternshipPage: React.FC = () => {
             setView('list');
             setEditingRecord(null);
             return res?.message || "Internship created successfully!";
+
           },
           error: (err) => {
+            // console.log(err)
             // Enhanced error handling for validation errors
-            if (err?.errorMessages?.length > 0) {
-              const errorList = err.errorMessages
-                .map((e: any) => e.message)
-                .join("\n");
+            // if (err?.data?.errorMessages?.length > 0) {
+            //   const errorList = err.data.errorMessages
+            //     .map((e: any) => e.message)
+            //     .join("\n");
 
-              return `${err.message || "Validation Error"}\n${errorList}`;
-            }
+            //   return `${err.data.message || "Validation Error"}\n${errorList}`;
+            // }
 
-            if (err?.message) {
-              return err.message;
+            if (err?.data?.message) {
+              return err.data.message;
             }
 
             return "Failed to create internship!";
@@ -115,10 +117,12 @@ const InternshipPage: React.FC = () => {
         }).unwrap(), {
           loading: "Updating internship...",
           success: (res) => {
+
             refetch();
             setView('list');
             setEditingRecord(null);
             return res?.message || "Internship updated successfully!";
+
           },
           error: (err) => {
             if (err?.errorMessages?.length > 0) {
@@ -133,7 +137,7 @@ const InternshipPage: React.FC = () => {
               return err.message;
             }
 
-            return "Failed to update internship!";
+            // return "Failed to update internship!";
           },
         });
       }
