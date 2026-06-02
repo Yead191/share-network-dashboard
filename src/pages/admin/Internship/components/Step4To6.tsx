@@ -46,25 +46,27 @@ export const Step4Evaluation: React.FC = () => {
           />
         </Form.Item>
 
-        <Form.Item label="Performance Rating" name="performanceRating">
-          <Rate
-            count={5}
-            style={{ fontSize: 28, color: '#f59e0b' }}
-            character={({ index }: { index?: number }) => (
-              <span style={{ fontSize: 28 }}>⭐</span>
-            )}
-          />
+        <div>
+          <Form.Item label="Performance Rating" name="performanceRating" style={{ marginBottom: 4 }}>
+            <Rate
+              count={5}
+              style={{ fontSize: 28, color: '#f59e0b' }}
+              character={() => (
+                <span style={{ fontSize: 28 }}>⭐</span>
+              )}
+            />
+          </Form.Item>
           <Form.Item noStyle shouldUpdate={(p, c) => p.performanceRating !== c.performanceRating}>
             {({ getFieldValue }) => {
               const r = getFieldValue('performanceRating');
               return r ? (
-                <Text style={{ display: 'block', marginTop: 4, color: '#6b7280', fontSize: 13 }}>
+                <Text style={{ display: 'block', color: '#6b7280', fontSize: 13, marginBottom: 24 }}>
                   {r} – {RATING_LABELS[r - 1]}
                 </Text>
               ) : null;
             }}
           </Form.Item>
-        </Form.Item>
+        </div>
       </div>
 
       <Form.Item label="Strengths" name="strengths">

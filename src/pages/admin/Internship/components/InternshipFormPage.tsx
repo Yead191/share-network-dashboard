@@ -4,7 +4,6 @@ import {
   Steps,
   Button,
   Typography,
-  message,
   Avatar,
   Tag,
 } from 'antd';
@@ -29,6 +28,7 @@ import { Step2Education, Step3Skills } from './Step2And3Education';
 import { Step4Evaluation, Step5Residency } from './Step4To6';
 import { Step7Preferences, Step8Compliance, Step9Notes } from './Step7To9';
 import type { InternshipRecord, InternshipFormValues, StudentFromApi } from '../../../../types/internship.types';
+import { toast } from 'sonner';
 
 const { Title, Text } = Typography;
 
@@ -46,7 +46,7 @@ const STEPS = [
 interface InternshipFormPageProps {
   mode: 'create' | 'edit';
   initialData?: InternshipRecord;
-  onSubmit: (values: InternshipFormValues, studentName: string, studentAvatar?: string) => Promise<void>;
+  onSubmit: (formData: FormData) => Promise<void>;
   onCancel: () => void;
   submitting: boolean;
 }
@@ -217,7 +217,14 @@ export const InternshipFormPage: React.FC<InternshipFormPageProps> = ({
       const formData = new FormData();
       Object.entries(formValues).forEach(([key, val]) => {
         if (val === undefined || val === null) return;
-        if (Array.isArray(val)) {
+        if (key === 'languages') {
+          const langs = val as { language: string; level: string }[];
+          langs.forEach((lang, index) => {
+            if (lang.language && lang.level) {
+              formData.append(`languages[${index}]`, JSON.stringify(lang));
+            }
+          });
+        } else if (Array.isArray(val)) {
           formData.append(key, JSON.stringify(val));
         } else {
           formData.append(key, String(val));
@@ -225,18 +232,21 @@ export const InternshipFormPage: React.FC<InternshipFormPageProps> = ({
       });
       if (cvFile) formData.append('cv', cvFile);
 
+      const studentName = selectedStudent
+        ? `${selectedStudent.firstName} ${selectedStudent.lastName}`
+        : formValues.fullName;
+      const studentAvatar = selectedStudent?.profile ?? initialData?.studentAvatar;
+
+      formData.append('studentName', studentName);
+      if (studentAvatar) formData.append('studentAvatar', studentAvatar);
+
       // Log formData entries for debugging
       console.log('=== InternshipFormData ===');
       formData.forEach((v, k) => console.log(`${k}:`, v));
 
-      const studentName = selectedStudent
-        ? `${selectedStudent.firstName} ${selectedStudent.lastName}`
-        : formValues.fullName;
-
-      await onSubmit(formValues, studentName, selectedStudent?.profile);
-      message.success(mode === 'create' ? 'Internship profile created!' : 'Internship profile updated!');
+      await onSubmit(formData);
     } catch (err) {
-      message.error('Please fill in all required fields before submitting.');
+      toast.error('Please fill in all required fields before submitting.');
     }
   };
 

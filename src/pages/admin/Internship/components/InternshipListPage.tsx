@@ -22,8 +22,11 @@ import {
   DeleteOutlined,
   EyeOutlined,
   UserOutlined,
+  FilePdfOutlined,
+  DownloadOutlined,
 } from '@ant-design/icons';
 import type { InternshipRecord } from '../../../../types/internship.types';
+import { getImageUrl } from '../../../../utils/getImageUrl';
 
 const { Title, Text } = Typography;
 
@@ -48,6 +51,8 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
 }) => {
   const [search, setSearch] = useState('');
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
+
+
 
   const filtered = records.filter((r) => {
     const q = search.toLowerCase();
@@ -116,6 +121,28 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
       },
     },
     {
+      title: 'CV',
+      key: 'cv',
+      width: 110,
+      render: (_, r) => {
+        const cvPath = r.cv || r.cvFileUrl;
+        return cvPath ? (
+          <Button
+            type="link"
+            icon={<FilePdfOutlined />}
+            href={getImageUrl(cvPath)}
+            target="_blank"
+            download
+            style={{ padding: 0 }}
+          >
+            Download
+          </Button>
+        ) : (
+          <Text type="secondary">—</Text>
+        );
+      },
+    },
+    {
       title: 'Rating',
       dataIndex: 'performanceRating',
       key: 'performanceRating',
@@ -175,7 +202,7 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
     {
       title: 'Actions',
       key: 'actions',
-      width: 130,
+      width: 150,
       fixed: 'right',
       render: (_, r) => (
         <Space size={4}>
@@ -187,6 +214,19 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
               onClick={() => onView(r)}
             />
           </Tooltip>
+
+          {(r.cv || r.cvFileUrl) && (
+            <Tooltip title="Download CV">
+              <Button
+                type="text"
+                icon={<DownloadOutlined />}
+                size="small"
+                href={getImageUrl(r.cv || r.cvFileUrl || '')}
+                target="_blank"
+                download
+              />
+            </Tooltip>
+          )}
 
           {isAdmin && (
             <>
@@ -202,7 +242,7 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
                 <Popconfirm
                   title="Delete this internship profile?"
                   description="This action cannot be undone."
-                  onConfirm={() => handleDelete(r.id)}
+                  onConfirm={() => handleDelete(r.id || r._id || '')}
                   okText="Delete"
                   okButtonProps={{ danger: true }}
                   cancelText="Cancel"
@@ -212,7 +252,7 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
                     danger
                     icon={<DeleteOutlined />}
                     size="small"
-                    loading={deleteLoadingId === r.id}
+                    loading={deleteLoadingId === (r.id || r._id)}
                   />
                 </Popconfirm>
               </Tooltip>

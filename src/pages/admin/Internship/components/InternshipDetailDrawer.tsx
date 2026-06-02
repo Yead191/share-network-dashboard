@@ -8,7 +8,6 @@ import {
   Rate,
   Space,
   Button,
-  Descriptions,
   Alert,
   Badge,
 } from 'antd';
@@ -20,11 +19,12 @@ import {
   PhoneOutlined,
   EnvironmentOutlined,
   FilePdfOutlined,
-  StarOutlined,
 } from '@ant-design/icons';
-import type { InternshipRecord } from '../types/internship.types';
+import type { InternshipRecord } from '../../../../types/internship.types';
 
 const { Title, Text, Link } = Typography;
+
+import { socketUrl } from '../../../../redux/api/baseApi';
 
 const RATING_LABELS: Record<number, { label: string; color: string }> = {
   1: { label: 'Very weak', color: '#ef4444' },
@@ -38,6 +38,12 @@ const WORK_AUTH_LABELS: Record<string, { label: string; color: string }> = {
   fully_allowed: { label: 'Fully allowed to work', color: 'green' },
   limited: { label: 'Limited work permit', color: 'orange' },
   not_allowed: { label: 'Not allowed to work yet', color: 'red' },
+};
+
+const getCvUrl = (cvPath?: string) => {
+  if (!cvPath) return '';
+  if (cvPath.startsWith('http://') || cvPath.startsWith('https://')) return cvPath;
+  return `${socketUrl}${cvPath.startsWith('/') ? '' : '/'}${cvPath}`;
 };
 
 interface InternshipDetailDrawerProps {
@@ -134,14 +140,15 @@ export const InternshipDetailDrawer: React.FC<InternshipDetailDrawerProps> = ({
         />
       </div>
 
-      {record.cvFileUrl && (
+      {(record.cv || record.cvFileUrl) && (
         <Button
           icon={<FilePdfOutlined />}
-          href={record.cvFileUrl}
+          href={getCvUrl(record.cv || record.cvFileUrl)}
           target="_blank"
+          download
           style={{ marginBottom: 8 }}
         >
-          View CV: {record.cvFileName}
+          Download CV{record.cvFileName ? `: ${record.cvFileName}` : ''}
         </Button>
       )}
 
@@ -183,13 +190,13 @@ export const InternshipDetailDrawer: React.FC<InternshipDetailDrawerProps> = ({
       <div style={{ marginBottom: 12 }}>
         <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 6 }}>Key Skills</Text>
         <Space wrap>
-          {record.keySkills?.map((s) => <Tag key={s} color="blue">{s}</Tag>)}
+          {record.keySkills?.map((s: string) => <Tag key={s} color="blue">{s}</Tag>)}
         </Space>
       </div>
       <div style={{ marginBottom: 12 }}>
         <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 6 }}>Languages</Text>
         <Space wrap>
-          {record.languages?.map((l, i) => (
+          {record.languages?.map((l: { language: string; level: string }, i: number) => (
             <Tag key={i} color="cyan">{l.language} — {l.level}</Tag>
           ))}
         </Space>
@@ -288,7 +295,7 @@ export const InternshipDetailDrawer: React.FC<InternshipDetailDrawerProps> = ({
           label="Preferred Fields"
           value={
             <Space wrap>
-              {record.preferredFields?.map((f) => <Tag key={f} color="purple">{f}</Tag>)}
+              {record.preferredFields?.map((f: string) => <Tag key={f} color="purple">{f}</Tag>)}
             </Space>
           }
         />

@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
-import { useInternshipStore } from '../../../hooks/useInternshipStore';
 import { InternshipListPage } from './components/InternshipListPage';
 import { InternshipFormPage } from './components/InternshipFormPage';
 import { InternshipDetailDrawer } from './components/InternshipDetailDrawer';
 import { useGetprofileQuery } from '../../../redux/apiSlices/students/overview.slice';
-import { InternshipFormValues, InternshipRecord } from '../../../types/internship.types';
+import { InternshipRecord } from '../../../types/internship.types';
+import {
+  useGetAllInternshipsQuery,
+  useCreateInternshipMutation,
+  useUpdateInternshipMutation,
+  useDeleteInternshipMutation,
+} from '../../../redux/apiSlices/admin/adminInternshipApi';
+import { toast } from 'sonner';
 
 type View = 'list' | 'create' | 'edit';
 
@@ -14,9 +20,19 @@ const InternshipPage: React.FC = () => {
   const user = data?.data?.data ?? data?.data ?? data;
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
 
-  // ─── Store ────────────────────────────────────────────────────────────────
-  const { records, loading, createInternship, updateInternship, deleteInternship } =
-    useInternshipStore();
+  // ─── RTK Query ────────────────────────────────────────────────────────────
+  const { data: internshipsResponse, isLoading: fetchLoading, refetch } =
+    useGetAllInternshipsQuery({ page: 1, limit: 100, searchTerm: '' });
+
+  const [createInternship] = useCreateInternshipMutation();
+  const [updateInternship] = useUpdateInternshipMutation();
+  const [deleteInternship] = useDeleteInternshipMutation();
+
+  const rawRecords = internshipsResponse?.data || [];
+  const records: InternshipRecord[] = rawRecords.map((item: any) => ({
+    ...item,
+    id: item._id || item.id,
+  }));
 
   // ─── UI State ─────────────────────────────────────────────────────────────
   const [view, setView] = useState<View>('list');
@@ -45,23 +61,44 @@ const InternshipPage: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     if (!isAdmin) return;
-    await deleteInternship(id);
+    try {
+      await deleteInternship({ id }).unwrap();
+      refetch();
+    } catch (err) {
+      console.error('Delete failed:', err);
+    }
   };
 
-  const handleSubmit = async (
-    values: InternshipFormValues,
-    studentName: string,
-    studentAvatar?: string
-  ) => {
+  const handleSubmit = async (formData: FormData) => {
     setSubmitting(true);
     try {
       if (view === 'create') {
-        await createInternship(values, studentName, studentAvatar);
+        toast.promise(createInternship(formData).unwrap(), {
+          loading: "Creating internship...",
+          success: (res) => {
+            refetch();
+            setView('list');
+            setEditingRecord(null);
+            return res?.message || "Internship created successfully!";
+          },
+          error: (err) => {
+            return err?.message || "Failed to create internship!";
+          },
+        })
       } else if (view === 'edit' && editingRecord) {
-        await updateInternship(editingRecord.id, values);
+        toast.promise(updateInternship({ id: editingRecord.id || editingRecord._id || '', data: formData }).unwrap(), {
+          loading: "Updating internship...",
+          success: (res) => {
+            refetch();
+            setView('list');
+            setEditingRecord(null);
+            return res?.message || "Internship updated successfully!";
+          },
+          error: "Failed to update internship!",
+        })
       }
-      setView('list');
-      setEditingRecord(null);
+    } catch (err) {
+      console.error('Submit failed:', err);
     } finally {
       setSubmitting(false);
     }
@@ -97,7 +134,7 @@ const InternshipPage: React.FC = () => {
       <InternshipListPage
         records={records}
         isAdmin={isAdmin}
-        loading={loading || profileLoading}
+        loading={fetchLoading || profileLoading}
         onCreateNew={handleCreate}
         onEdit={handleEdit}
         onView={handleView}

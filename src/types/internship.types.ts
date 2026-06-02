@@ -22,11 +22,13 @@ export type PerformanceRating = 1 | 2 | 3 | 4 | 5;
 
 export interface InternshipRecord {
   id: string;
+  _id?: string;
   studentId: string;
   studentName: string;
   studentAvatar?: string;
   createdAt: string;
   updatedAt: string;
+  cv?: string;
 
   // 1. Personal Information
   fullName: string;
