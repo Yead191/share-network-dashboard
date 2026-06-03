@@ -3,7 +3,7 @@ import { api } from '../../api/baseApi';
 const adminInternshipApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getAllInternships: builder.query({
-            query: ({ page, limit, searchTerm }: { page: number; limit: number; searchTerm: string }) => {
+            query: ({ page, limit, searchTerm, sortBy, sortOrder }: { page: number; limit: number; searchTerm: string; sortBy?: string; sortOrder?: 'asc' | 'desc' }) => {
                 return {
                     url: `/internship`,
                     method: 'GET',
@@ -11,6 +11,8 @@ const adminInternshipApi = api.injectEndpoints({
                         page,
                         limit,
                         searchTerm,
+                        sortBy,
+                        sortOrder,
                     },
                 };
             },

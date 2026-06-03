@@ -18,7 +18,9 @@ type View = 'list' | 'create' | 'edit';
 
 const InternshipPage: React.FC = () => {
   const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState<string | undefined>(undefined);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | undefined>(undefined);
   // ─── Auth / Role ─────────────────────────────────────────────────────────
   const { data, isLoading: profileLoading } = useGetprofileQuery({});
   const user = data?.data?.data ?? data?.data ?? data;
@@ -27,7 +29,7 @@ const InternshipPage: React.FC = () => {
   // ─── RTK Query ────────────────────────────────────────────────────────────
   const debouncedSearch = useDebounce(search, 500);
   const { data: internshipsResponse, isLoading: fetchLoading, refetch } =
-    useGetAllInternshipsQuery({ page: page, limit: 10, searchTerm: debouncedSearch });
+    useGetAllInternshipsQuery({ page: page, limit: 10, searchTerm: debouncedSearch, sortBy, sortOrder });
   const { data: internshipStatsRes, isLoading: statsLoading, refetch: statsRefetch } = useGetInternshipStatsQuery({});
   // console.log(internshipStatsRes)
 
@@ -197,6 +199,10 @@ const InternshipPage: React.FC = () => {
         onDelete={handleDelete}
         stats={internshipStatsRes?.data}
         pagination={pagination}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        setSortBy={setSortBy}
+        setSortOrder={setSortOrder}
       />
 
       <InternshipDetailDrawer

@@ -11,6 +11,7 @@ import {
   Badge,
   Empty,
   Dropdown,
+  Select,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import type { MenuProps } from 'antd';
@@ -60,7 +61,11 @@ interface InternshipListPageProps {
     limit: number;
     total: number;
     totalPages: number;
-  }
+  };
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  setSortBy: (value: string | undefined) => void;
+  setSortOrder: (value: 'asc' | 'desc' | undefined) => void;
 }
 
 export const InternshipListPage: React.FC<InternshipListPageProps> = ({
@@ -75,7 +80,11 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
   setSearch,
   search,
   pagination,
-  setPage
+  setPage,
+  sortBy,
+  sortOrder,
+  setSortBy,
+  setSortOrder,
 }) => {
 
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
@@ -182,6 +191,8 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
       dataIndex: 'performanceRating',
       key: 'performanceRating',
       width: 140,
+      sorter: true,
+      sortOrder: sortBy === 'performanceRating' ? (sortOrder === 'asc' ? 'ascend' : 'descend') : undefined,
       render: (v) =>
         v ? (
           <Rate value={v} disabled count={5} style={{ fontSize: 13 }} />
@@ -195,6 +206,8 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
       key: 'overallScore',
       width: 80,
       align: 'center',
+      sorter: true,
+      sortOrder: sortBy === 'overallScore' ? (sortOrder === 'asc' ? 'ascend' : 'descend') : undefined,
       render: (v) =>
         v != null ? (
           <Tag color={v >= 8 ? 'green' : v >= 6 ? 'blue' : v >= 4 ? 'orange' : 'red'}>
@@ -363,7 +376,7 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
         overflow: 'hidden',
       }}>
         {/* Toolbar */}
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid #f3f4f6', display: 'flex', gap: 12 }}>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid #f3f4f6', display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
           <Input
             prefix={<SearchOutlined style={{ color: '#9ca3af' }} />}
             placeholder="Search by name, email, city, field of study…"
@@ -371,6 +384,28 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
             onChange={(e) => setSearch(e.target.value)}
             style={{ maxWidth: 380, borderRadius: 8, height: 40 }}
             allowClear
+          />
+          <Select
+            placeholder="Sort by"
+            style={{ width: 220, height: 40 }}
+            allowClear
+            value={sortBy && sortOrder ? `${sortBy}_${sortOrder}` : undefined}
+            onChange={(value) => {
+              if (value) {
+                const [field, order] = value.split('_');
+                setSortBy(field);
+                setSortOrder(order as 'asc' | 'desc');
+              } else {
+                setSortBy(undefined);
+                setSortOrder(undefined);
+              }
+            }}
+            options={[
+              { value: 'overallScore_desc', label: 'Overall Score (Highest)' },
+              { value: 'overallScore_asc', label: 'Overall Score (Lowest)' },
+              { value: 'performanceRating_desc', label: 'Overall Rating (Highest)' },
+              { value: 'performanceRating_asc', label: 'Overall Rating (Lowest)' },
+            ]}
           />
           <Text type="secondary" style={{ alignSelf: 'center', marginLeft: 'auto', fontSize: 13 }}>
             Showing {records.length} {records.length === 1 ? 'profile' : 'profiles'}
@@ -403,6 +438,15 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
                 style={{ padding: '40px 0' }}
               />
             ),
+          }}
+          onChange={(p, f, sorter: any) => {
+            if (sorter && sorter.field && sorter.order) {
+              setSortBy(sorter.field);
+              setSortOrder(sorter.order === 'ascend' ? 'asc' : 'desc');
+            } else {
+              setSortBy(undefined);
+              setSortOrder(undefined);
+            }
           }}
           onRow={(r) => ({
             style: { cursor: 'pointer' },
