@@ -9,20 +9,27 @@ import {
   useCreateInternshipMutation,
   useUpdateInternshipMutation,
   useDeleteInternshipMutation,
+  useGetInternshipStatsQuery,
 } from '../../../redux/apiSlices/admin/adminInternshipApi';
 import { toast } from 'sonner';
+import { useDebounce } from '../../../hooks/useDebounce';
 
 type View = 'list' | 'create' | 'edit';
 
 const InternshipPage: React.FC = () => {
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1)
   // ─── Auth / Role ─────────────────────────────────────────────────────────
   const { data, isLoading: profileLoading } = useGetprofileQuery({});
   const user = data?.data?.data ?? data?.data ?? data;
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
 
   // ─── RTK Query ────────────────────────────────────────────────────────────
+  const debouncedSearch = useDebounce(search, 500);
   const { data: internshipsResponse, isLoading: fetchLoading, refetch } =
-    useGetAllInternshipsQuery({ page: 1, limit: 100, searchTerm: '' });
+    useGetAllInternshipsQuery({ page: page, limit: 10, searchTerm: debouncedSearch });
+  const { data: internshipStatsRes, isLoading: statsLoading, refetch: statsRefetch } = useGetInternshipStatsQuery({});
+  // console.log(internshipStatsRes)
 
   const [createInternship] = useCreateInternshipMutation();
   const [updateInternship] = useUpdateInternshipMutation();
@@ -33,7 +40,7 @@ const InternshipPage: React.FC = () => {
     ...item,
     id: item._id || item.id,
   }));
-
+  const pagination = internshipsResponse?.pagination
   // ─── UI State ─────────────────────────────────────────────────────────────
   const [view, setView] = useState<View>('list');
   const [editingRecord, setEditingRecord] = useState<InternshipRecord | null>(null);
@@ -86,6 +93,7 @@ const InternshipPage: React.FC = () => {
           loading: "Creating internship...",
           success: (res) => {
             refetch();
+            statsRefetch()
             setView('list');
             setEditingRecord(null);
             return res?.message || "Internship created successfully!";
@@ -117,7 +125,7 @@ const InternshipPage: React.FC = () => {
         }).unwrap(), {
           loading: "Updating internship...",
           success: (res) => {
-
+            statsRefetch()
             refetch();
             setView('list');
             setEditingRecord(null);
@@ -177,13 +185,18 @@ const InternshipPage: React.FC = () => {
   return (
     <>
       <InternshipListPage
+        setPage={setPage}
+        setSearch={setSearch}
+        search={search}
         records={records}
         isAdmin={isAdmin}
-        loading={fetchLoading || profileLoading}
+        loading={fetchLoading || profileLoading || statsLoading}
         onCreateNew={handleCreate}
         onEdit={handleEdit}
         onView={handleView}
         onDelete={handleDelete}
+        stats={internshipStatsRes?.data}
+        pagination={pagination}
       />
 
       <InternshipDetailDrawer

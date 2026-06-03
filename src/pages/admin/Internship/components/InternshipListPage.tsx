@@ -28,6 +28,7 @@ import {
 import type { InternshipRecord } from '../../../../types/internship.types';
 import { getImageUrl } from '../../../../utils/getImageUrl';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
+import { InternshipStatsRow } from './InternshipStatsRow';
 
 const { Title, Text } = Typography;
 
@@ -39,6 +40,27 @@ interface InternshipListPageProps {
   onEdit: (record: InternshipRecord) => void;
   onView: (record: InternshipRecord) => void;
   onDelete: (id: string) => Promise<void>;
+  setSearch: (value: string) => void;
+  search: string;
+  setPage: (page: number) => void;
+  stats?: {
+    totalProfiles: number;
+    interestedInInternship: number;
+    dutchResidency: number;
+    averageScore: number;
+    distribution?: {
+      low: number;
+      medium: number;
+      good: number;
+      excellent: number;
+    };
+  };
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  }
 }
 
 export const InternshipListPage: React.FC<InternshipListPageProps> = ({
@@ -49,23 +71,16 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
   onEdit,
   onView,
   onDelete,
+  stats,
+  setSearch,
+  search,
+  pagination,
+  setPage
 }) => {
-  const [search, setSearch] = useState('');
+
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState<InternshipRecord | null>(null);
-
-
-
-  const filtered = records.filter((r) => {
-    const q = search.toLowerCase();
-    return (
-      r.studentName.toLowerCase().includes(q) ||
-      r.email.toLowerCase().includes(q) ||
-      r.currentCity?.toLowerCase().includes(q) ||
-      r.studyDirection?.toLowerCase().includes(q)
-    );
-  });
 
   const handleDeleteClick = (record: InternshipRecord) => {
     setRecordToDelete(record);
@@ -338,49 +353,7 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
       </div>
 
       {/* Stats Row */}
-      <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap' }}>
-        {[
-          { label: 'Total Profiles', value: records.length, color: '#3b82f6' },
-          {
-            label: 'Interested in Internship',
-            value: records.filter((r) => r.interestedInInternship).length,
-            color: '#8b5cf6',
-          },
-          {
-            label: 'Dutch Residency',
-            value: records.filter((r) => r.hasDutchResidency).length,
-            color: '#22c55e',
-          },
-          {
-            label: 'Avg Score',
-            value:
-              records.filter((r) => r.overallScore != null).length > 0
-                ? (
-                  records
-                    .filter((r) => r.overallScore != null)
-                    .reduce((a, b) => a + (b.overallScore ?? 0), 0) /
-                  records.filter((r) => r.overallScore != null).length
-                ).toFixed(1)
-                : '—',
-            color: '#f59e0b',
-          },
-        ].map((stat) => (
-          <div
-            key={stat.label}
-            style={{
-              background: '#fff',
-              borderRadius: 12,
-              padding: '14px 20px',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-              borderLeft: `4px solid ${stat.color}`,
-              minWidth: 140,
-            }}
-          >
-            <Text type="secondary" style={{ fontSize: 12 }}>{stat.label}</Text>
-            <div style={{ fontSize: 22, fontWeight: 700, color: stat.color }}>{stat.value}</div>
-          </div>
-        ))}
-      </div>
+      <InternshipStatsRow records={records} stats={stats} />
 
       {/* Table Card */}
       <div style={{
@@ -396,23 +369,26 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
             placeholder="Search by name, email, city, field of study…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ maxWidth: 380, borderRadius: 8 }}
+            style={{ maxWidth: 380, borderRadius: 8, height: 40 }}
             allowClear
           />
           <Text type="secondary" style={{ alignSelf: 'center', marginLeft: 'auto', fontSize: 13 }}>
-            {filtered.length} {filtered.length === 1 ? 'profile' : 'profiles'}
+            Showing {records.length} {records.length === 1 ? 'profile' : 'profiles'}
           </Text>
         </div>
 
         <Table
           columns={columns}
-          dataSource={filtered}
+          dataSource={records}
           rowKey="_id"
           loading={loading}
           scroll={{ x: 1200 }}
           pagination={{
-            pageSize: 10,
+            pageSize: pagination?.limit,
+            total: pagination?.total,
+            current: pagination?.page,
             showTotal: (total) => `Total ${total} profiles`,
+            onChange: (page) => setPage(page),
           }}
           locale={{
             emptyText: (

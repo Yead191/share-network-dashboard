@@ -41,7 +41,14 @@ const adminInternshipApi = api.injectEndpoints({
                 };
             },
         }),
-
+        getInternshipStats: builder.query({
+            query: () => {
+                return {
+                    url: `/internship/stats`,
+                    method: 'GET',
+                };
+            },
+        }),
     }),
 });
 
@@ -50,4 +57,5 @@ export const {
     useCreateInternshipMutation,
     useUpdateInternshipMutation,
     useDeleteInternshipMutation,
+    useGetInternshipStatsQuery,
 } = adminInternshipApi;
