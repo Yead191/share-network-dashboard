@@ -439,7 +439,7 @@ export const InternshipListPage: React.FC<InternshipListPageProps> = ({
               />
             ),
           }}
-          onChange={(p, f, sorter: any) => {
+          onChange={(sorter: any) => {
             if (sorter && sorter.field && sorter.order) {
               setSortBy(sorter.field);
               setSortOrder(sorter.order === 'ascend' ? 'asc' : 'desc');
