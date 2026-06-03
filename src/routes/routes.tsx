@@ -46,8 +46,9 @@ import TeacherClassSchedule from '../pages/teacher/class-schedule';
 import TeacherResources from '../pages/teacher/resources';
 
 import MentorDetailsPage from '../pages/mentor-coordinator/mentors/details/index';
-import PrivacyPolicy from '../pages/authentication/PrivacyPolicy';
+import PrivacyPolicy from '../pages/extra/PrivacyPolicy';
 import InternshipPage from '../pages/admin/Internship/InternshipPage';
+import HowToDelete from '../pages/extra/HowToDelete';
 
 const router = createBrowserRouter([
     {
@@ -434,6 +435,7 @@ const router = createBrowserRouter([
     { path: '/verify-otp', element: <VerifyOtp /> },
     { path: '/new-password', element: <NewPassword /> },
     { path: '/privacy-policy', element: <PrivacyPolicy /> },
+    { path: '/how-to-delete', element: <HowToDelete /> },
 ]);
 
 export default router;
