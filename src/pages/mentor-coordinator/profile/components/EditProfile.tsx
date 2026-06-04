@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Form, Input, Divider } from 'antd';
-import { imageUrl } from '../../../../redux/api/baseApi';
 import { errorType } from '../../../authentication/Login';
 import { useUpdateProfileMutation } from '../../../../redux/apiSlices/authSlice';
 import { CameraOutlined } from '@ant-design/icons';
 import Swal from 'sweetalert2';
+import { getImageUrl } from '../../../../utils/getImageUrl';
 
 const { TextArea } = Input;
 
@@ -39,11 +39,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, onCancel, refetch }) =>
                 streetAddress: user?.address?.streetAddress,
             });
             setImgURL(
-                user?.profile?.startsWith('http')
-                    ? user?.profile
-                    : user?.profile
-                      ? `${imageUrl}${user?.profile}`
-                      : 'https://via.placeholder.com/150',
+                getImageUrl(user?.profile)
             );
         }
     }, [profileForm, user]);
@@ -129,7 +125,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ user, onCancel, refetch }) =>
                             style={{ backgroundImage: `url(${imgURL})` }}
                         />
                         <div className="hidden">
-                            <input onChange={onChange} type="file" id="img" className="hidden" />
+                            <input onChange={onChange} type="file" id="img" className="hidden" accept='.jpeg, .jpg, .png, .gif' />
                         </div>
                         <label
                             htmlFor="img"
