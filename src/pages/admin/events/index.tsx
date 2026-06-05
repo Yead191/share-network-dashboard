@@ -32,6 +32,7 @@ const AdminEvents = () => {
         description: item?.description,
         type: item?.type,
         location: item?.location,
+        status: item?.status,
         targetGroup: item?.targetGroup,
         targetUser: item?.targetUser,
         date: moment(item?.date).format('YYYY-MM-DD'),
@@ -100,7 +101,22 @@ const AdminEvents = () => {
             ),
         },
         {
-            title: 'TARGET',
+            title: 'STATUS',
+            dataIndex: 'status',
+            key: 'status',
+            render: (text: string) => (
+                <span
+                    className={`px-3 py-1 text-[11px] rounded-full border font-medium ${text === 'active'
+                        ? 'bg-green-50 text-green-600 border-green-100'
+                        : 'bg-gray-50 text-gray-600 border-gray-100'
+                        }`}
+                >
+                    {text?.charAt(0)?.toUpperCase() + text?.slice(1)}
+                </span>
+            ),
+        },
+        {
+            title: 'TARGET GROUP',
             dataIndex: 'targetGroup',
             key: 'targetGroup',
             render: (target: { name: string; _id: string }) => (

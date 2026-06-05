@@ -53,6 +53,7 @@ const AddEventModal = ({
                 targetGroup: selectedEvent.targetGroup?._id || selectedEvent.targetGroup,
                 targetUser: selectedEvent.targetUser?._id || selectedEvent.targetUser,
                 students: selectedEvent.students ? selectedEvent.students.map((s: any) => s._id || s) : undefined,
+                status: selectedEvent.status,
             });
         } else if (open && !selectedEvent) {
             form.resetFields();
@@ -181,6 +182,19 @@ const AddEventModal = ({
                             <Select.Option value="other">other</Select.Option>
                         </Select>
                     </Form.Item>
+                    <Form.Item name="status" label={<span className="text-sm font-semibold text-gray-700">Status</span>} initialValue="active">
+                        <Select
+                            placeholder="Select status"
+                            className="w-full h-11 rounded-lg border-gray-200"
+                            options={[
+                                { value: 'active', label: 'Active' },
+                                { value: 'inactive', label: 'Inactive' },
+                            ]}
+                        />
+                    </Form.Item>
+
+                </div>
+                <div>
                     <Form.Item
                         name="invitationType"
                         label={<span className="text-sm font-semibold text-gray-700">Invitation Type</span>}

@@ -24,9 +24,9 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onCancel, refet
                         form.resetFields();
                         onCancel();
                     }
-                    return res?.message || 'Teacher created successfully';
+                    return res?.data?.message || 'Teacher created successfully';
                 },
-                error: (err: any) => err?.message || 'Failed to create teacher',
+                error: (err: any) => err?.data?.message || 'Failed to create teacher',
             });
         } catch (error: any) {
             toast.error(error?.data?.message || 'Something went wrong');
