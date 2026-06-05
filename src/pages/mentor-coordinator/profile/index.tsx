@@ -39,6 +39,39 @@ export default function MentorCoordinatorProfile() {
 
     const displayName = user?.firstName + ' ' + user?.lastName || 'N/A';
 
+    const getAddressDisplay = () => {
+        if (!user?.address) return 'N/A';
+        let addressStr = user.address;
+        if (typeof addressStr === 'string' && addressStr.startsWith('{')) {
+            try {
+                const parsed = JSON.parse(addressStr);
+                addressStr = `${parsed.city || ''}, ${parsed.streetAddress || ''}`;
+            } catch (e) {
+                // ignore
+            }
+        }
+        return addressStr;
+    };
+
+    const getCareerDirectionsDisplay = () => {
+        if (!user?.careerDirections) return 'N/A';
+        if (Array.isArray(user.careerDirections)) {
+            return user.careerDirections.join(', ');
+        }
+        if (typeof user.careerDirections === 'string') {
+            try {
+                const parsed = JSON.parse(user.careerDirections);
+                if (Array.isArray(parsed)) {
+                    return parsed.join(', ');
+                }
+            } catch (e) {
+                // not JSON
+            }
+            return user.careerDirections;
+        }
+        return 'N/A';
+    };
+
     if (isLoading) {
         return <Spinner />;
     }
@@ -109,9 +142,15 @@ export default function MentorCoordinatorProfile() {
                         {infoItem('Professional Title', user?.professionalTitle)}
                         {infoItem('Group', user?.userGroup?.[0]?.name || 'Group not assigned yet')}
                         {infoItem('Phone', user?.contactNumber || user?.mobileNumber)}
+                        {infoItem('Highest Education', user?.highestEducation)}
+                        {infoItem('Career Directions', getCareerDirectionsDisplay())}
+                        {infoItem('Has Laptop', user?.havealaptop === true || user?.havealaptop === 'true' || user?.havealaptop === 'Yes' ? 'Yes' : user?.havealaptop === false || user?.havealaptop === 'false' || user?.havealaptop === 'No' ? 'No' : 'N/A')}
+                        {infoItem('V-Number', user?.vNumber)}
                         {infoItem('LinkedIn', user?.linkedInProfile)}
                         {infoItem('GitHub', user?.githubProfile)}
-                        {infoItem('address', user?.address)}
+                        {infoItem('Portfolio', user?.PortfolioWebsite || user?.portfolioWebsite)}
+                        {infoItem('Address', getAddressDisplay())}
+                        {infoItem('Notes', user?.note || user?.notes)}
                     </div>
                 </div>
             </div>

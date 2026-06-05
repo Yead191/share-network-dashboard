@@ -19,7 +19,7 @@ const MainLayout: React.FC = () => {
                 <Sidebar />
             </div>
 
-            <div className="overflow-y-scroll bg-[#F6F6F6] min-h-[83vh]">
+            <div className=" bg-[#F6F6F6] min-h-[calc(100vh-195px)] overflow-y-auto">
                 <div
                     className="container py-5  w-full"
                     style={{

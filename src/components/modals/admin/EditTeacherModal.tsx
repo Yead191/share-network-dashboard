@@ -8,7 +8,7 @@ interface EditTeacherModalProps {
     open: boolean;
     onCancel: () => void;
     teacher: any;
-    students: any[];
+    // students: any[];
     refetch: () => void;
     userGroups: any[];
     userTracks: any[];
@@ -20,7 +20,7 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({
     open,
     onCancel,
     teacher,
-    students,
+    // students,
     refetch,
     userGroups,
     userTracks,
@@ -155,7 +155,7 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({
                     )}
                 </div>
 
-                <Form.Item
+                {/* <Form.Item
                     label={<span className="font-semibold text-gray-700">Assign Students</span>}
                     name="assignedStudents"
                 >
@@ -172,7 +172,7 @@ const EditTeacherModal: React.FC<EditTeacherModalProps> = ({
                             String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                         }
                     />
-                </Form.Item>
+                </Form.Item> */}
 
                 <Row gutter={24}>
 

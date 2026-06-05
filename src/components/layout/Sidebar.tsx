@@ -11,7 +11,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 const NavbarSkeleton = () => {
     return (
-        <div className="container py-5 px-1.5">
+        <div className="container py-2 px-1.5">
             <nav className="w-full bg-white rounded-xl">
                 <ul className="flex flex-wrap items-center gap-2 p-2">
                     {[...Array(5)].map((_, i) => (
@@ -66,7 +66,7 @@ const Sidebar = () => {
     return (
         <div className="container py-2 px-1.5">
             <nav className="w-full bg-white rounded-xl">
-                <ul className="flex flex-wrap items-center gap-2 custom-sidebar-menu px-1 py-2">
+                <ul className="flex flex-wrap items-center gap-2 custom-sidebar-menu px-1 2xl:py-2">
                     {sidebarItems.map((item: TSidebarItem) => {
                         const active = isActive(item.path);
 

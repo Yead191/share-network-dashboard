@@ -4,7 +4,7 @@ import { Search, Filter, Download as DownloadIcon, Plus, Eye, Edit2, Trash2, Use
 import ImportExcelModal from '../../../components/modals/admin/ImportExcelModal';
 import {
     useDeleteTeacherMutation,
-    useGetAllStudentsQuery,
+    // useGetAllStudentsQuery,
     useGetTeachersQuery,
 } from '../../../redux/apiSlices/admin/adminTeachersApi';
 import AddTeacherModal from '../../../components/modals/admin/AddTeacherModal';
@@ -35,7 +35,7 @@ const AdminTeachers = () => {
         userGroup: selectedGroup,
         status: selectedStatus,
     });
-    const { data: studentsApi } = useGetAllStudentsQuery({});
+    // const { data: studentsApi } = useGetAllStudentsQuery({});
     const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({});
     const { data: userTracksApi, isLoading: isUserTracksLoading } = useGetUserTracksQuery({});
     const [deleteTeacher] = useDeleteTeacherMutation();
@@ -43,7 +43,7 @@ const AdminTeachers = () => {
     const userGroups = userGroupsApi?.data || [];
     const userTracks = userTracksApi?.data || [];
     const teachers = teachersApi?.data || [];
-    const students = studentsApi?.data?.data || [];
+    // const students = studentsApi?.data?.data || [];
 
     const handleDelete = (id: string) => {
         Modal.confirm({
@@ -260,7 +260,7 @@ const AdminTeachers = () => {
                 open={isEditModalOpen}
                 onCancel={() => setIsEditModalOpen(false)}
                 teacher={selectedTeacher}
-                students={students}
+                // students={students}
                 userGroups={userGroups}
                 userTracks={userTracks}
                 isUserGroupsLoading={isUserGroupsLoading}

@@ -105,9 +105,9 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ open, onCancel, stu
             ]}
             closeIcon={<X size={20} />}
             width={700}
-            centered
+
         >
-            <Form form={form} layout="vertical" className="mt-4 max-h-[70vh] px-4 overflow-y-auto  custom-scrollbar">
+            <Form form={form} layout="vertical" className="mt-4 px-4">
                 {/* Basic Info */}
                 <Row gutter={24}>
                     <Col span={12}>
