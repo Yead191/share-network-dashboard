@@ -192,7 +192,7 @@ const Register = () => {
                                 <Form.Item
                                     label={<span className="text-[#1E293B] font-semibold text-base">V-Number</span>}
                                     name="vNumber"
-                                    rules={[{ required: true, message: 'V-Number is required!' }]}
+                                // rules={[{ required: true, message: 'V-Number is required!' }]}
                                 >
                                     <Input placeholder="Enter V-Number" />
                                 </Form.Item>
@@ -203,17 +203,35 @@ const Register = () => {
                                 <Form.Item
                                     label={<span className="text-[#1E293B] font-semibold text-base">About</span>}
                                     name="about"
-                                    rules={[{ required: true, message: 'About is required!' }]}
+                                // rules={[{ required: true, message: 'About is required!' }]}
                                 >
                                     <Input.TextArea placeholder="Tell us about yourself" rows={4} />
                                 </Form.Item>
 
                                 <Form.Item
-                                    label={<span className="text-[#1E293B] font-semibold text-base">Career Directions</span>}
+                                    label={<span className="font-medium text-gray-700">Career Directions</span>}
                                     name="careerDirections"
-                                    rules={[{ required: true, message: 'At least one career direction is required!' }]}
                                 >
-                                    <Select mode="tags" placeholder="Enter career directions (e.g. Web Development, UI/UX)" />
+                                    <Checkbox.Group className="w-full">
+                                        <div className="grid grid-cols-2 gap-2.5">
+                                            {[
+                                                'I have no idea yet',
+                                                'Frontend development (HTML/CSS/Javascript)',
+                                                'App development',
+                                                'Game development',
+                                                'AI (Artificial Intelligence)',
+                                                'Cybersecurity',
+                                                'Web design / UXD (User experience design)',
+                                                'Tester',
+                                                'UI/UX',
+                                                'Data Analyst'
+                                            ].map((direction) => (
+                                                <div key={direction}>
+                                                    <Checkbox value={direction}>{direction}</Checkbox>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </Checkbox.Group>
                                 </Form.Item>
 
                                 <Form.Item name="havealaptop" valuePropName="checked">
@@ -228,7 +246,7 @@ const Register = () => {
                                 <Form.Item
                                     label={<span className="text-[#1E293B] font-semibold text-base">LinkedIn Profile</span>}
                                     name="linkedInProfile"
-                                    rules={[{ required: true, message: 'LinkedIn profile is required!' }]}
+                                // rules={[{ required: true, message: 'LinkedIn profile is required!' }]}
                                 >
                                     <Input placeholder="https://linkedin.com/in/..." />
                                 </Form.Item>
@@ -236,7 +254,7 @@ const Register = () => {
                                 <Form.Item
                                     label={<span className="text-[#1E293B] font-semibold text-base">GitHub Profile</span>}
                                     name="githubProfile"
-                                    rules={[{ required: true, message: 'GitHub profile is required!' }]}
+                                // rules={[{ required: true, message: 'GitHub profile is required!' }]}
                                 >
                                     <Input placeholder="https://github.com/..." />
                                 </Form.Item>
