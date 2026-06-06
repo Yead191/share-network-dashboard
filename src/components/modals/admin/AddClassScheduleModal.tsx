@@ -41,6 +41,7 @@ const AddClassScheduleModal = ({ open, onCancel, refetch, selectedSchedule }: Ad
                 virtualClass: selectedSchedule?.virtualClass,
                 location: selectedSchedule?.location,
                 slideUrl: selectedSchedule?.slideUrl,
+                status: selectedSchedule?.status,
             });
             if (selectedSchedule?.file) {
                 setFileList([
@@ -63,6 +64,7 @@ const AddClassScheduleModal = ({ open, onCancel, refetch, selectedSchedule }: Ad
     const onFinish = async (values: any) => {
         try {
             const { date, time, slideUrl, file: ignoreFileField, ...rest } = values;
+            // console.log(values, 'values----->');
             // Combine date and time into a single ISO timestamp
             let classDate;
             if (date && time) {
@@ -99,7 +101,6 @@ const AddClassScheduleModal = ({ open, onCancel, refetch, selectedSchedule }: Ad
             }
 
             formData.append('published', 'true');
-            formData.append('status', 'true');
 
             // Handle file upload/removal
             const newFile = fileList[0]?.originFileObj;
@@ -247,15 +248,29 @@ const AddClassScheduleModal = ({ open, onCancel, refetch, selectedSchedule }: Ad
                     </Form.Item>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Form.Item name="virtualClass" valuePropName="checked" className="mb-0 flex items-center h-full">
-                        <Checkbox>Virtual Class</Checkbox>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                    <Form.Item
+                        name="status"
+                        valuePropName="value"
+                        className=" "
+                        label={<span className="text-sm font-semibold text-gray-700">Status</span>}
+                    >
+                        <Select placeholder="Select Status" className="w-full h-11 rounded-lg border-gray-200">
+                            <Select.Option value={true}>Active</Select.Option>
+                            <Select.Option value={false}>Inactive</Select.Option>
+                        </Select>
                     </Form.Item>
+
                     <Form.Item
                         name="location"
                         label={<span className="text-sm font-semibold text-gray-700">Location</span>}
                     >
                         <Input placeholder="Enter location" className="h-11 rounded-lg border-gray-200" />
+                    </Form.Item>
+                </div>
+                <div>
+                    <Form.Item name="virtualClass" valuePropName="checked" className="mb-0 flex items-center h-full">
+                        <Checkbox>Virtual Class</Checkbox>
                     </Form.Item>
                 </div>
 

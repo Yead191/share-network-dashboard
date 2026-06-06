@@ -43,7 +43,7 @@ const StudentSchedule = () => {
         virtualClass: item?.virtualClass,
         target: item,
         location: item?.location,
-        status: `${item?.status === true ? 'Active' : 'Inactive'}`,
+        status: item?.status,
         slideUrl: item?.slideUrl,
         file: item?.file,
     }));
@@ -148,9 +148,9 @@ const StudentSchedule = () => {
             title: 'STATUS',
             dataIndex: 'status',
             key: 'status',
-            render: (text: string) => (
-                <div className="flex items-center gap-2 px-3 py-1 border border-green-200 rounded-lg bg-green-50 text-green-600 text-xs font-medium cursor-pointer w-fit">
-                    {text}
+            render: (text: boolean) => (
+                <div className={`flex items-center gap-2 px-3 py-1 border rounded-lg text-xs font-medium cursor-pointer w-fit ${text ? 'border-green-200 bg-green-50 text-green-600' : 'border-red-200 bg-red-50 text-red-600'}`}>
+                    {text ? 'Active' : 'Inactive'}
                 </div>
             ),
         },

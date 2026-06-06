@@ -103,8 +103,8 @@ const ClassScheduleDetailsModal = ({ open, onCancel, data }: ClassScheduleDetail
                         <tr>
                             <td className="px-5 py-3.5 bg-gray-50/50 font-medium text-gray-600">Status</td>
                             <td className="px-5 py-3.5">
-                                <span className="px-3 py-1 bg-green-50 text-green-500 rounded-full text-xs font-semibold">
-                                    {data?.status || 'Active'}
+                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${data?.status ? 'border-green-200 bg-green-50 text-green-600' : 'border-red-200 bg-red-50 text-red-600'}`}>
+                                    {data?.status ? 'Active' : 'Inactive'}
                                 </span>
                             </td>
                         </tr>
