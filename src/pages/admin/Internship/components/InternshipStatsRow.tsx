@@ -11,6 +11,7 @@ interface InternshipStatsRowProps {
     totalProfiles: number;
     interestedInInternship: number;
     dutchResidency: number;
+    graduatedStudents: number;
     averageScore: number;
     distribution?: {
       low: number;
@@ -26,8 +27,8 @@ export const InternshipStatsRow: React.FC<InternshipStatsRowProps> = ({
   stats,
 }) => {
   const total = stats?.totalProfiles ?? records.length;
-  const interested = stats?.interestedInInternship ?? records.filter(r => r.interestedInInternship).length;
-  const residency = stats?.dutchResidency ?? records.filter(r => r.hasDutchResidency).length;
+  const interested = stats?.interestedInInternship ?? 0;
+  const graduatedStudents = stats?.graduatedStudents ?? 0;
   const avgScore = stats?.averageScore ?? (
     records.filter((r) => r.overallScore != null).length > 0
       ? Number((
@@ -40,7 +41,7 @@ export const InternshipStatsRow: React.FC<InternshipStatsRowProps> = ({
   );
 
   const interestedPercent = total > 0 ? Math.round((interested / total) * 100) : 0;
-  const residencyPercent = total > 0 ? Math.round((residency / total) * 100) : 0;
+  const graduatedPercent = total > 0 ? Math.round((graduatedStudents / total) * 100) : 0;
 
   // Default distribution if undefined
   const dist = stats?.distribution ?? {
@@ -58,7 +59,7 @@ export const InternshipStatsRow: React.FC<InternshipStatsRowProps> = ({
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20, marginBottom: 28 }}>
-      
+
       {/* Total Profiles Card */}
       <div style={{
         background: '#fff',
@@ -96,7 +97,7 @@ export const InternshipStatsRow: React.FC<InternshipStatsRowProps> = ({
         justifyContent: 'space-between'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text type="secondary" style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Interested in Intern</Text>
+          <Text type="secondary" style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Interested in Internship</Text>
           <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(139, 92, 246, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ color: '#8b5cf6', fontSize: 16, fontWeight: 'bold' }}>✓</div>
           </div>
@@ -112,30 +113,37 @@ export const InternshipStatsRow: React.FC<InternshipStatsRowProps> = ({
         </div>
       </div>
 
-      {/* Dutch Residency Card */}
-      <div style={{
-        background: '#fff',
-        borderRadius: 16,
-        padding: '20px 24px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)',
-        border: '1px solid #f0f0f0',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text type="secondary" style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Dutch Residency</Text>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(34, 197, 94, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ color: '#22c55e', fontSize: 16, fontWeight: 'bold' }}>⌂</div>
+      {/* Graduated Students Card */}
+      <div className="flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+        <div className="flex items-center justify-between">
+          <p className="text-[13px] font-semibold uppercase tracking-[0.05em] text-gray-500">
+            Graduated Students
+          </p>
+
+          <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-green-500/10">
+            <span className="text-base font-bold text-green-500">🎓</span>
           </div>
         </div>
-        <div style={{ marginTop: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <div style={{ fontSize: 32, fontWeight: 800, color: '#1f2937', lineHeight: 1 }}>{residency}</div>
-            <Tag color="success" style={{ borderRadius: 6, margin: 0, fontWeight: 600 }}>{residencyPercent}%</Tag>
+
+        <div className="mt-3">
+          <div className="flex items-baseline gap-2">
+            <div className="text-[32px] font-extrabold leading-none text-gray-800">
+              {graduatedStudents}
+            </div>
+
+            <Tag
+              color="success"
+              className="m-0 rounded-md font-semibold"
+            >
+              {graduatedPercent}%
+            </Tag>
           </div>
-          <div style={{ width: '100%', height: 6, background: '#f3f4f6', borderRadius: 3, marginTop: 10, overflow: 'hidden' }}>
-            <div style={{ width: `${residencyPercent}%`, height: '100%', background: '#22c55e', borderRadius: 3, transition: 'width 0.6s ease' }} />
+
+          <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded bg-gray-100">
+            <div
+              className="h-full rounded bg-green-500 transition-all duration-700 ease-in-out"
+              style={{ width: `${graduatedPercent}%` }}
+            />
           </div>
         </div>
       </div>
@@ -175,7 +183,7 @@ export const InternshipStatsRow: React.FC<InternshipStatsRowProps> = ({
             <div title={`Medium: ${dist.medium}`} style={{ width: `${mW}%`, height: '100%', background: '#f59e0b', transition: 'width 0.4s' }} />
             <div title={`Low: ${dist.low}`} style={{ width: `${lW}%`, height: '100%', background: '#ef4444', transition: 'width 0.4s' }} />
           </div>
-          
+
           {/* Legend indicator */}
           <div style={{ display: 'flex', gap: 10, fontSize: 9, color: '#9ca3af', marginTop: 2 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>

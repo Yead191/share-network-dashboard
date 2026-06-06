@@ -128,7 +128,8 @@ export const InternshipFormPage: React.FC<InternshipFormPageProps> = ({
       0: ['fullName', 'phoneNumber', 'email', 'currentCity'],
       1: ['studyDirection', 'institution', 'currentStatus'],
       2: ['keySkills'],
-      3: ['overallScore', 'performanceRating'],
+      // 3: ['overallScore', 'performanceRating'],
+      3: ['overallScore'],
       4: ['hasDutchResidency', 'isAsylumSeeker'],
       5: ['interestedInInternship', 'interestedInFullTime'],
       6: ['consentToShare'],
@@ -395,7 +396,7 @@ export const InternshipFormPage: React.FC<InternshipFormPageProps> = ({
           </Tag>
         </div>
 
-        <Form form={form} layout="vertical" size="middle" requiredMark="optional" preserve={true}>
+        <Form form={form} layout="vertical" size="middle" requiredMark preserve={true}>
           {renderStep()}
         </Form>
       </div>

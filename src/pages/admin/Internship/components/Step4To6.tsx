@@ -48,7 +48,9 @@ export const Step4Evaluation: React.FC = () => {
         </Form.Item>
 
         <div>
-          <Form.Item label="Performance Rating" name="performanceRating" style={{ marginBottom: 4 }} rules={[{ required: true, message: 'Performance rating is required' }]}>
+          <Form.Item label="Performance Rating" name="performanceRating" style={{ marginBottom: 4 }}
+          //  rules={[{ required: true, message: 'Performance rating is required' }]}
+          >
             <Rate
               count={5}
               style={{ fontSize: 28, color: '#f59e0b' }}

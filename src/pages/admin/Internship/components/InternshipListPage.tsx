@@ -48,6 +48,7 @@ interface InternshipListPageProps {
     totalProfiles: number;
     interestedInInternship: number;
     dutchResidency: number;
+    graduatedStudents: number
     averageScore: number;
     distribution?: {
       low: number;
