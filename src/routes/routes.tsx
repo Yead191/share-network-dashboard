@@ -7,7 +7,6 @@ import VerifyOtp from '../pages/authentication/VerifyOtp';
 import NewPassword from '../pages/authentication/NewPassword';
 import AdminOverview from '../pages/admin/overview';
 import MentorCoordinatorOverview from '../pages/mentor-coordinator/mentor-coordinator-overview';
-import MentorCoordinatorProfile from '../pages/mentor-coordinator/profile';
 import GroupSchedule from '../pages/mentor-coordinator/group-schedule';
 import CoordinatorResources from '../pages/mentor-coordinator/resources';
 import TeacherOverview from '../pages/teacher/overview';
@@ -275,7 +274,7 @@ const router = createBrowserRouter([
                 path: '/mentor-coordinator/profile',
                 element: (
                     <PrivateRoute role="coordinator">
-                        <MentorCoordinatorProfile />
+                        <StudentProfile />
                     </PrivateRoute>
                 ),
             },

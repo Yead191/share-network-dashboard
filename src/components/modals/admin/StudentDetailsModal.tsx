@@ -64,10 +64,9 @@ const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ open, onCance
             footer={null}
             closeIcon={<X size={20} />}
             width={800}
-            centered
             className="student-details-modal"
         >
-            <div className="py-2 max-h-[80vh] overflow-y-auto px-2">
+            <div className="py-2 px-2">
                 {/* Basic Section */}
                 <div className="border border-gray-100 rounded-xl overflow-hidden mb-6">
                     <InfoRow label="First Name" value={student.firstName} />

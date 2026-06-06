@@ -27,9 +27,11 @@ const TeacherResources = () => {
         page: page,
         limit: 10,
         searchTerm: searchTerm,
+        // targeteAudience: 'TEACHER',
         type: type === 'ALL' ? undefined : type,
         targertGroup: userGroup,
         ...(userGroupTrack && { userGroupTrack }),
+
     });
 
     const [deleteResource] = useDeleteResourseMutation();
