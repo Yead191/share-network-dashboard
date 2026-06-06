@@ -1,5 +1,5 @@
 import { useRef, useEffect, useMemo } from 'react';
-import { Image as AntdImage, Avatar, Typography } from 'antd';
+import { Image as AntdImage, Avatar, } from 'antd';
 import MessageInput from './MessageInput';
 import { io } from 'socket.io-client';
 import { socketUrl } from '../../../redux/api/baseApi';
@@ -7,7 +7,6 @@ import { useGetMessagesQuery, useSendMessageMutation } from '../../../redux/apiS
 import { useProfileQuery } from '../../../redux/apiSlices/authSlice';
 import { getImageUrl } from '../../../utils/getImageUrl';
 
-const { Text } = Typography;
 
 export function ChatConversation({ messageId, activeUser }: { messageId: any; activeUser: any }) {
     const { data: userData } = useProfileQuery({});
@@ -57,6 +56,7 @@ export function ChatConversation({ messageId, activeUser }: { messageId: any; ac
         );
     }
 
+    console.log(activeUser, 'chat')
 
     return (
         <div className="bg-white border border-gray-100 rounded-2xl flex flex-col h-full shadow-sm overflow-hidden">
@@ -65,16 +65,16 @@ export function ChatConversation({ messageId, activeUser }: { messageId: any; ac
                 <div className="flex items-center gap-3">
                     <Avatar
                         size={44}
-                        src={getImageUrl(activeUser?.participants[0]?.profile)}
+                        src={getImageUrl(activeUser?.participants[0]?.profile || "")}
                         className="border border-gray-100"
                     />
                     <div>
                         <h3 className="font-bold text-gray-800 text-[16px] leading-tight">
                             {activeUser?.participants[0]?.firstName + ' ' + activeUser?.participants[0]?.lastName}
                         </h3>
-                        <Text type="secondary" className="text-[12px]">
+                        {/* <Text type="secondary" className="text-[12px]">
                             Online
-                        </Text>
+                        </Text> */}
                     </div>
                 </div>
             </div>

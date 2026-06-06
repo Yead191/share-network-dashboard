@@ -180,6 +180,7 @@ const AdminEvents = () => {
                         <Input
                             placeholder="Search events"
                             value={searchTerm}
+                            allowClear
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="h-10 pl-10 bg-white border border-gray-100 shadow-sm w-72 rounded-lg"
                         />

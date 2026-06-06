@@ -18,6 +18,8 @@ export default function ChatLayout() {
     const [messageId, setMessageId] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    console.log(activeRoom, 'active room')
+
     const { data, isLoading, refetch } = useGetChatRoomsQuery(undefined);
     const [createChatRoom, { isLoading: isCreatingChatRoom }] = useCreateChatRoomMutation();
 
@@ -59,8 +61,13 @@ export default function ChatLayout() {
 
                     const room = res?.data;
                     if (room) {
+                        const otherParticipant = room?.participants?.find(
+                            (participant: any) => participant._id !== user?._id
+                        );
                         setTimeout(() => {
-                            setActiveRoom(room);
+                            setActiveRoom(
+                                { participants: [otherParticipant] },
+                            );
                             setMessageId(room._id);
                             refetch();
                             setIsModalOpen(false);

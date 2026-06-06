@@ -11,16 +11,17 @@ import {
 } from '../../../redux/apiSlices/mentor/weeklyReportApi';
 import { useProfileQuery } from '../../../redux/apiSlices/authSlice';
 import { toast } from 'sonner';
+import Spinner from '../../../components/shared/Spinner';
 
 const WeeklyReport = () => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedReport, setSelectedReport] = useState<any>(null);
-    const { data: profileData } = useProfileQuery(undefined);
+    const { data: profileData, isLoading: isProfileLoading } = useProfileQuery(undefined);
     const assignedStudent = profileData?.data?.assignedStudents;
     // console.log(assignedStudent);
-    const { data, refetch } = useGetWeeklyReportsQuery(
+    const { data, refetch, isLoading: isWeeklyReportLoading } = useGetWeeklyReportsQuery(
         { id: assignedStudent?.[0]?._id },
         {
             skip: !assignedStudent?.[0]?._id,
@@ -136,7 +137,9 @@ const WeeklyReport = () => {
             ),
         },
     ];
-
+    if (isProfileLoading || isWeeklyReportLoading) {
+        return <Spinner />
+    }
     return (
         <section className="space-y-6">
             <div className="flex justify-between items-start">

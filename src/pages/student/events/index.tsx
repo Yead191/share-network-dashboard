@@ -3,6 +3,7 @@ import { LuClock, LuMapPin } from 'react-icons/lu';
 import { EventDetailsModal } from '../../../components/modals/student/EventDetailsModal';
 import { useGetEventStudentQuery } from '../../../redux/apiSlices/students/eventsSlice';
 import Spinner from '../../../components/shared/Spinner';
+import { Empty } from 'antd';
 
 export default function StudentEvents() {
     const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
@@ -22,6 +23,9 @@ export default function StudentEvents() {
     };
 
     const events = data?.data?.data || [];
+    if (events?.length === 0) {
+        return <Empty className='min-h-[70vh] flex flex-col justify-center items-center' description="No events available" />
+    }
 
     return (
         <section className="p-6">
