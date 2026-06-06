@@ -3,8 +3,8 @@ import { api } from '../../api/baseApi';
 const adminWeeklyReportApi = api.injectEndpoints({
     endpoints: (build) => ({
         getWeeklyReport: build.query({
-            query: ({ page, limit, searchTerm, mentorId }: { page: number; limit: number; searchTerm: string; mentorId?: string }) => ({
-                url: `/mentor/report?page=${page}&limit=${limit}&searchTerm=${searchTerm}${mentorId ? `&mentorId=${mentorId}` : ''}`,
+            query: ({ page, limit, searchTerm, mentorId, selectedGroup, startDate, endDate }: { page: number; limit: number; searchTerm: string; mentorId?: string; selectedGroup?: string; startDate?: string; endDate?: string }) => ({
+                url: `/mentor/report?page=${page}&limit=${limit}&searchTerm=${searchTerm}${mentorId ? `&mentorId=${mentorId}` : ''}${selectedGroup ? `&selectedGroup=${selectedGroup}` : ''}${startDate ? `&startDate=${startDate}` : ''}${endDate ? `&endDate=${endDate}` : ''}`,
                 method: 'GET',
             }),
         }),

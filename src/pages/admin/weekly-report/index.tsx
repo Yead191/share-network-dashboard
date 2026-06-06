@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Table, Button, Input, Popconfirm, Tooltip } from 'antd';
+import { Table, Button, Input, Popconfirm, Tooltip, Select, DatePicker } from 'antd';
 import { Eye, Search, Edit, Trash2 } from 'lucide-react';
+import { Dayjs } from 'dayjs';
 import WeeklyReportDetailsModal from '../../../components/modals/admin/WeeklyReportDetailsModal';
 import EditReportModal from '../../../components/modals/mentor/EditReportModal';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
@@ -8,7 +9,7 @@ import {
     useGetWeeklyReportQuery,
     useDeleteWeeklyReportMutation,
 } from '../../../redux/apiSlices/admin/adminWeeklyReport';
-import { useGetStudentsQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
+import { useGetStudentsQuery, useGetUserGroupsQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
 import moment from 'moment';
 import Spinner from '../../../components/shared/Spinner';
 import { toast } from 'sonner';
@@ -18,14 +19,27 @@ const AdminWeeklyReport = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedReport, setSelectedReport] = useState<any>(null);
     const [page, setPage] = useState(1);
+    const [selectedGroup, setSelectedGroup] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
+    const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null);
 
     // API CALLS
     const {
         data: weeklyReportApi,
         isLoading,
         refetch,
-    } = useGetWeeklyReportQuery({ page: page, limit: 10, searchTerm: searchTerm });
+    } = useGetWeeklyReportQuery({
+        page,
+        limit: 10,
+        searchTerm,
+        selectedGroup,
+        startDate: dateRange?.[0]?.format('YYYY-MM-DD') || undefined,
+        endDate: dateRange?.[1]?.format('YYYY-MM-DD') || undefined,
+    });
+    const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({});
+    const userGroups = userGroupsApi?.data;
+
+
 
     const [deleteReport] = useDeleteWeeklyReportMutation();
     const { data: studentsApi } = useGetStudentsQuery({ page: 1, limit: 1000 });
@@ -167,6 +181,31 @@ const AdminWeeklyReport = () => {
             <div className="flex justify-between items-center">
                 <HeaderTitle title="Weekly Report" />
                 <div className="flex gap-3 w-full md:w-auto">
+                    <Select
+                        placeholder="Filter by Group"
+                        className="h-10 w-48"
+                        allowClear
+                        loading={isUserGroupsLoading}
+                        onChange={(value) => {
+                            setSelectedGroup(value);
+                            setPage(1);
+                        }}
+                        options={userGroups?.map((group: any) => ({
+                            label: group.name,
+                            value: group._id,
+                        }))}
+                    />
+                    <DatePicker.RangePicker
+                        className="h-10"
+                        format="DD/MM/YYYY"
+                        placeholder={['Start Date', 'End Date']}
+                        value={dateRange}
+                        onChange={(dates) => {
+                            setDateRange(dates as [Dayjs, Dayjs] | null);
+                            setPage(1);
+                        }}
+                        allowClear
+                    />
                     <div className="relative flex-1 md:w-64">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
                         <Input
