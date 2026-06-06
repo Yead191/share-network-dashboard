@@ -10,7 +10,7 @@ const MainLayout: React.FC = () => {
     } = theme.useToken();
 
     return (
-        <div className=" flex flex-col h-screen ">
+        <div className=" flex flex-col h-screen bg-[#F6F6F6] ">
             <div className="bg-[#21C45D] h-20 w-full flex-center">
                 <HeaderDashboard />
             </div>

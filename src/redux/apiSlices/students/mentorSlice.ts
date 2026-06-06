@@ -10,7 +10,15 @@ const mentorStudentResources = api.injectEndpoints({
                     method: "GET",
                 }
             },
-
+        }),
+        getMentorId: build.query({
+            query: (id) => {
+                console.log(id)
+                return {
+                    url: `/admin-mentor/${id}`,
+                    method: "GET",
+                }
+            },
         }),
 
 
@@ -18,9 +26,10 @@ const mentorStudentResources = api.injectEndpoints({
 });
 
 
-export const { 
+export const {
 
     useGetMentorProfileQuery,
     // useUplloadAssignmentMutation
+    useGetMentorIdQuery
 
 } = mentorStudentResources;

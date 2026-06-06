@@ -7,19 +7,24 @@ import { Empty } from 'antd';
 import { useCreateChatRoomMutation } from '../../../redux/apiSlices/chatSlice';
 import { toast } from 'sonner';
 import { getImageUrl } from '../../../utils/getImageUrl';
+import { useGetMentorIdQuery } from '../../../redux/apiSlices/students/mentorSlice';
+import Spinner from '../../../components/shared/Spinner';
 
 export default function Mentor() {
     const navigate = useNavigate();
-    const { data: profileData } = useProfileQuery(
+    const { data: profileData, isLoading: isProfileLoading } = useProfileQuery(
         {},
-        { selectFromResult: ({ data }) => ({ data: data?.data || data }) },
+        { selectFromResult: ({ data, isLoading }) => ({ data: data?.data || data, isLoading }) },
     );
     // create chat room
     const [createChatRoom] = useCreateChatRoomMutation();
-
+    // get mentor id
+    const { data: mentorIdData, isLoading: isMentorIdLoading } = useGetMentorIdQuery(
+        profileData?.mentorId?._id,
+        { skip: !profileData?.mentorId?._id },
+    );
     // Extract mentor from student profile
-    const mentorRaw = profileData?.mentorId;
-    // console.log(mentorRaw);
+    const mentorRaw = mentorIdData?.data;
     // Format mentor for UI
     const formattedMentor = mentorRaw
         ? {
@@ -51,6 +56,10 @@ export default function Mentor() {
             },
         );
     };
+
+    if (isMentorIdLoading || isProfileLoading) {
+        return <Spinner />
+    }
 
     if (!formattedMentor) return <Empty description="No mentor assigned yet" />;
 

@@ -36,18 +36,6 @@ export const MentorJourney = () => (
                     </p>
                 </div>
             </div>
-
-            {/* Card 4 - Green */}
-            <div className="bg-[#E9F7EF] p-5 rounded-2xl border border-[#D4EFDF]">
-                <div className="flex items-center gap-2 text-[#27AE60] font-bold mb-2">
-                    <LuCalendar size={18} />
-                    <span>Meeting Sessions</span>
-                </div>
-                <p className="text-[#52BE80] text-sm">
-                    Session scheduling feature is coming soon! For now, coordinate meeting times through messages below.
-                    Your mentor will help you set up regular check-ins to discuss your progress.
-                </p>
-            </div>
         </div>
     </div>
 );
