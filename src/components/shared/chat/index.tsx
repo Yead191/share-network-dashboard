@@ -56,13 +56,17 @@ export default function ChatLayout() {
             {
                 loading: 'Creating chat room...',
                 success: (res) => {
-                    refetch();
-                    setIsModalOpen(false);
+
                     const room = res?.data;
                     if (room) {
-                        setActiveRoom(room);
-                        setMessageId(room._id);
+                        setTimeout(() => {
+                            setActiveRoom(room);
+                            setMessageId(room._id);
+                            refetch();
+                            setIsModalOpen(false);
+                        }, 500);
                     }
+
                     return res?.message || 'Chat room created successfully';
                 },
                 error: (err) => {
