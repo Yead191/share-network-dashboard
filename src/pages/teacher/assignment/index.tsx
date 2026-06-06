@@ -20,11 +20,14 @@ import {
 import { toast } from 'sonner';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
 import { useGetprofileQuery } from '../../../redux/apiSlices/students/overview.slice';
+import { useGetUserGroupsQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
 
 function Assignment() {
     const { data: profile, isLoading: profileLoading } = useGetprofileQuery({});
+    const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({}, { skip: profileLoading || profile?.data?.role !== 'SUPER_ADMIN' });
 
-    const myGroups = profile?.data?.userGroup;
+
+    const myGroups = profile?.data?.role === 'SUPER_ADMIN' ? userGroupsApi?.data : profile?.data?.userGroup;
     // console.log("userGroups", myGroups)
     const [page, setPage] = useState(1);
     const [createAssignment] = useCreateAssignmentMutation();
@@ -38,7 +41,7 @@ function Assignment() {
         isLoading,
         isFetching,
         refetch,
-    } = useGetAssignmentQuery({ page: page, limit: 10, searchTerm: searchText, userGroup: selectedGroup ?? myGroups?.map((group: any) => group._id) }, {
+    } = useGetAssignmentQuery({ page: page, limit: 10, searchTerm: searchText, userGroup: selectedGroup ?? (profile?.data?.role === 'SUPER_ADMIN' ? undefined : myGroups?.map((group: any) => group._id)) }, {
         skip: !myGroups || profileLoading
     });
     const { data: submissionData } = useGetAllSubmissionOfAssignmentQuery({ page: 1, limit: 10 });
@@ -202,7 +205,7 @@ function Assignment() {
                         className="w-full md:w-48 h-10 rounded-lg"
                         allowClear
                         onChange={setSelectedGroup}
-                        loading={profileLoading}
+                        loading={profileLoading || isUserGroupsLoading}
                         suffixIcon={<FilterOutlined className="text-gray-400" />}
                     >
                         {myGroups?.map((group: any) => (

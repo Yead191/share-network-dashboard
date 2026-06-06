@@ -17,7 +17,6 @@ const WeeklyReportDetailsModal = ({ open, onCancel, data }: WeeklyReportDetailsM
             footer={null}
             width={700}
             closeIcon={null}
-            centered
             styles={{
                 content: {
                     padding: '24px',

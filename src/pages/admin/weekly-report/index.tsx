@@ -32,8 +32,9 @@ const AdminWeeklyReport = () => {
     const allStudents = studentsApi?.data?.students || [];
 
     const handleDelete = async (id: string) => {
+        console.log(id)
         try {
-            toast.promise(deleteReport({ id }).unwrap(), {
+            toast.promise(deleteReport(id).unwrap(), {
                 loading: 'Deleting report...',
                 success: (res) => {
                     refetch();
@@ -142,7 +143,7 @@ const AdminWeeklyReport = () => {
                     <Popconfirm
                         title="Delete the report"
                         description="Are you sure to delete this report?"
-                        onConfirm={() => handleDelete(record.key)}
+                        onConfirm={() => handleDelete(record._id)}
                         okText="Yes"
                         cancelText="No"
                     >

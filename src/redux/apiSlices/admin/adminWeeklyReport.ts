@@ -23,7 +23,7 @@ const adminWeeklyReportApi = api.injectEndpoints({
             }),
         }),
         deleteWeeklyReport: build.mutation({
-            query: ({ id }: { id: string }) => ({
+            query: (id) => ({
                 url: `/mentor/report/${id}`,
                 method: 'DELETE',
             }),
