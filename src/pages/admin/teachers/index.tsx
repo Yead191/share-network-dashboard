@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import FilterMentorModal from '../../../components/modals/admin/FilterMentorModal';
 import { useGetUserGroupsQuery, useGetUserTracksQuery } from '../../../redux/apiSlices/admin/adminStudentApi';
 import Spinner from '../../../components/shared/Spinner';
+import { getImageUrl } from '../../../utils/getImageUrl';
 
 const AdminTeachers = () => {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -80,7 +81,7 @@ const AdminTeachers = () => {
             render: (_: string, record: any) => (
                 <div className="flex items-center gap-3">
                     <Avatar
-                        src={record.profile}
+                        src={getImageUrl(record.profile)}
                         icon={<User size={16} />}
                         className="bg-[#f6ffed] text-[#52c41a] flex items-center justify-center border-none"
                     />

@@ -88,8 +88,8 @@ export default function StudentAssignment() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 gap-6">
-                    {filteredAssignments.length > 0 ? (
-                        filteredAssignments.map((assignment) => (
+                    {filteredAssignments?.length > 0 ? (
+                        filteredAssignments?.map((assignment) => (
                             <AssignmentCard
                                 key={assignment.id}
                                 assignment={assignment}

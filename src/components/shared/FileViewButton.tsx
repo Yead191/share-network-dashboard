@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button, Modal } from "antd";
 import { EyeOutlined, FilePdfOutlined, FileImageOutlined, FileOutlined } from "@ant-design/icons";
 import { imageUrl } from "../../redux/api/baseApi";
+import { getImageUrl } from "../../utils/getImageUrl";
 
 interface FileViewerButtonProps {
   fileUrl: string;
@@ -24,15 +25,15 @@ function getFileIcon(type: FileType) {
 }
 
 export default function FileViewerButton({ fileUrl, fileName = "File Preview" }: FileViewerButtonProps) {
-  fileUrl=fileUrl?.replace("/uploads","")
+  fileUrl = fileUrl?.replace("/uploads", "")
   const [open, setOpen] = useState(false);
   const fileType = getFileType(fileUrl);
-
+  // console.log(fileUrl)
   const renderContent = () => {
     if (fileType === "pdf") {
       return (
         <iframe
-          src={imageUrl+fileUrl}
+          src={imageUrl + fileUrl}
           title={fileName}
           style={{ width: "100%", height: "70vh", border: "none", borderRadius: 8 }}
         />
@@ -42,7 +43,7 @@ export default function FileViewerButton({ fileUrl, fileName = "File Preview" }:
       return (
         <div style={{ textAlign: "center" }}>
           <img
-            src={imageUrl+fileUrl}
+            src={imageUrl + fileUrl}
             alt={fileName}
             style={{ maxWidth: "100%", maxHeight: "70vh", borderRadius: 8, objectFit: "contain" }}
           />
@@ -53,7 +54,7 @@ export default function FileViewerButton({ fileUrl, fileName = "File Preview" }:
       <div style={{ textAlign: "center", padding: "40px 0" }}>
         <FileOutlined style={{ fontSize: 48, color: "#999", marginBottom: 16, display: "block" }} />
         <p style={{ color: "#666" }}>Preview not available for this file type.</p>
-        <Button type="primary"  href={imageUrl+fileUrl} target="_blank" rel="noopener noreferrer">
+        <Button type="primary" href={getImageUrl(fileUrl)} target="_blank" rel="noopener noreferrer">
           Download File
         </Button>
       </div>
@@ -77,7 +78,7 @@ export default function FileViewerButton({ fileUrl, fileName = "File Preview" }:
           paddingInline: 20,
         }}
       >
-       View
+        View
       </Button>
 
       <Modal
