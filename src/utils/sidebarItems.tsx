@@ -186,7 +186,7 @@ export const studentSidebarItems: TSidebarItem[] = [
     },
     {
         key: 'goal',
-        label: 'Goals',
+        label: 'Goals & WOOP',
         path: 'student/goal',
         icon: <LuTarget size={20} />,
     },

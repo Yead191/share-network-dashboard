@@ -6,12 +6,13 @@ import { getImageUrl } from '../../../../utils/getImageUrl';
 type WoopCardProps = {
     woop: any;
     onView: (woop: any) => void;
-    onEdit: (woop: any) => void;
-    onDelete: (id: string) => void;
-    isDeleting: boolean;
+    onEdit?: (woop: any) => void;
+    onDelete?: (id: string) => void;
+    isDeleting?: boolean;
+    readOnly?: boolean;
 };
 
-const WoopCard = ({ woop, onView, onEdit, onDelete, isDeleting }: WoopCardProps) => {
+const WoopCard = ({ woop, onView, onEdit, onDelete, isDeleting, readOnly }: WoopCardProps) => {
     return (
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 group flex flex-col h-full relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#7C3AED] to-purple-300" />
@@ -44,20 +45,24 @@ const WoopCard = ({ woop, onView, onEdit, onDelete, isDeleting }: WoopCardProps)
                 </div>
 
                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => onView(woop)} className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100" title="View">
+                    <button onClick={() => onView(woop)} className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100" title="View">
                         <FiEye />
                     </button>
-                    <button onClick={() => onEdit(woop)} className="w-8 h-8 rounded-full bg-purple-50 text-[#7C3AED] hover:bg-purple-100" title="Edit">
-                        <FiEdit2 />
-                    </button>
-                    <button
-                        onClick={() => onDelete(woop._id)}
-                        disabled={isDeleting}
-                        className="w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-100"
-                        title="Delete"
-                    >
-                        <FiTrash2 />
-                    </button>
+                    {!readOnly && onEdit && (
+                        <button onClick={() => onEdit(woop)} className="w-8 h-8 rounded-full bg-purple-50 text-[#7C3AED] flex items-center justify-center hover:bg-purple-100" title="Edit">
+                            <FiEdit2 />
+                        </button>
+                    )}
+                    {!readOnly && onDelete && (
+                        <button
+                            onClick={() => onDelete(woop._id)}
+                            disabled={isDeleting}
+                            className="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100"
+                            title="Delete"
+                        >
+                            <FiTrash2 />
+                        </button>
+                    )}
                 </div>
             </div>
 

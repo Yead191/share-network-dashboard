@@ -4,14 +4,15 @@ import { FiPlus } from 'react-icons/fi';
 
 type Props = {
     woops: any[];
-    onCreateNew: () => void;
+    onCreateNew?: () => void;
     onView: (woop: any) => void;
-    onEdit: (woop: any) => void;
-    onDelete: (id: string) => void;
-    isDeleting: boolean;
+    onEdit?: (woop: any) => void;
+    onDelete?: (id: string) => void;
+    isDeleting?: boolean;
+    readOnly?: boolean;
 };
 
-const WoopList = ({ woops, onCreateNew, onView, onEdit, onDelete, isDeleting }: Props) => {
+const WoopList = ({ woops, onCreateNew, onView, onEdit, onDelete, isDeleting, readOnly }: Props) => {
     return (
         <div className="mx-auto pb-10">
             <div className="flex justify-between items-center mb-8">
@@ -19,13 +20,15 @@ const WoopList = ({ woops, onCreateNew, onView, onEdit, onDelete, isDeleting }: 
                     <h2 className="text-2xl font-bold text-gray-800 mb-2">My WOOPs</h2>
                     <p className="text-gray-500">Manage and track your goals with the WOOP method.</p>
                 </div>
-                <button
-                    onClick={onCreateNew}
-                    className="bg-[#7C3AED] hover:bg-[#6d28d9] text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-semibold shadow-md shadow-purple-500/30"
-                >
-                    <FiPlus className="text-lg" />
-                    Create New WOOP
-                </button>
+                {!readOnly && onCreateNew && (
+                    <button
+                        onClick={onCreateNew}
+                        className="bg-[#7C3AED] hover:bg-[#6d28d9] text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-semibold shadow-md shadow-purple-500/30"
+                    >
+                        <FiPlus className="text-lg" />
+                        Create New WOOP
+                    </button>
+                )}
             </div>
 
             {woops.length === 0 ? (
@@ -35,9 +38,11 @@ const WoopList = ({ woops, onCreateNew, onView, onEdit, onDelete, isDeleting }: 
                     </div>
                     <h3 className="text-xl font-bold text-gray-800 mb-2">No WOOPs found</h3>
                     <p className="text-gray-500 mb-6">Create your first WOOP to start achieving your goals.</p>
-                    <button onClick={onCreateNew} className="bg-[#7C3AED] text-white px-6 py-3 rounded-xl font-semibold shadow-md hover:bg-[#6d28d9]">
-                        Get Started
-                    </button>
+                    {!readOnly && onCreateNew && (
+                        <button onClick={onCreateNew} className="bg-[#7C3AED] text-white px-6 py-3 rounded-xl font-semibold shadow-md hover:bg-[#6d28d9]">
+                            Get Started
+                        </button>
+                    )}
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -49,6 +54,7 @@ const WoopList = ({ woops, onCreateNew, onView, onEdit, onDelete, isDeleting }: 
                             onEdit={onEdit}
                             onDelete={onDelete}
                             isDeleting={isDeleting}
+                            readOnly={readOnly}
                         />
                     ))}
                 </div>

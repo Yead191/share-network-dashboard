@@ -5,16 +5,43 @@ import GoalSuccessModal from '../../../components/modals/student/GoalSuccessModa
 import { questionnaireData } from '../../../constants/student-data';
 import { useProfileQuery } from '../../../redux/apiSlices/authSlice';
 import { useSubmitonboardingMutation } from '../../../redux/apiSlices/students/goalSlice';
+import { useGetMentorWoopsQuery } from '../../../redux/apiSlices/mentor/mentorWoops';
 import Spinner from '../../../components/shared/Spinner';
+import WoopList from '../../mentor/woops/components/WoopList';
+import WoopDetailsModal from '../../mentor/woops/components/WoopDetailsModal';
 
 type ViewState = 'questionnaire' | 'results';
+type TabState = 'goal' | 'woop';
+
+const WoopsTab = ({ profileData }: { profileData: any }) => {
+    const { data: woopsRes, isLoading } = useGetMentorWoopsQuery(profileData?.data?._id, { skip: !profileData?.data?._id });
+    const [viewingWoop, setViewingWoop] = useState<any | null>(null);
+
+    if (isLoading) return <Spinner />;
+
+    return (
+        <div className="mt-2 animate-fadeIn">
+            <WoopList 
+                woops={woopsRes?.data || []} 
+                onView={setViewingWoop} 
+                readOnly={true} 
+            />
+            <WoopDetailsModal 
+                visible={!!viewingWoop} 
+                woop={viewingWoop} 
+                onClose={() => setViewingWoop(null)} 
+                readOnly={true} 
+            />
+        </div>
+    );
+};
 
 const Goal = () => {
     const { data: profileData, isLoading, refetch } = useProfileQuery(undefined);
-    // console.log(profileData, 'profile data');
     const [submitOnboarding] = useSubmitonboardingMutation();
 
     const [view, setView] = useState<ViewState>('questionnaire');
+    const [activeTab, setActiveTab] = useState<TabState>('goal');
     const [responses, setResponses] = useState<Record<string, string>>({});
     const [showModal, setShowModal] = useState(false);
 
@@ -74,7 +101,37 @@ const Goal = () => {
                     </div>
                 </div>
             ) : (
-                <GoalResults />
+                <div className="flex flex-col gap-6">
+                    {/* Tabs Navigation */}
+                    <div className="flex gap-4 border-b border-gray-200 pb-2">
+                        <button
+                            onClick={() => setActiveTab('goal')}
+                            className={`px-6 py-2 font-semibold text-lg transition-all border-b-2 ${
+                                activeTab === 'goal'
+                                    ? 'border-[#7C3AED] text-[#7C3AED]'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                            }`}
+                        >
+                            Goal Questionnaire
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('woop')}
+                            className={`px-6 py-2 font-semibold text-lg transition-all border-b-2 ${
+                                activeTab === 'woop'
+                                    ? 'border-[#7C3AED] text-[#7C3AED]'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                            }`}
+                        >
+                            My WOOPs
+                        </button>
+                    </div>
+
+                    {/* Tab Content */}
+                    <div className="mt-4">
+                        {activeTab === 'goal' && <GoalResults />}
+                        {activeTab === 'woop' && <WoopsTab profileData={profileData} />}
+                    </div>
+                </div>
             )}
 
             {showModal && <GoalSuccessModal onClose={handleCloseModal} isOpen={showModal} />}

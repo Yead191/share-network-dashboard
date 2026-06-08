@@ -9,7 +9,7 @@ interface WoopFormProps {
 
 const WoopForm: React.FC<WoopFormProps> = ({ stepData, detailValue, onDetailChange }) => {
     return (
-        <div className="mt-10">
+        <div className="mt-10 p-6">
             <h2 className="text-3xl font-bold text-gray-800 mb-8">{stepData.subtitle}</h2>
 
             <div className="space-y-6">

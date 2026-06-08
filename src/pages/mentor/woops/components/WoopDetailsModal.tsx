@@ -7,10 +7,11 @@ type Props = {
     visible: boolean;
     woop: any | null;
     onClose: () => void;
-    onEdit: (woop: any) => void;
+    onEdit?: (woop: any) => void;
+    readOnly?: boolean;
 };
 
-const WoopDetailsModal = ({ visible, woop, onClose, onEdit }: Props) => {
+const WoopDetailsModal = ({ visible, woop, onClose, onEdit, readOnly }: Props) => {
     if (!woop) return null;
 
     return (
@@ -20,15 +21,17 @@ const WoopDetailsModal = ({ visible, woop, onClose, onEdit }: Props) => {
             onCancel={onClose}
             footer={
                 <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 mt-6">
-                    <button
-                        onClick={() => {
-                            onEdit(woop);
-                            onClose();
-                        }}
-                        className="px-5 py-2.5 bg-purple-50 text-[#7C3AED] hover:bg-purple-100 font-semibold rounded-xl flex items-center gap-2"
-                    >
-                        <FiEdit2 /> Edit
-                    </button>
+                    {!readOnly && onEdit && (
+                        <button
+                            onClick={() => {
+                                onEdit(woop);
+                                onClose();
+                            }}
+                            className="px-5 py-2.5 bg-purple-50 text-[#7C3AED] hover:bg-purple-100 font-semibold rounded-xl flex items-center gap-2"
+                        >
+                            <FiEdit2 /> Edit
+                        </button>
+                    )}
                     <button onClick={onClose} className="px-5 py-2.5 bg-gray-100 text-gray-700 hover:bg-gray-200 font-semibold rounded-xl">
                         Close
                     </button>
