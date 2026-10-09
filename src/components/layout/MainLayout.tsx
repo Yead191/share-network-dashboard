@@ -1,36 +1,35 @@
-import React from "react";
-import { theme } from "antd";
-import { Outlet } from "react-router-dom";
-import HeaderDashboard from "./HeaderDashboard";
-import Sidebar from "./Sidebar";
+import React from 'react';
+import { theme } from 'antd';
+import { Outlet } from 'react-router-dom';
+import HeaderDashboard from './HeaderDashboard';
+import Sidebar from './Sidebar';
 
 const MainLayout: React.FC = () => {
-  const {
-    token: { borderRadiusLG },
-  } = theme.useToken();
+    const {
+        token: { borderRadiusLG },
+    } = theme.useToken();
 
-  return (
-    <div className=" flex flex-col h-screen bg-[#F6F6F6] ">
-      <div className="bg-[#21C45D] h-20 w-full flex-center">
-        <HeaderDashboard />
-      </div>
+    return (
+        <div className="flex flex-col h-screen overflow-hidden bg-slate-50/80 antialiased">
+            {/* Fixed Header & Navigation Wrapper */}
+            <div className="shrink-0 z-50 sticky top-0 shadow-xs">
+                <HeaderDashboard />
+                <Sidebar />
+            </div>
 
-      <div className=" flex-center bg-white shadow-2xl">
-        <Sidebar />
-      </div>
-
-      <div className=" bg-[#F6F6F6] min-h-[calc(100vh-195px)] overflow-y-auto">
-        <div
-          className="container py-5  w-full"
-          style={{
-            borderRadius: borderRadiusLG,
-          }}
-        >
-          <Outlet />
+            {/* Scrollable Content Container */}
+            <main className="flex-1 overflow-y-auto">
+                <div
+                    className="container mx-auto px-4 sm:px-6 py-6 w-full"
+                    style={{
+                        borderRadius: borderRadiusLG,
+                    }}
+                >
+                    <Outlet />
+                </div>
+            </main>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default MainLayout;

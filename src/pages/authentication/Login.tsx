@@ -1,212 +1,334 @@
-import { Button, Checkbox, ConfigProvider, Form, FormProps, Input, Select } from 'antd';
-import { Link, useNavigate } from 'react-router-dom';
-import AuthSidebar from '../../components/ui/AuthSidebar';
-import { useLoginMutation } from '../../redux/apiSlices/authSlice';
-import { toast } from 'sonner';
-import { useState } from 'react';
+import React, { useState } from "react";
+import { Button, Checkbox, ConfigProvider, Form, FormProps, Input } from "antd";
+import { Link, useNavigate } from "react-router-dom";
+import AuthSidebar from "../../components/ui/AuthSidebar";
+import { useLoginMutation } from "../../redux/apiSlices/authSlice";
+import { toast } from "sonner";
+import {
+  GraduationCap,
+  Sparkles,
+  BookOpen,
+  Users,
+  ShieldCheck,
+  Mail,
+  Lock,
+  ArrowRight,
+} from "lucide-react";
 
 export type errorType = {
-    data: {
-        errorMessages: { message: string }[];
-        message: string;
-    };
+  data: {
+    errorMessages: { message: string }[];
+    message: string;
+  };
 };
 
 interface LoginFormValues {
-    role: string;
-    email: string;
-    password?: string;
-    remember?: boolean;
+  role: string;
+  email: string;
+  password?: string;
+  remember?: boolean;
 }
 
-const Login = () => {
-    const navigate = useNavigate();
-    // api call
-    const [login] = useLoginMutation();
-    // const [resendOtp] = useResendOtpMutation()
-    const [form] = Form.useForm();
-    const [hiddenForget, setHiddenForget] = useState(false);
+const ROLES = [
+  {
+    id: "student",
+    label: "Student",
+    desc: "Learning Portal",
+    icon: GraduationCap,
+  },
+  {
+    id: "mentor",
+    label: "Mentor",
+    desc: "Student Guidance",
+    icon: Sparkles,
+  },
+  {
+    id: "teacher",
+    label: "Teacher",
+    desc: "Class Resources",
+    icon: BookOpen,
+  },
+  {
+    id: "mentor-coordinator",
+    label: "Coordinator",
+    desc: "Group Management",
+    icon: Users,
+  },
+  {
+    id: "admin",
+    label: "Admin",
+    desc: "Platform Overview",
+    icon: ShieldCheck,
+  },
+];
 
-    const onFinish: FormProps<LoginFormValues>['onFinish'] = async (values) => {
-        try {
-            toast.promise(login(values).unwrap(), {
-                loading: 'Logging in...',
-                success: (res) => {
-                    // console.log(res)
-                    // if (
-                    //     res?.success === false &&
-                    //     res?.message === "Please verify your account, then try to login again"
-                    // ) {
-                    //     try {
-                    //         resendOtp({ email: values.email }).unwrap();
-                    //         navigate('/verify-otp');
-                    //         return 'OTP sent. Please verify your account.';
-                    //     } catch (otpErr) {
-                    //         return 'Failed to resend OTP';
-                    //     }
-                    // }
-                    // console.log(res);
-                    localStorage.setItem('token', res?.data?.accessToken);
-                    localStorage.setItem('role', res?.data?.role);
-                    const role = res?.data?.role?.toLowerCase();
-                    let routeRole = role;
-                    if (role === 'super_admin') {
-                        routeRole = 'admin';
-                    } else if (role === 'coordinator') {
-                        routeRole = 'mentor-coordinator';
-                    }
-                    navigate(`/${routeRole}/overview`);
-                    return res.message || 'Login successful';
-                },
-                error: async (err) => {
-                    const message =
-                        err?.data?.message ||
-                        err?.data?.errorMessages?.[0]?.message ||
-                        'Login failed';
+interface RoleSelectorProps {
+  value?: string;
+  onChange?: (role: string) => void;
+}
 
-                    // if (
-                    //     message === "Please verify your account, then try to login again"
-                    // ) {
-                    //     try {
-                    //         await resendOtp({ email: values.email }).unwrap();
-                    //         navigate('/verify-otp');
-                    //         return 'OTP sent. Please verify your account.';
-                    //     } catch (otpErr) {
-                    //         return 'Failed to resend OTP';
-                    //     }
-                    // }
+const RoleSelector: React.FC<RoleSelectorProps> = ({ value, onChange }) => {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+      {ROLES.map((r, index) => {
+        const isSelected = value === r.id;
+        const IconComponent = r.icon;
+        const isLast = index === 4;
 
-                    return message;
-                },
-            });
-        } catch (error) {
-            const err = error as errorType;
-            console.log(err.data.errorMessages[0].message);
-        }
-    };
-
-    const handleValuesChange = (changedValues: any) => {
-        if (changedValues.role === 'mentor') {
-            setHiddenForget(true);
-        } else {
-            setHiddenForget(false);
-        }
-
-    };
-
-    return (
-        <section className="min-h-screen grid lg:grid-cols-2 items-center bg-[#F8FAFC]">
-            <AuthSidebar backgroundImage="/assets/images/auth/login.jpg" />
-
-            {/* Right Side: Login Form */}
-            <div className="flex items-center justify-center p-10">
-                <ConfigProvider
-                    theme={{
-                        token: {
-                            colorPrimary: '#66D978',
-                            colorBgContainer: '#fff',
-                            borderRadius: 12,
-                        },
-                        components: {
-                            Input: {
-                                controlHeight: 48,
-                                colorBorder: '#E2E8F0',
-                                borderRadius: 10,
-                            },
-                            Select: {
-                                controlHeight: 48,
-                                colorBorder: '#E2E8F0',
-                                borderRadius: 10,
-                            },
-                            Button: {
-                                controlHeight: 48,
-                                borderRadius: 10,
-                            },
-                        },
-                    }}
-                >
-                    <div className="bg-white w-[540px] rounded-2xl shadow-xl p-12 ">
-                        <div className="text-center mb-10">
-                            <h1 className="text-[32px] text-[#000000] font-bold mb-2">Login</h1>
-                            <p className="text-[#64748B] text-lg font-normal">Access the Share Network App dashboard</p>
-                        </div>
-
-                        <Form
-                            form={form}
-                            name="normal_login"
-                            className="login-form"
-                            layout="vertical"
-                            initialValues={{ remember: true }}
-                            onFinish={onFinish}
-                            onValuesChange={handleValuesChange}
-                        >
-                            <Form.Item
-                                label={<span className="text-[#1E293B] font-semibold text-base">Select your role</span>}
-                                name="role"
-                                rules={[{ required: true, message: 'Please select your role!' }]}
-                            >
-                                <Select placeholder="Enter Role">
-                                    <Select.Option value="admin">Admin</Select.Option>
-                                    <Select.Option value="teacher">Teacher</Select.Option>
-                                    <Select.Option value="mentor-coordinator">Mentor Coordinator</Select.Option>
-                                    <Select.Option value="mentor">Mentor</Select.Option>
-                                    <Select.Option value="student">Student</Select.Option>
-                                </Select>
-                            </Form.Item>
-
-                            <Form.Item
-                                label={<span className="text-[#1E293B] font-semibold text-base">Email</span>}
-                                name="email"
-                                rules={[{ required: true, message: 'Please input your email!' }]}
-                            >
-                                <Input placeholder="Enter Email" type="email" />
-                            </Form.Item>
-
-                            <Form.Item
-                                label={<span className="text-[#1E293B] font-semibold text-base">Password</span>}
-                                name="password"
-                                rules={[{ required: true, message: 'Please input your Password!' }]}
-                            >
-                                <Input.Password placeholder="*************" />
-                            </Form.Item>
-
-                            <div className="flex items-center justify-between mb-8">
-                                <Form.Item name="remember" valuePropName="checked" noStyle>
-                                    <Checkbox className="text-[#64748B]">Remember Me</Checkbox>
-                                </Form.Item>
-                                {!hiddenForget && (
-                                    <Link
-                                        to="/forget-password"
-                                        className="text-[#F43F5E] hover:text-[#E11D48] font-medium"
-                                    >
-                                        Forgot Password?
-                                    </Link>
-                                )}
-                            </div>
-
-                            <Form.Item className="mb-4">
-                                <Button
-                                    type="primary"
-                                    htmlType="submit"
-                                    block
-                                    className="h-[52px] text-lg font-semibold bg-[#66D978] hover:bg-[#58C469] border-none shadow-md shadow-green-200"
-                                >
-                                    Sign in
-                                </Button>
-                            </Form.Item>
-
-                            <div className="text-center text-[#64748B] text-base">
-                                Don't have an account?{' '}
-                                <Link to="/signup" className="text-[#66D978] font-semibold hover:underline">
-                                    Sign Up
-                                </Link>
-                            </div>
-                        </Form>
-                    </div>
-                </ConfigProvider>
+        return (
+          <button
+            type="button"
+            key={r.id}
+            onClick={() => onChange?.(r.id)}
+            className={`group relative flex items-center gap-2.5 p-3 rounded-2xl border text-left transition-all duration-200 select-none cursor-pointer ${
+              isLast ? "col-span-2 sm:col-span-1" : ""
+            } ${
+              isSelected
+                ? "bg-emerald-50/90 border-emerald-500 text-emerald-950 ring-2 ring-emerald-500/20 shadow-xs"
+                : "bg-white border-slate-200/90 hover:border-slate-300 hover:bg-slate-50/80 text-slate-700 shadow-2xs"
+            }`}
+          >
+            <div
+              className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200 ${
+                isSelected
+                  ? "bg-emerald-500 text-white shadow-2xs scale-105"
+                  : "bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-700"
+              }`}
+            >
+              <IconComponent className="w-4 h-4" />
             </div>
-        </section>
-    );
+
+            <div className="min-w-0 flex-1">
+              <span className="block text-xs sm:text-sm font-bold truncate leading-tight">
+                {r.label}
+              </span>
+              <span className="block text-[10px] text-slate-400 group-hover:text-slate-500 truncate leading-tight mt-0.5">
+                {r.desc}
+              </span>
+            </div>
+
+            {isSelected && (
+              <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200" />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
+const Login = () => {
+  const navigate = useNavigate();
+  const [login] = useLoginMutation();
+  const [form] = Form.useForm();
+  const [hiddenForget, setHiddenForget] = useState(false);
+
+  const onFinish: FormProps<LoginFormValues>["onFinish"] = async (values) => {
+    try {
+      toast.promise(login(values).unwrap(), {
+        loading: "Signing in...",
+        success: (res) => {
+          localStorage.setItem("token", res?.data?.accessToken);
+          localStorage.setItem("role", res?.data?.role);
+          const role = res?.data?.role?.toLowerCase();
+          let routeRole = role;
+          if (role === "super_admin") {
+            routeRole = "admin";
+          } else if (role === "coordinator") {
+            routeRole = "mentor-coordinator";
+          }
+          navigate(`/${routeRole}/overview`);
+          return res.message || "Login successful";
+        },
+        error: async (err) => {
+          const message =
+            err?.data?.message ||
+            err?.data?.errorMessages?.[0]?.message ||
+            "Login failed";
+          return message;
+        },
+      });
+    } catch (error) {
+      const err = error as errorType;
+      console.log(err?.data?.errorMessages?.[0]?.message);
+    }
+  };
+
+  const handleValuesChange = (changedValues: any) => {
+    if (changedValues.role === "mentor") {
+      setHiddenForget(true);
+    } else if (changedValues.role) {
+      setHiddenForget(false);
+    }
+  };
+
+  return (
+    <section className="min-h-screen grid lg:grid-cols-2 bg-slate-50 antialiased">
+      <AuthSidebar backgroundImage="/assets/images/auth/login.jpg" />
+
+      {/* Right Side: Login Form */}
+      <div className="min-h-screen flex items-center justify-center p-6 sm:p-10 relative">
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: "#66D978",
+              colorBgContainer: "#fff",
+              borderRadius: 14,
+            },
+            components: {
+              Input: {
+                controlHeight: 50,
+                colorBorder: "#E2E8F0",
+                borderRadius: 12,
+              },
+              Button: {
+                controlHeight: 52,
+                borderRadius: 12,
+              },
+            },
+          }}
+        >
+          <div className="bg-white/95 backdrop-blur-xl w-full max-w-[540px] rounded-3xl border border-slate-200/80 shadow-2xl p-7 sm:p-10">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#11998e] via-[#10b981] to-[#059669] shadow-lg shadow-emerald-600/30 ring-4 ring-emerald-100/80 mb-3.5 p-2.5 transition-transform hover:scale-105">
+                <img
+                  src="/logo.png"
+                  alt="Share Network Logo"
+                  className="w-full h-full object-contain filter drop-shadow-xs"
+                />
+              </div>
+              <h1 className="text-2xl sm:text-3xl text-slate-900 font-extrabold tracking-tight">
+                Welcome Back
+              </h1>
+              <p className="text-slate-500 text-xs sm:text-sm mt-1">
+                Select your portal role and sign in to continue
+              </p>
+            </div>
+
+            <Form
+              form={form}
+              name="normal_login"
+              className="login-form space-y-4"
+              layout="vertical"
+              initialValues={{ remember: true }}
+              onFinish={onFinish}
+              onValuesChange={handleValuesChange}
+              requiredMark={false}
+            >
+              {/* Role Selection Grid */}
+              <Form.Item
+                label={
+                  <span className="text-slate-700 font-bold text-xs uppercase tracking-wider">
+                    Select Portal Role
+                  </span>
+                }
+                name="role"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select a role to sign in",
+                  },
+                ]}
+                className="mb-5"
+              >
+                <RoleSelector />
+              </Form.Item>
+
+              {/* Email */}
+              <Form.Item
+                label={
+                  <span className="text-slate-700 font-bold text-xs uppercase tracking-wider">
+                    Email Address
+                  </span>
+                }
+                name="email"
+                rules={[
+                  { required: true, message: "Please enter your email" },
+                  {
+                    type: "email",
+                    message: "Please enter a valid email address",
+                  },
+                ]}
+              >
+                <Input
+                  prefix={
+                    <Mail className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
+                  }
+                  placeholder="name@share-network.org"
+                  type="email"
+                  className="rounded-xl border-slate-200 hover:border-emerald-400 focus:border-emerald-500"
+                />
+              </Form.Item>
+
+              {/* Password */}
+              <Form.Item
+                label={
+                  <span className="text-slate-700 font-bold text-xs uppercase tracking-wider">
+                    Password
+                  </span>
+                }
+                name="password"
+                rules={[
+                  { required: true, message: "Please enter your password" },
+                ]}
+              >
+                <Input.Password
+                  prefix={
+                    <Lock className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
+                  }
+                  placeholder="Enter your password"
+                  className="rounded-xl border-slate-200 hover:border-emerald-400 focus:border-emerald-500"
+                />
+              </Form.Item>
+
+              {/* Remember Me & Forgot Password */}
+              <div className="flex items-center justify-between pt-1 pb-2">
+                <Form.Item name="remember" valuePropName="checked" noStyle>
+                  <Checkbox className="text-slate-500 text-xs sm:text-sm font-medium">
+                    Remember Me
+                  </Checkbox>
+                </Form.Item>
+
+                {!hiddenForget && (
+                  <Link
+                    to="/forget-password"
+                    className="text-xs sm:text-sm font-semibold text-rose-500 hover:text-rose-600 transition-colors"
+                  >
+                    Forgot Password?
+                  </Link>
+                )}
+              </div>
+
+              {/* Submit Button */}
+              <Form.Item className="mb-4 pt-2">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  block
+                  icon={<ArrowRight className="w-4 h-4 mr-1 inline-block" />}
+                  className="h-[52px] text-base font-bold bg-[#66D978] hover:bg-[#58C469] border-none shadow-md shadow-emerald-200/60 text-slate-900 transition-all hover:scale-[1.01] active:scale-[0.99]"
+                >
+                  Sign In
+                </Button>
+              </Form.Item>
+
+              {/* Sign Up Link */}
+              <div className="text-center text-slate-500 text-xs sm:text-sm pt-2">
+                Don&apos;t have an account?{" "}
+                <Link
+                  to="/signup"
+                  className="text-emerald-600 font-bold hover:underline"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            </Form>
+          </div>
+        </ConfigProvider>
+      </div>
+    </section>
+  );
 };
 
 export default Login;
