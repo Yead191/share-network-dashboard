@@ -11,23 +11,20 @@ import { useEffect, useMemo, useState } from 'react';
 
 const NavbarSkeleton = () => {
     return (
-        <div className="container py-2 px-1.5">
-            <nav className="w-full bg-white rounded-xl">
-                <ul className="flex flex-wrap items-center gap-2 p-2">
-                    {[...Array(5)].map((_, i) => (
-                        <li key={i}>
-                            <div className="h-9 w-28 rounded-lg bg-gray-200 animate-pulse" />
-                        </li>
+        <div className="w-full bg-white border-b border-slate-200/80 shadow-2xs py-2.5">
+            <div className="container mx-auto px-4 sm:px-6">
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                    {[...Array(6)].map((_, i) => (
+                        <div key={i} className="h-9 w-28 rounded-xl bg-slate-100 animate-pulse shrink-0" />
                     ))}
-                </ul>
-            </nav>
+                </div>
+            </div>
         </div>
     );
 };
 
 const Sidebar = () => {
     const location = useLocation();
-
     const [role, setRole] = useState<string | null>(localStorage.getItem('role'));
 
     useEffect(() => {
@@ -37,13 +34,16 @@ const Sidebar = () => {
 
     const sidebarItems = useMemo(() => {
         if (!role) return [];
+        const normalizedRole = role.toUpperCase();
 
-        switch (role) {
+        switch (normalizedRole) {
             case 'SUPER_ADMIN':
+            case 'ADMIN':
                 return adminSidebarItems;
             case 'TEACHER':
                 return teacherSidebarItems;
             case 'COORDINATOR':
+            case 'MENTOR-COORDINATOR':
                 return mentorCoordinatorSidebarItems;
             case 'STUDENT':
                 return studentSidebarItems;
@@ -64,31 +64,42 @@ const Sidebar = () => {
     };
 
     return (
-        <div className="container py-2 px-1.5">
-            <nav className="w-full bg-white rounded-xl">
-                <ul className="flex flex-wrap items-center gap-2 custom-sidebar-menu px-1 2xl:py-2">
+        <nav className="w-full bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-2xs relative z-40 transition-colors">
+            <div className="container mx-auto px-4 sm:px-6 py-2">
+                <ul className="flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth py-0.5">
                     {sidebarItems.map((item: TSidebarItem) => {
                         const active = isActive(item.path);
 
                         return (
-                            <li key={item.key}>
+                            <li key={item.key} className="shrink-0">
                                 <Link
                                     to={`/${item.path}`}
-                                    className={`flex items-center gap-1 px-2 md:px-2 py-2 transition-all duration-300 rounded-lg text-xs md:text-sm font-semibold
-                                        ${active
-                                            ? 'text-[#3BB77E] bg-[#3BB77E]/10 border border-[#3BB77E]'
-                                            : 'text-[#7A7D85] hover:text-[#3BB77E] hover:bg-[#3BB77E]/10 border border-transparent'
+                                    className={`group flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm tracking-tight transition-all duration-200 select-none whitespace-nowrap
+                                        ${
+                                            active
+                                                ? 'bg-emerald-50 text-emerald-900 font-bold border border-emerald-200/90 shadow-2xs'
+                                                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 font-semibold border border-transparent'
                                         }`}
                                 >
-                                    {item.icon}
+                                    <span
+                                        className={`shrink-0 transition-transform duration-200 group-hover:scale-110 ${
+                                            active ? 'text-emerald-600' : 'text-slate-400 group-hover:text-slate-700'
+                                        }`}
+                                    >
+                                        {item.icon}
+                                    </span>
                                     <span>{item.label}</span>
+
+                                    {active && (
+                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-xs ml-0.5 shrink-0" />
+                                    )}
                                 </Link>
                             </li>
                         );
                     })}
                 </ul>
-            </nav>
-        </div>
+            </div>
+        </nav>
     );
 };
 
