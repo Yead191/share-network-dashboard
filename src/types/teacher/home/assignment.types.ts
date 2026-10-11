@@ -39,6 +39,7 @@ export interface IAssignment {
   updatedAt: string;
   __v: number;
   submitAssignment: ISubmitAssignment[];
+  studentAssigned?: any[];
 }
 
 

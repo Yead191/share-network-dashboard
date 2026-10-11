@@ -13,8 +13,14 @@ const AssignmentDetailsModal = ({ open, onCancel, data }: AssignmentDetailsModal
     if (!data) return null;
 
     const teacherProfile = data.teacher?.profile ? `${imageUrl}${data.teacher.profile}` : null;
-    const attachmentUrl = data.attachment ? `${imageUrl}${data.attachment}` : null;
+    const isUrl = data.attachment?.startsWith('http');
+    const attachmentUrl = data.attachment
+        ? isUrl
+            ? data.attachment
+            : `${imageUrl}${data.attachment.startsWith('/') ? data.attachment : `/${data.attachment}`}`
+        : null;
     const userGroups = data.userGroup || [];
+    const studentAssigned = data.studentAssigned || [];
 
     return (
         <Modal
@@ -94,24 +100,35 @@ const AssignmentDetailsModal = ({ open, onCancel, data }: AssignmentDetailsModal
                         </div>
                     </div>
 
-                    {/* Target Groups */}
+                    {/* Target Groups & Students */}
                     <div className="space-y-3">
                         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                             <Users size={14} />
-                            TARGET GROUPS
+                            ASSIGNED TARGETS
                         </h3>
                         <div className="flex flex-wrap gap-2 pt-1">
-                            {userGroups.length > 0 ? (
+                            {userGroups.length > 0 &&
                                 userGroups.map((group: any) => (
                                     <span
                                         key={group._id}
                                         className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-sm font-bold border border-emerald-100"
                                     >
-                                        {group.name}
+                                        Group: {group.name}
                                     </span>
-                                ))
-                            ) : (
-                                <span className="text-gray-400 text-sm italic">No specific group assigned</span>
+                                ))}
+                            {studentAssigned.length > 0 &&
+                                studentAssigned.map((st: any) => (
+                                    <span
+                                        key={st._id}
+                                        className="px-4 py-2 bg-purple-50 text-purple-700 rounded-xl text-sm font-bold border border-purple-100"
+                                    >
+                                        Student: {st.firstName} {st.lastName}
+                                    </span>
+                                ))}
+                            {userGroups.length === 0 && studentAssigned.length === 0 && (
+                                <span className="px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-sm font-bold border border-blue-100">
+                                    All Students
+                                </span>
                             )}
                         </div>
                     </div>
@@ -159,7 +176,7 @@ const AssignmentDetailsModal = ({ open, onCancel, data }: AssignmentDetailsModal
                                 icon={<Download size={18} />}
                                 className="h-14 flex-1 flex items-center justify-center gap-3 rounded-2xl bg-teal-600 hover:!bg-teal-700 border-none shadow-lg shadow-teal-100 font-bold text-base transition-all hover:-translate-y-1 active:scale-95"
                             >
-                                Download Attachment
+                                {isUrl ? 'Open Assignment Link' : 'Download Attachment'}
                             </Button>
                         ) : (
                             <div className="w-full py-6 text-center text-gray-400 bg-gray-50 rounded-2xl border border-dashed border-gray-200">

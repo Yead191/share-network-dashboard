@@ -84,6 +84,11 @@ export const AssignmentDetailsModal = ({
                             Group: {assignment.userGroup.map((g) => g.name).join(', ')}
                         </span>
                     )}
+                    {assignment.studentAssigned && assignment.studentAssigned.length > 0 && (
+                        <span className="bg-purple-50 text-purple-600 text-xs font-semibold px-4 py-1.5 rounded-full uppercase">
+                            Individual Assignment
+                        </span>
+                    )}
                 </div>
 
                 {/* Title */}
@@ -130,16 +135,22 @@ export const AssignmentDetailsModal = ({
                     <div className="bg-[#F0FDF4] border border-[#DCFCE7] p-5 rounded-2xl flex items-center justify-between">
                         <div className="flex flex-col gap-1">
                             <span className="text-sm font-bold text-[#1E293B]">Assignment Material</span>
-                            <span className="text-xs text-[#64748B]">Download the attached file for instructions.</span>
+                            <span className="text-xs text-[#64748B]">
+                                {assignment.attachment.startsWith('http') ? 'Click to open assignment link.' : 'Download the attached file for instructions.'}
+                            </span>
                         </div>
                         <Button
                             type="primary"
-                            href={`${imageUrl + assignment.attachment}`}
+                            href={
+                                assignment.attachment.startsWith('http')
+                                    ? assignment.attachment
+                                    : `${imageUrl}${assignment.attachment.startsWith('/') ? assignment.attachment : `/${assignment.attachment}`}`
+                            }
                             target="_blank"
                             icon={<LuDownload size={18} />}
                             className="bg-[#3BB77E] hover:bg-[#34a873] border-none flex items-center gap-2 rounded-xl h-10 px-5 font-semibold shadow-sm"
                         >
-                            Download
+                            {assignment.attachment.startsWith('http') ? 'Open Link' : 'Download'}
                         </Button>
                     </div>
                 )}

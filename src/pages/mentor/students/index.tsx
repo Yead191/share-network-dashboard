@@ -27,9 +27,15 @@ const Students = () => {
 
     const resources = resourcesData?.data?.resources || [];
     const student = studentProfile?.data || {};
-    const { data: activeAssignmentsData, isLoading: activeAssignmentsLoading } = useGetActiveAssignmentsQuery({
-        userGroup: student?.userGroup?.[0]?._id,
-    });
+    const { data: activeAssignmentsData, isLoading: activeAssignmentsLoading } = useGetActiveAssignmentsQuery(
+        {
+            userGroup: student?.userGroup?.[0]?._id,
+            studentId: student?._id,
+        },
+        {
+            skip: !student?._id,
+        },
+    );
     const { data: studentUpcomingEventsData, isLoading: studentUpcomingEventsLoading } =
         useGetStudentUpcomingEventsQuery({
             targetGroup: student?.userGroup?.[0]?._id,
@@ -101,7 +107,7 @@ const Students = () => {
 
                 <UpcomingEvents data={studentUpcomingEvents} />
 
-                <ActiveAssignments data={activeAssignments} />
+                <ActiveAssignments data={activeAssignments} studentId={student?._id} />
             </div>
         </div>
     );

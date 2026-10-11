@@ -92,9 +92,9 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
             title: 'TARGET',
             dataIndex: 'targets',
             key: 'targets',
-            render: (targets: { name: string; _id: string }[]) => (
+            render: (targets: { name: string; _id: string }[], record: any) => (
                 <div className="flex flex-col gap-1">
-                    {targets?.map((t) => (
+                    {targets && targets.length > 0 && targets.map((t) => (
                         <Tag
                             key={t._id}
                             className={`${t.name === 'Skill Path' ? 'bg-green-50 text-green-500 border-green-100' : 'bg-gray-50 text-gray-500 border-gray-100'} rounded-full px-3 py-0.5 text-[10px] w-fit font-medium`}
@@ -102,6 +102,16 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
                             {t.name}
                         </Tag>
                     ))}
+                    {record.studentAssigned && record.studentAssigned.length > 0 && (
+                        <Tag className="bg-purple-50 text-purple-600 border-purple-100 rounded-full px-3 py-0.5 text-[10px] w-fit font-medium">
+                            {record.studentAssigned.length} Student{record.studentAssigned.length > 1 ? 's' : ''}
+                        </Tag>
+                    )}
+                    {(!targets || targets.length === 0) && (!record.studentAssigned || record.studentAssigned.length === 0) && (
+                        <Tag className="bg-blue-50 text-blue-600 border-blue-100 rounded-full px-3 py-0.5 text-[10px] w-fit font-medium">
+                            All Students
+                        </Tag>
+                    )}
                 </div>
             ),
         },

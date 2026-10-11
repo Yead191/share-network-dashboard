@@ -16,10 +16,9 @@ export default function StudentAssignment() {
     const currentUserId = profileData?.data?._id;
 
     const { data, isLoading, isError, refetch } = useGetAssignmentsStudentQuery(
-        { userGroup: profileData?.data?.userGroup?.[0]?._id },
-        {
-            skip: !profileData?.data?.userGroup?.[0]?._id,
-        },
+        profileData?.data?.userGroup?.[0]?._id
+            ? { userGroup: profileData?.data?.userGroup?.[0]?._id }
+            : undefined,
     );
 
     const handleCardClick = (assignment: Assignment) => {
@@ -40,6 +39,7 @@ export default function StudentAssignment() {
             attachment: item.attachment,
             teacher: item.teacher,
             userGroup: item.userGroup,
+            studentAssigned: item.studentAssigned,
             submitAssignment:
                 item.submitAssignment?.map((s: any) => ({
                     _id: s._id,

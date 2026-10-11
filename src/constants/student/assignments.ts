@@ -29,4 +29,5 @@ export interface Assignment {
     };
     userGroup?: { _id: string; name: string }[];
     userGroupTrack?: string;
+    studentAssigned?: any[];
 }

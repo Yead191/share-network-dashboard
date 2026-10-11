@@ -24,10 +24,10 @@ import { useGetUserGroupsQuery } from '../../../redux/apiSlices/admin/adminStude
 
 function Assignment() {
     const { data: profile, isLoading: profileLoading } = useGetprofileQuery({});
-    const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({}, { skip: profileLoading || profile?.data?.role !== 'SUPER_ADMIN' });
+    const isAdmin = ['ADMIN', 'SUPER_ADMIN', 'admin', 'super_admin'].includes(profile?.data?.role);
+    const { data: userGroupsApi, isLoading: isUserGroupsLoading } = useGetUserGroupsQuery({}, { skip: profileLoading || !isAdmin });
 
-
-    const myGroups = profile?.data?.role === 'SUPER_ADMIN' ? userGroupsApi?.data : profile?.data?.userGroup;
+    const myGroups = isAdmin ? userGroupsApi?.data : profile?.data?.userGroup;
     // console.log("userGroups", myGroups)
     const [page, setPage] = useState(1);
     const [createAssignment] = useCreateAssignmentMutation();
@@ -41,8 +41,8 @@ function Assignment() {
         isLoading,
         isFetching,
         refetch,
-    } = useGetAssignmentQuery({ page: page, limit: 10, searchTerm: searchText, userGroup: selectedGroup ?? (profile?.data?.role === 'SUPER_ADMIN' ? undefined : myGroups?.map((group: any) => group._id)) }, {
-        skip: !myGroups || profileLoading
+    } = useGetAssignmentQuery({ page: page, limit: 10, searchTerm: searchText, userGroup: selectedGroup ?? (isAdmin ? undefined : myGroups?.map((group: any) => group._id)) }, {
+        skip: profileLoading
     });
     const { data: submissionData } = useGetAllSubmissionOfAssignmentQuery({ page: 1, limit: 10 });
     const [reviewSubmission] = useGiveMarksOfSubmissionMutation();
@@ -71,6 +71,7 @@ function Assignment() {
             points: item.totalPoint,
             type: item.userGroupTrack,
             attachment: item.attachment,
+            studentAssigned: item.studentAssigned,
         };
     });
 
@@ -112,6 +113,12 @@ function Assignment() {
 
         if (values.userGroupTrack) {
             formData.append('userGroupTrack', values.userGroupTrack);
+        }
+
+        if (values.studentAssigned && values.studentAssigned.length > 0) {
+            values.studentAssigned.forEach((studentId: string) => {
+                formData.append('studentAssigned[]', studentId);
+            });
         }
 
         if (values.attachmentType === 'file') {

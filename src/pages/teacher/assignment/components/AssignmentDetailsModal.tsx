@@ -64,17 +64,38 @@ const AssignmentDetailsModal: React.FC<AssignmentDetailsModalProps> = ({ open, o
                             <td className="p-4 font-semibold text-gray-500 text-sm">Groups</td>
                             <td className="p-4">
                                 <div className="flex flex-wrap gap-1">
-                                    {assignment.targets?.map((t: { _id: string; name: string }) => (
-                                        <Tag
-                                            key={t._id}
-                                            className="bg-gray-100 text-gray-600 border-none rounded-full px-4 font-medium uppercase text-[10px]"
-                                        >
-                                            {t.name}
-                                        </Tag>
-                                    ))}
+                                    {assignment.targets && assignment.targets.length > 0 ? (
+                                        assignment.targets.map((t: { _id: string; name: string }) => (
+                                            <Tag
+                                                key={t._id}
+                                                className="bg-gray-100 text-gray-600 border-none rounded-full px-4 font-medium uppercase text-[10px]"
+                                            >
+                                                {t.name}
+                                            </Tag>
+                                        ))
+                                    ) : (
+                                        <span className="text-gray-400 text-xs italic">No group targeted</span>
+                                    )}
                                 </div>
                             </td>
                         </tr>
+                        {assignment.studentAssigned && assignment.studentAssigned.length > 0 && (
+                            <tr className="border-b border-gray-100">
+                                <td className="p-4 font-semibold text-gray-500 text-sm">Assigned Students</td>
+                                <td className="p-4">
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {assignment.studentAssigned.map((st: any) => (
+                                            <Tag
+                                                key={st._id}
+                                                className="bg-purple-50 text-purple-700 border-purple-100 rounded-full px-3 py-0.5 font-medium text-xs"
+                                            >
+                                                {st.firstName} {st.lastName} ({st.email})
+                                            </Tag>
+                                        ))}
+                                    </div>
+                                </td>
+                            </tr>
+                        )}
                         <tr className="border-b border-gray-100">
                             <td className="p-4 font-semibold text-gray-500 text-sm">Due Date</td>
                             <td className="p-4 text-gray-700 font-medium">
