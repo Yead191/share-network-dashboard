@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ChatSidebar } from './ChatSidebar';
 import { Grid } from 'antd';
 import { ChatConversation } from './ChatConversation';
 import { useGetChatRoomsQuery, useCreateChatRoomMutation } from '../../../redux/apiSlices/chatSlice';
 import Spinner from '../../../components/shared/Spinner';
-import { socketUrl } from '../../../redux/api/baseApi';
-import { io } from 'socket.io-client';
 import { useProfileQuery } from '../../../redux/apiSlices/authSlice';
+import { getSocket } from '../../../utils/socket';
 import NewChatModal from '../../modals/chat/NewChatModal';
 import { toast } from 'sonner';
 
@@ -14,40 +14,75 @@ export default function ChatLayout() {
     const { data: userData } = useProfileQuery({});
     const user = userData?.data;
     const { lg } = Grid.useBreakpoint();
-    const [activeRoom, setActiveRoom] = useState<any>(null);
-    const [messageId, setMessageId] = useState<string | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    console.log(activeRoom, 'active room')
+    const [searchParams, setSearchParams] = useSearchParams();
+    const queryChatId = searchParams.get('chatId') || searchParams.get('id');
+    const queryUserId = searchParams.get('userId');
+
+    const [activeRoom, setActiveRoom] = useState<any>(null);
+    const [messageId, setMessageId] = useState<string | null>(queryChatId);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const { data, isLoading, refetch } = useGetChatRoomsQuery(undefined);
     const [createChatRoom, { isLoading: isCreatingChatRoom }] = useCreateChatRoomMutation();
 
     const chatRooms = data?.data || [];
-    // console.log(chatRooms);
 
-    const socket = useMemo(() => io(`${socketUrl}?userId=${user?._id}`), []);
-
+    // Socket listener for new incoming chat rooms
     useEffect(() => {
-        socket.on(`newChat`, (data) => {
+        if (!user?._id) return;
+        const socket = getSocket(user._id);
+
+        const handleNewChat = () => {
             refetch();
-            console.log(data, 'socket chat room');
+        };
 
-            // setMessages((prev) => [...prev, { ...data, sender: { _id: data?.sender?._id } }]);
-        });
-    }, [socket, user?._id]);
+        socket.on('newChat', handleNewChat);
+        return () => {
+            socket.off('newChat', handleNewChat);
+        };
+    }, [user?._id, refetch]);
 
-    // Default to the first room on desktop
+    // Synchronize selected conversation with URL query parameters & chat room list
     useEffect(() => {
-        if (lg && !messageId && chatRooms.length > 0) {
-            setActiveRoom(chatRooms[0]);
-            setMessageId(chatRooms[0]._id);
+        if (!chatRooms || chatRooms.length === 0) return;
+
+        // 1. If URL specifies a chatId
+        if (queryChatId) {
+            const matchedRoom = chatRooms.find((r: any) => String(r._id) === String(queryChatId));
+            if (matchedRoom) {
+                setActiveRoom(matchedRoom);
+                setMessageId(matchedRoom._id);
+                return;
+            }
         }
-    }, [lg, messageId, chatRooms]);
+
+        // 2. If URL specifies a participant userId
+        if (queryUserId) {
+            const matchedRoom = chatRooms.find((r: any) =>
+                r.participants?.some((p: any) => String(p._id) === String(queryUserId))
+            );
+            if (matchedRoom) {
+                setActiveRoom(matchedRoom);
+                setMessageId(matchedRoom._id);
+                setSearchParams({ chatId: matchedRoom._id }, { replace: true });
+                return;
+            }
+        }
+
+        // 3. If on desktop and nothing selected or selection not found, default to first room
+        if (lg && (!messageId || !chatRooms.some((r: any) => r._id === messageId))) {
+            const defaultRoom = chatRooms[0];
+            setActiveRoom(defaultRoom);
+            setMessageId(defaultRoom._id);
+            setSearchParams({ chatId: defaultRoom._id }, { replace: true });
+        }
+    }, [queryChatId, queryUserId, chatRooms, lg, messageId, setSearchParams]);
 
     const selectRoom = (room: any) => {
         setActiveRoom(room);
         setMessageId(room._id);
+        setSearchParams({ chatId: room._id });
     };
 
     const handleSelectUser = async (participantId: string) => {
@@ -58,22 +93,19 @@ export default function ChatLayout() {
             {
                 loading: 'Creating chat room...',
                 success: (res) => {
-
                     const room = res?.data;
                     if (room) {
                         const otherParticipant = room?.participants?.find(
                             (participant: any) => participant._id !== user?._id
                         );
                         setTimeout(() => {
-                            setActiveRoom(
-                                { participants: [otherParticipant] },
-                            );
+                            setActiveRoom({ ...room, participants: [otherParticipant] });
                             setMessageId(room._id);
+                            setSearchParams({ chatId: room._id });
                             refetch();
                             setIsModalOpen(false);
                         }, 500);
                     }
-
                     return res?.message || 'Chat room created successfully';
                 },
                 error: (err) => {
@@ -90,12 +122,17 @@ export default function ChatLayout() {
     // Mobile view logic
     if (!lg) {
         if (messageId) {
-            const selectedRoom = chatRooms.find((r: any) => r._id === messageId) || chatRooms[0];
+            const selectedRoom =
+                activeRoom || chatRooms.find((r: any) => r._id === messageId) || chatRooms[0];
             return (
                 <div className="h-[calc(100vh-120px)] flex flex-col p-4">
                     <button
-                        onClick={() => setMessageId(null)}
-                        className="mb-4 text-[#055E6E] font-medium flex items-center gap-2"
+                        onClick={() => {
+                            setMessageId(null);
+                            setActiveRoom(null);
+                            setSearchParams({});
+                        }}
+                        className="mb-4 text-emerald-700 font-semibold flex items-center gap-2 cursor-pointer hover:underline"
                     >
                         ← Back to Messages
                     </button>
@@ -126,8 +163,8 @@ export default function ChatLayout() {
 
     // Desktop view
     return (
-        <div className="flex gap-6 h-[calc(100vh-210px)] ">
-            <div className="w-[320px] shrink-0 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-y-auto">
+        <div className="flex gap-5 h-[calc(100vh-200px)]">
+            <div className="w-[340px] shrink-0 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
                 <ChatSidebar
                     messageId={messageId}
                     onSelect={selectRoom}
@@ -135,7 +172,7 @@ export default function ChatLayout() {
                     onNewChat={() => setIsModalOpen(true)}
                 />
             </div>
-            <div className="grow">
+            <div className="grow min-w-0">
                 <ChatConversation messageId={messageId} activeUser={activeRoom} />
             </div>
 

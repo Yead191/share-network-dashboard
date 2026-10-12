@@ -147,7 +147,8 @@ export const NotificationPage: React.FC = () => {
         }
 
         if (item.type === 'MESSAGE' || item.path === '/chat' || item.path?.includes('chat')) {
-            navigate(`/${routeRole}/chat`);
+            const chatId = item.refId;
+            navigate(chatId ? `/${routeRole}/chat?chatId=${chatId}` : `/${routeRole}/chat`);
             return;
         }
 
