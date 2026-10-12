@@ -15,8 +15,19 @@ const studentApi = api.injectEndpoints({
             query: ({ targetGroup }) => `/admin-event?targetGroup=${targetGroup}`,
         }),
         getStudentSchedule: builder.query({
-            query: ({ userGroup, userGroupTrack, filterType }) => `/class?userGroup=${userGroup}&filterType=${filterType}${userGroupTrack ? `&userGroupTrack=${userGroupTrack}` : ''
-                }`
+            query: ({ userGroup, userGroupTrack, filterType, studentId }: {
+                userGroup?: string;
+                userGroupTrack?: string;
+                filterType?: string;
+                studentId?: string;
+            } = {}) => {
+                const params = new URLSearchParams();
+                if (userGroup) params.append('userGroup', userGroup);
+                if (userGroupTrack) params.append('userGroupTrack', userGroupTrack);
+                if (filterType) params.append('filterType', filterType);
+                if (studentId) params.append('studentId', studentId);
+                return `/class?${params.toString()}`;
+            },
         }),
     }),
 });

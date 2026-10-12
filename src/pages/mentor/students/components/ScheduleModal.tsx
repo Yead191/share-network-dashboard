@@ -37,11 +37,11 @@ export default function ScheduleModal({ isModalOpen, setIsModalOpen, selectedSch
                     </h2>
                     <div className="flex items-center gap-4 text-sm text-gray-500 font-medium">
                         <div className="flex items-center gap-2">
-                            <Calendar size={16} className="text-blue-500" />
+                            <Calendar size={16} className="text-emerald-500" />
                             {moment(selectedSchedule?.classDate).format('MMMM DD, YYYY')}
                         </div>
                         <div className="flex items-center gap-2">
-                            <Clock size={16} className="text-blue-500" />
+                            <Clock size={16} className="text-emerald-500" />
                             {moment(selectedSchedule?.classDate).format('hh:mm A')}
                         </div>
                     </div>
@@ -55,7 +55,7 @@ export default function ScheduleModal({ isModalOpen, setIsModalOpen, selectedSch
                             <BookOpen size={16} className="text-gray-400" />
                             <h4 className="text-sm font-bold text-gray-700">Course Content</h4>
                         </div>
-                        <p className="text-sm text-gray-600 leading-relaxed bg-blue-50/30 p-4 rounded-xl border border-blue-50/50">
+                        <p className="text-sm text-gray-600 leading-relaxed bg-emerald-50/30 p-4 rounded-xl border border-emerald-50/50">
                             {selectedSchedule?.description}
                         </p>
                     </div>
@@ -87,14 +87,25 @@ export default function ScheduleModal({ isModalOpen, setIsModalOpen, selectedSch
                             <div>
                                 <div className="flex items-center gap-2 mb-1.5">
                                     <Tag className="text-gray-400" />
-                                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Group</h4>
+                                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Audience</h4>
                                 </div>
                                 <div className="flex flex-wrap gap-1 pl-6">
-                                    {selectedSchedule?.userGroup?.map((group: any) => (
-                                        <Tag key={group._id} className="m-0 rounded-full border-none bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-0">
-                                            {group.name}
+                                    {selectedSchedule?.userGroup && selectedSchedule?.userGroup?.length > 0 ? (
+                                        selectedSchedule.userGroup.map((group: any) => (
+                                            <Tag key={group._id} className="m-0 rounded-full border-none bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-0">
+                                                {group.name}
+                                            </Tag>
+                                        ))
+                                    ) : (selectedSchedule?.studentAssigned && selectedSchedule?.studentAssigned?.length > 0) ||
+                                      (selectedSchedule?.studentId && selectedSchedule?.studentId?.length > 0) ? (
+                                        <Tag className="m-0 rounded-full border-none bg-purple-50 text-purple-600 text-[10px] font-bold px-2 py-0">
+                                            Individual Assigned
                                         </Tag>
-                                    )) || <span className="text-sm text-gray-400">N/A</span>}
+                                    ) : (
+                                        <Tag className="m-0 rounded-full border-none bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-0">
+                                            All Students
+                                        </Tag>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -113,10 +124,10 @@ export default function ScheduleModal({ isModalOpen, setIsModalOpen, selectedSch
                                     href={selectedSchedule.slideUrl}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="flex items-center justify-between p-3 rounded-xl bg-blue-50/50 border border-blue-100/50 hover:bg-blue-50 transition-all group"
+                                    className="flex items-center justify-between p-3 rounded-xl bg-emerald-50/50 border border-emerald-100/50 hover:bg-emerald-50 transition-all group"
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
+                                        <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
                                             <ExternalLink size={16} />
                                         </div>
                                         <div>
@@ -124,7 +135,7 @@ export default function ScheduleModal({ isModalOpen, setIsModalOpen, selectedSch
                                             <p className="text-[10px] text-gray-500">Click to visit slide</p>
                                         </div>
                                     </div>
-                                    <div className="text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <ExternalLink size={14} />
                                     </div>
                                 </a>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Table, Button, Input, Modal, message, Popover, Select } from 'antd';
-import { Search, Plus, Calendar, MapPin, Eye, Edit, Trash2, Filter as FilterIcon, Clock, CheckCircle2 } from 'lucide-react';
+import { Search, Plus, Calendar, MapPin, Eye, Edit, Trash2, Filter as FilterIcon, Clock, CheckCircle2, Video } from 'lucide-react';
 import HeaderTitle from '../../../components/shared/HeaderTitle';
 import AddClassScheduleModal from '../../../components/modals/admin/AddClassScheduleModal';
 import ClassScheduleDetailsModal from '../../../components/modals/admin/ClassScheduleDetailsModal';
@@ -50,6 +50,8 @@ const AdminSchedule = () => {
         userGroup: item?.userGroup,
         teacher: item?.teacher,
         userGroupTrack: item?.userGroupTrack,
+        studentAssigned: item?.studentAssigned,
+        studentId: item?.studentId,
         virtualClass: item?.virtualClass,
         location: item?.location,
         target: item,
@@ -88,21 +90,38 @@ const AdminSchedule = () => {
         {
             title: 'CLASS',
             key: 'class',
-            render: (_: any, record: any) => (
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
-                        <Calendar size={18} />
+            render: (_: any, record: any) => {
+                const assigned = record?.studentAssigned || record?.studentId || [];
+                const isIndividual = Array.isArray(assigned) && assigned.length > 0;
+                return (
+                    <div className="flex items-center gap-3">
+                        <div
+                            className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                                record.virtualClass
+                                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                                    : 'bg-blue-50 text-blue-600 border border-blue-100'
+                            }`}
+                        >
+                            {record.virtualClass ? <Video size={18} /> : <Calendar size={18} />}
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <p className="font-semibold text-gray-800 leading-snug">{record.title}</p>
+                                {isIndividual && (
+                                    <span className="text-[10px] font-bold bg-purple-50 text-purple-600 border border-purple-100 rounded-full px-2 py-0.5">
+                                        Individual
+                                    </span>
+                                )}
+                            </div>
+                            <p className="text-xs text-gray-400 line-clamp-1 mt-0.5">
+                                {record.description?.length > 50
+                                    ? `${record.description.slice(0, 50)}...`
+                                    : record.description}
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <p className="font-semibold text-gray-800">{record.title}</p>
-                        <p className="text-xs text-gray-400">
-                            {record.description?.length > 50
-                                ? `${record.description.slice(0, 50)}...`
-                                : record.description}
-                        </p>
-                    </div>
-                </div>
-            ),
+                );
+            },
         },
         {
             title: 'DATE & TIME',
@@ -110,40 +129,69 @@ const AdminSchedule = () => {
             render: (_: any, record: any) => (
                 <div className="text-sm">
                     <p className="font-medium text-gray-800">{record.date}</p>
-                    <p className="text-gray-400">{record.time}</p>
+                    <p className="text-gray-400 text-xs mt-0.5">{record.time}</p>
                 </div>
             ),
         },
         {
-            title: 'TARGET',
+            title: 'TARGET AUDIENCE',
             dataIndex: 'target',
             key: 'target',
-            render: (tags: { userGroupTrack: { name: string }; userGroup: { _id: string; name: string }[] }) => (
-                <div className="flex flex-wrap gap-1">
-                    <p className="px-2.5 py-1 bg-gray-50 text-gray-400 text-[10px] rounded-full border border-gray-100 uppercase tracking-tighter">
-                        {tags?.userGroupTrack?.name}
-                    </p>
-                    <div className="flex flex-wrap gap-1.5">
-                        {tags?.userGroup?.map((tag: { _id: string; name: string }) => (
-                            <span
-                                key={tag?._id}
-                                className="px-2.5 py-1 bg-gray-50 text-gray-400 text-[10px] rounded-full border border-gray-100 uppercase tracking-tighter"
-                            >
-                                {tag?.name}
+            render: (_: any, record: any) => {
+                const assigned = record?.studentAssigned || record?.studentId || [];
+                const hasAssigned = Array.isArray(assigned) && assigned.length > 0;
+                const groups = record?.userGroup || [];
+                const hasGroups = Array.isArray(groups) && groups.length > 0;
+
+                return (
+                    <div className="flex flex-col gap-1">
+                        {hasAssigned && (
+                            <span className="px-2.5 py-0.5 bg-purple-50 text-purple-700 text-[10px] font-bold rounded-full border border-purple-200 uppercase tracking-tight w-fit">
+                                {assigned.length} Student{assigned.length > 1 ? 's' : ''} (1-on-1)
                             </span>
-                        ))}
+                        )}
+                        {hasGroups ? (
+                            <div className="flex flex-wrap gap-1">
+                                {record?.userGroupTrack?.name && (
+                                    <span className="px-2 py-0.5 bg-gray-50 text-gray-500 text-[10px] font-medium rounded-md border border-gray-100">
+                                        {record.userGroupTrack.name}
+                                    </span>
+                                )}
+                                {groups.map((tag: any) => (
+                                    <span
+                                        key={tag?._id}
+                                        className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-semibold rounded-md border border-blue-100"
+                                    >
+                                        {tag?.name}
+                                    </span>
+                                ))}
+                            </div>
+                        ) : !hasAssigned ? (
+                            <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200 uppercase tracking-tight w-fit">
+                                All Students
+                            </span>
+                        ) : null}
                     </div>
-                </div>
-            ),
+                );
+            },
         },
         {
             title: 'LOCATION',
             dataIndex: 'location',
             key: 'location',
-            render: (text: string) => (
-                <div className="flex items-center gap-1.5 text-sm text-gray-600">
-                    <MapPin size={14} className="text-gray-400" />
-                    <span>{text}</span>
+            render: (text: string, record: any) => (
+                <div className="flex items-center gap-1.5 text-xs text-gray-600">
+                    {record.virtualClass ? (
+                        <>
+                            <Video size={13} className="text-emerald-500" />
+                            <span className="text-emerald-700 font-medium">Virtual / Online</span>
+                        </>
+                    ) : (
+                        <>
+                            <MapPin size={13} className="text-gray-400" />
+                            <span>{text || 'Campus'}</span>
+                        </>
+                    )}
                 </div>
             ),
         },
@@ -152,7 +200,12 @@ const AdminSchedule = () => {
             dataIndex: 'status',
             key: 'status',
             render: (text: boolean) => (
-                <div className={`flex items-center gap-2 px-3 py-1 border rounded-lg text-xs font-medium cursor-pointer w-fit ${text ? 'border-green-200 bg-green-50 text-green-600' : 'border-red-200 bg-red-50 text-red-600'}`}>
+                <div
+                    className={`flex items-center gap-1.5 px-2.5 py-0.5 border rounded-full text-xs font-semibold w-fit ${
+                        text ? 'border-green-200 bg-green-50 text-green-600' : 'border-red-200 bg-red-50 text-red-600'
+                    }`}
+                >
+                    <span className={`w-1.5 h-1.5 rounded-full ${text ? 'bg-green-500' : 'bg-red-500'}`} />
                     {text ? 'Active' : 'Inactive'}
                 </div>
             ),
@@ -164,7 +217,7 @@ const AdminSchedule = () => {
                 <div className="flex items-center gap-2">
                     <Button
                         icon={<Eye size={16} />}
-                        className="flex items-center justify-center gap-1.5 text-sm text-gray-500 hover:text-blue-500 border-none shadow-none bg-transparent"
+                        className="flex items-center justify-center gap-1.5 text-sm text-gray-500 hover:text-emerald-600 border-none shadow-none bg-transparent"
                         onClick={() => {
                             setSelectedSchedule(record);
                             setIsDetailsModalOpen(true);
@@ -270,21 +323,22 @@ const AdminSchedule = () => {
                     >
                         <Button
                             icon={<FilterIcon className="w-4 h-4" />}
-                            className={`h-10 px-6 border-gray-200 text-gray-600 font-semibold flex items-center gap-2 rounded-lg shadow-sm transition-all ${filterGroup || filterTrack ? 'bg-blue-50 border-blue-200 text-blue-600' : ''
-                                }`}
+                            className={`h-10 px-6 border-gray-200 text-gray-600 font-semibold flex items-center gap-2 rounded-xl shadow-sm transition-all ${
+                                filterGroup || filterTrack ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : ''
+                            }`}
                         >
                             Filter
                         </Button>
                     </Popover>
                     <Button
                         icon={<Plus className="w-4 h-4" />}
-                        className="h-10 px-6 bg-[#22C55E] text-white hover:bg-[#1ea34d] border-none font-medium flex items-center gap-2 rounded-lg"
+                        className="h-10 px-6 bg-[#22C55E] hover:!bg-[#1ea34d] text-white border-none font-semibold flex items-center gap-2 rounded-xl shadow-md shadow-emerald-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                         onClick={() => {
                             setSelectedSchedule(null);
                             setIsAddModalOpen(true);
                         }}
                     >
-                        Add Schedule
+                        Schedule Class
                     </Button>
                 </div>
             </div>
@@ -292,20 +346,24 @@ const AdminSchedule = () => {
             {/* Tab Filter */}
             <div className="flex items-center gap-1 p-1 bg-gray-100/80 rounded-xl w-fit">
                 <button
-                    onClick={() => { setActiveTab('upcoming'); setPage(1); }}
+                    onClick={() => {
+                        setActiveTab('upcoming');
+                        setPage(1);
+                    }}
                     className={`
                         relative flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold
                         transition-all duration-300 ease-out cursor-pointer
-                        ${activeTab === 'upcoming'
-                            ? 'bg-white text-blue-600 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
-                            : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                        ${
+                            activeTab === 'upcoming'
+                                ? 'bg-white text-emerald-600 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
+                                : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
                         }
                     `}
                 >
-                    <Clock size={15} className={activeTab === 'upcoming' ? 'text-blue-500' : 'text-gray-400'} />
+                    <Clock size={15} className={activeTab === 'upcoming' ? 'text-emerald-500' : 'text-gray-400'} />
                     Upcoming
                     {activeTab === 'upcoming' && scheduleApi?.pagination?.total != null && (
-                        <span className="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                        <span className="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
                             {scheduleApi.pagination.total}
                         </span>
                     )}

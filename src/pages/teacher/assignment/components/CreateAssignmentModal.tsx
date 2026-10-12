@@ -23,7 +23,6 @@ import {
   Check,
   File as FileIcon,
   Trash2,
-  Sparkles,
 } from "lucide-react";
 import dayjs from "dayjs";
 import {

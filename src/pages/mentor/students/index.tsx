@@ -40,13 +40,19 @@ const Students = () => {
         useGetStudentUpcomingEventsQuery({
             targetGroup: student?.userGroup?.[0]?._id,
         });
-    const { data: schedule, isLoading: scheduleLoading } = useGetStudentScheduleQuery({
-        userGroup: student?.userGroup?.[0]?._id,
-        filterType: "upcoming",
-        ...(student?.userGroupTrack?._id && {
-            userGroupTrack: student?.userGroupTrack?._id,
-        })
-    });
+    const { data: schedule, isLoading: scheduleLoading } = useGetStudentScheduleQuery(
+        {
+            userGroup: student?.userGroup?.[0]?._id,
+            studentId: student?._id,
+            filterType: 'upcoming',
+            ...(student?.userGroupTrack?._id && {
+                userGroupTrack: student?.userGroupTrack?._id,
+            }),
+        },
+        {
+            skip: !student?._id,
+        },
+    );
 
     const activeAssignments = activeAssignmentsData?.data || [];
     const studentUpcomingEvents = studentUpcomingEventsData?.data?.data || [];

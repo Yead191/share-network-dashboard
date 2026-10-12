@@ -17,15 +17,17 @@ const StudentSchedule = () => {
     const [activeTab, setActiveTab] = useState<'upcoming' | 'completed'>('upcoming');
     const { data } = useGetprofileQuery({});
     const user = data?.data?.data ?? data?.data ?? data;
+    const studentId = user?._id;
     const userGroup = user?.userGroup?.[0]?._id;
     const { data: scheduleApi, isLoading, isFetching } = useGetStudentClassScheduleQuery({
         page: page,
         limit: 10,
         searchTerm: searchTerm,
         userGroup: userGroup,
+        studentId: studentId,
         filterType: activeTab,
     }, {
-        skip: !userGroup,
+        skip: !studentId,
     });
     const pagination = scheduleApi?.pagination;
 
@@ -40,6 +42,8 @@ const StudentSchedule = () => {
         userGroup: item?.userGroup,
         teacher: item?.teacher,
         userGroupTrack: item?.userGroupTrack,
+        studentAssigned: item?.studentAssigned,
+        studentId: item?.studentId,
         virtualClass: item?.virtualClass,
         target: item,
         location: item?.location,
@@ -52,22 +56,35 @@ const StudentSchedule = () => {
         {
             title: 'CLASS',
             key: 'class',
-            render: (_: any, record: any) => (
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
-                        <Calendar size={18} />
+            render: (_: any, record: any) => {
+                const isPersonal =
+                    (record?.studentAssigned && record.studentAssigned.length > 0) ||
+                    (record?.studentId && record.studentId.length > 0);
+                return (
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-50/80 border border-emerald-100/60 flex items-center justify-center text-emerald-600 shrink-0">
+                            <Calendar size={18} />
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <p className="font-semibold text-gray-800 hover:text-emerald-600 transition-colors">
+                                    {record.title}
+                                </p>
+                                {isPersonal && (
+                                    <span className="text-[10px] font-bold bg-purple-50 text-purple-600 border border-purple-100 rounded-full px-2 py-0.5">
+                                        Personal
+                                    </span>
+                                )}
+                            </div>
+                            <p className="text-xs text-gray-400 line-clamp-1 mt-0.5">
+                                {record.description?.length > 60
+                                    ? record.description.slice(0, 60) + '...'
+                                    : record.description}
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <p className="font-semibold text-gray-800">{record.title}</p>
-
-                        <p className="text-xs text-gray-400">
-                            {record.description?.length > 50
-                                ? record.description.slice(0, 50) + '...'
-                                : record.description}
-                        </p>
-                    </div>
-                </div>
-            ),
+                );
+            },
         },
         {
             title: 'DATE & TIME',
@@ -90,7 +107,7 @@ const StudentSchedule = () => {
                                 href={record.slideUrl}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                                className="p-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
                             >
                                 <ExternalLink size={16} />
                             </a>
@@ -106,7 +123,7 @@ const StudentSchedule = () => {
                                 href={getImageUrl(record.file)}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="p-2 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors"
+                                className="p-2 rounded-lg bg-teal-50 text-teal-600 hover:bg-teal-100 transition-colors"
                             >
                                 <Download size={16} />
                             </a>
@@ -131,18 +148,36 @@ const StudentSchedule = () => {
             ),
         },
         {
-            title: 'Target Group',
-            dataIndex: 'userGroup',
-            key: 'userGroup',
-            render: (userGroup: { _id: string; name: string }[]) => (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                    {userGroup?.map((group) => (
-                        <Tag key={group._id} color="blue">
-                            {group.name}
+            title: 'TARGET',
+            key: 'target',
+            render: (_: any, record: any) => {
+                if (record?.userGroup && record.userGroup.length > 0) {
+                    return (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                            {record.userGroup.map((group: any) => (
+                                <Tag key={group._id} color="green">
+                                    {group.name}
+                                </Tag>
+                            ))}
+                        </div>
+                    );
+                }
+                const isPersonal =
+                    (record?.studentAssigned && record.studentAssigned.length > 0) ||
+                    (record?.studentId && record.studentId.length > 0);
+                if (isPersonal) {
+                    return (
+                        <Tag color="purple">
+                            Personal Assigned
                         </Tag>
-                    ))}
-                </div>
-            ),
+                    );
+                }
+                return (
+                    <Tag color="green">
+                        All Students
+                    </Tag>
+                );
+            },
         },
         {
             title: 'STATUS',
@@ -161,7 +196,7 @@ const StudentSchedule = () => {
                 <div className="flex items-center gap-2">
                     <Button
                         icon={<Eye size={16} />}
-                        className="flex items-center justify-center gap-1.5 text-sm text-gray-500 hover:text-blue-500 border-none shadow-none bg-transparent"
+                        className="flex items-center justify-center gap-1.5 text-sm text-gray-500 hover:text-emerald-600 border-none shadow-none bg-transparent"
                         onClick={() => {
                             setSelectedSchedule(record);
                             setIsDetailsModalOpen(true);
@@ -193,15 +228,15 @@ const StudentSchedule = () => {
                         relative flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold
                         transition-all duration-300 ease-out cursor-pointer
                         ${activeTab === 'upcoming'
-                                ? 'bg-white text-blue-600 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
+                                ? 'bg-white text-emerald-600 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
                                 : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
                             }
                     `}
                     >
-                        <Clock size={15} className={activeTab === 'upcoming' ? 'text-blue-500' : 'text-gray-400'} />
+                        <Clock size={15} className={activeTab === 'upcoming' ? 'text-emerald-500' : 'text-gray-400'} />
                         Upcoming
                         {activeTab === 'upcoming' && pagination?.total != null && (
-                            <span className="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                            <span className="ml-1 px-2 py-0.5 text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
                                 {pagination.total}
                             </span>
                         )}
