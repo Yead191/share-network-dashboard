@@ -6,6 +6,8 @@ import { useGetprofileQuery } from '../../redux/apiSlices/students/overview.slic
 import { getImageUrl } from '../../utils/getImageUrl';
 import { LogOut, Sparkles, GraduationCap, ShieldCheck, Users } from 'lucide-react';
 import { Avatar } from 'antd';
+import NotificationDropdown from './NotificationDropdown';
+import { disconnectSocket } from '../../utils/socket';
 
 const HeaderDashboard = () => {
     const { data: userResponse } = useGetprofileQuery({});
@@ -52,6 +54,7 @@ const HeaderDashboard = () => {
                     : `/${routeRole}/overview`;
 
     const handleLogout = () => {
+        disconnectSocket(userData?._id);
         localStorage.removeItem('token');
         localStorage.removeItem('role');
         dispatch(api.util.resetApiState());
@@ -122,8 +125,14 @@ const HeaderDashboard = () => {
                     </div>
                 </div>
 
-                {/* Right Side: User Profile Snippet & Logout */}
-                <div className="flex items-center gap-3 sm:gap-4">
+                {/* Right Side: Notifications, User Profile Snippet & Logout */}
+                <div className="flex items-center gap-2.5 sm:gap-3.5">
+                    {/* Real-time Notification Bell & Dropdown */}
+                    <NotificationDropdown
+                        currentUserId={userData?._id}
+                        routeRole={routeRole}
+                    />
+
                     {/* User Snippet (Clickable to profile) */}
                     <div
                         onClick={() => navigate(profilePath)}

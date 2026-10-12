@@ -27,6 +27,7 @@ export const api = createApi({
     "Assignment",
     "Submission",
     "MentorWoops",
+    "Notification",
   ],
   endpoints: () => ({}),
 });

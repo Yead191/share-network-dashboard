@@ -48,6 +48,7 @@ import MentorDetailsPage from '../pages/mentor-coordinator/mentors/details/index
 import PrivacyPolicy from '../pages/extra/PrivacyPolicy';
 import InternshipPage from '../pages/admin/Internship/InternshipPage';
 import HowToDelete from '../pages/extra/HowToDelete';
+import NotificationPage from '../pages/notifications/NotificationPage';
 
 const router = createBrowserRouter([
     {
@@ -63,6 +64,51 @@ const router = createBrowserRouter([
             {
                 index: true,
                 element: <HomeRedirect />,
+            },
+            // Notifications (Global & Role-specific)
+            {
+                path: '/notifications',
+                element: <NotificationPage />,
+            },
+            {
+                path: '/admin/notifications',
+                element: (
+                    <PrivateRoute role={['admin', 'super_admin']}>
+                        <NotificationPage />
+                    </PrivateRoute>
+                ),
+            },
+            {
+                path: '/teacher/notifications',
+                element: (
+                    <PrivateRoute role={['teacher']}>
+                        <NotificationPage />
+                    </PrivateRoute>
+                ),
+            },
+            {
+                path: '/mentor/notifications',
+                element: (
+                    <PrivateRoute role={['mentor']}>
+                        <NotificationPage />
+                    </PrivateRoute>
+                ),
+            },
+            {
+                path: '/student/notifications',
+                element: (
+                    <PrivateRoute role={['student']}>
+                        <NotificationPage />
+                    </PrivateRoute>
+                ),
+            },
+            {
+                path: '/mentor-coordinator/notifications',
+                element: (
+                    <PrivateRoute role={['coordinator', 'mentor-coordinator']}>
+                        <NotificationPage />
+                    </PrivateRoute>
+                ),
             },
             // Admin
             {

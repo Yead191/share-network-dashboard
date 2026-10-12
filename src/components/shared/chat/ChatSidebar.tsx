@@ -1,6 +1,7 @@
 import { Empty, Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { getImageUrl } from '../../../utils/getImageUrl';
+import { useOnlineUsers } from '../../../utils/socket';
 
 interface ChatSidebarProps {
     messageId: string | null;
@@ -10,6 +11,8 @@ interface ChatSidebarProps {
 }
 
 export function ChatSidebar({ messageId, onSelect, chatRooms, onNewChat }: ChatSidebarProps) {
+    const onlineUsers = useOnlineUsers();
+
     return (
         <div className="space-y-2 p-2">
             <div className="p-2 mb-4 flex justify-between items-center border-b border-gray-50 pb-3">
@@ -28,25 +31,34 @@ export function ChatSidebar({ messageId, onSelect, chatRooms, onNewChat }: ChatS
                     <Empty description="No Chatrooms Found" />
                 </div>
             ) : (
-                chatRooms?.map((room: any) => (
-                    <button
-                        key={room._id}
-                        onClick={() => onSelect(room)}
-                        className={`w-full flex items-center gap-4 p-4 rounded-xl transition-colors text-left group
+                chatRooms?.map((room: any) => {
+                    const participant = room?.participants?.[0];
+                    const isOnline = participant?._id && onlineUsers.includes(String(participant._id));
+
+                    return (
+                        <button
+                            key={room._id}
+                            onClick={() => onSelect(room)}
+                            className={`w-full flex items-center gap-4 p-4 rounded-xl transition-colors text-left group
             ${messageId === room._id ? 'bg-[#055E6E]/10 border border-[#055E6E]/20' : 'hover:bg-gray-50 border border-transparent'}
           `}
-                    >
-                        <div className="relative w-12 h-12 rounded-full overflow-hidden shrink-0 bg-gray-100 border border-gray-200">
-                            <img
-                                src={
-                                    room?.participants[0]?.profile
-                                        ? getImageUrl(room?.participants[0]?.profile)
-                                        : '/assets/images/provider/no_user.png'
-                                }
-                                alt={room?.participants[0]?.firstName + ' ' + room?.participants[0]?.lastName}
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
+                        >
+                            <div className="relative w-12 h-12 rounded-full shrink-0 bg-gray-100 border border-gray-200">
+                                <img
+                                    src={
+                                        participant?.profile
+                                            ? getImageUrl(participant.profile)
+                                            : '/assets/images/provider/no_user.png'
+                                    }
+                                    alt={participant?.firstName + ' ' + participant?.lastName}
+                                    className="w-full h-full object-cover rounded-full"
+                                />
+                                <span
+                                    className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full ring-2 ring-white transition-colors duration-300 ${
+                                        isOnline ? 'bg-emerald-500' : 'bg-gray-300'
+                                    }`}
+                                />
+                            </div>
                         <div className="grow min-w-0">
                             <div className="flex justify-between items-start mb-0.5">
                                 <h4
@@ -75,7 +87,8 @@ export function ChatSidebar({ messageId, onSelect, chatRooms, onNewChat }: ChatS
                             </div>
                         </div>
                     </button>
-                ))
+                    );
+                })
             )}
         </div>
     );
