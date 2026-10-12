@@ -28,15 +28,13 @@ export function ChatConversation({ messageId, activeUser }: { messageId: any; ac
     const containerRef = useRef<HTMLDivElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const { data, refetch } = useGetMessagesQuery(messageId);
-    const [sendMessage, { isLoading: isSendingMutation }] = useSendMessageMutation();
+    const { data } = useGetMessagesQuery(messageId);
+    const [sendMessage] = useSendMessageMutation();
 
     const [localMessages, setLocalMessages] = useState<ILocalMessage[]>([]);
     const [showScrollButton, setShowScrollButton] = useState(false);
     const [unreadWhileScrolled, setUnreadWhileScrolled] = useState(0);
     const isAtBottomRef = useRef(true);
-
-    const socket = getSocket(user?._id);
 
     // Sync query messages into localMessages
     useEffect(() => {
@@ -86,6 +84,8 @@ export function ChatConversation({ messageId, activeUser }: { messageId: any; ac
     useEffect(() => {
         if (!messageId) return;
 
+        const socket = getSocket(user?._id);
+
         const handleFocus = () => {
             joinChatRoom(messageId);
         };
@@ -111,12 +111,27 @@ export function ChatConversation({ messageId, activeUser }: { messageId: any; ac
         document.addEventListener('visibilitychange', handleVisibilityChange);
 
         const handleNewMessage = (newMsg: any) => {
-            // Append message to state instantly
             setLocalMessages((prev) => {
+                // If message is already present by real _id, skip
                 if (prev.some((m) => m._id === newMsg._id)) return prev;
+
+                // If sent by me, check if there is a pending optimistic message to replace
+                const isSentByMe = newMsg?.sender?._id === user?._id;
+                if (isSentByMe) {
+                    const tempIndex = prev.findIndex(
+                        (m) =>
+                            (m.status === 'sending' || m._id.startsWith('temp-')) &&
+                            m.text === newMsg.text
+                    );
+                    if (tempIndex !== -1) {
+                        const updated = [...prev];
+                        updated[tempIndex] = { ...newMsg, status: 'sent' };
+                        return updated;
+                    }
+                }
+
                 return [newMsg, ...prev];
             });
-            refetch();
 
             // If user is near bottom, scroll down immediately
             if (isAtBottomRef.current) {
@@ -159,7 +174,7 @@ export function ChatConversation({ messageId, activeUser }: { messageId: any; ac
             document.removeEventListener('visibilitychange', handleVisibilityChange);
             socket.off(`getMessage::${messageId}`, handleNewMessage);
         };
-    }, [messageId, user?._id, socket, scrollToBottom]);
+    }, [messageId, user?._id, scrollToBottom]);
 
     // Handle scroll position and toggle floating button
     const handleScroll = () => {
@@ -213,11 +228,17 @@ export function ChatConversation({ messageId, activeUser }: { messageId: any; ac
             });
 
             const res = await sendMessage(formData).unwrap();
+            const serverMsg = res?.data;
 
-            // Replace optimistic message with server confirmed message
-            setLocalMessages((prev) =>
-                prev.map((m) => (m._id === tempId ? { ...(res?.data || m), status: 'sent' } : m))
-            );
+            if (serverMsg) {
+                setLocalMessages((prev) => {
+                    const alreadyExists = prev.some((m) => m._id === serverMsg._id);
+                    if (alreadyExists) {
+                        return prev.filter((m) => m._id !== tempId);
+                    }
+                    return prev.map((m) => (m._id === tempId ? { ...serverMsg, status: 'sent' } : m));
+                });
+            }
             setTimeout(() => scrollToBottom(true), 30);
         } catch (err: any) {
             console.error('Failed to send message:', err);
@@ -228,9 +249,19 @@ export function ChatConversation({ messageId, activeUser }: { messageId: any; ac
         }
     };
 
-    // Sort messages chronologically: oldest first, newest at the bottom
+    // Sort messages chronologically: oldest first, newest at the bottom, deduplicating by _id
     const sortedMessages = useMemo(() => {
-        return [...localMessages].sort(
+        const seenIds = new Set<string>();
+        const unique: ILocalMessage[] = [];
+
+        for (const msg of localMessages) {
+            if (!seenIds.has(msg._id)) {
+                seenIds.add(msg._id);
+                unique.push(msg);
+            }
+        }
+
+        return unique.sort(
             (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
     }, [localMessages]);
@@ -443,7 +474,7 @@ export function ChatConversation({ messageId, activeUser }: { messageId: any; ac
 
             {/* Input Bar */}
             <div className="p-4 bg-white border-t border-gray-100 z-10">
-                <MessageInput onSend={handleSendMessage} disabled={isSendingMutation} />
+                <MessageInput onSend={handleSendMessage} />
             </div>
         </div>
     );

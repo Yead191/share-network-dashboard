@@ -14,6 +14,7 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
     const [mediaFiles, setMediaFiles] = useState<File[]>([]);
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const textAreaRef = useRef<any>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
@@ -38,10 +39,18 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
         setMessage('');
         setMediaFiles([]);
         setPreviewUrls([]);
+
+        // Ensure focus remains on the message textarea
+        setTimeout(() => {
+            textAreaRef.current?.focus();
+        }, 0);
     };
 
     const onEmojiClick = (emojiData: EmojiClickData) => {
         setMessage((prev) => prev + emojiData.emoji);
+        setTimeout(() => {
+            textAreaRef.current?.focus();
+        }, 0);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -101,6 +110,7 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
                 {/* Text Input Area */}
                 <div className="flex-1 min-w-0 flex items-center py-0.5">
                     <Input.TextArea
+                        ref={textAreaRef}
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         onKeyDown={handleKeyDown}

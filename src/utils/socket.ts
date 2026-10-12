@@ -4,6 +4,7 @@ import { socketUrl as baseSocketUrl } from '../redux/api/baseApi';
 
 let socketInstance: Socket | null = null;
 let currentOnlineUsers: string[] = [];
+let lastIdentifiedUserId: string | null = null;
 const onlineSubscribers = new Set<(users: string[]) => void>();
 
 export const getSocketUrl = (): string => {
@@ -42,14 +43,21 @@ export const getSocket = (userId?: string): Socket => {
         socketInstance.on('connect', () => {
             console.log('[Socket] Connected:', socketInstance?.id);
             if (userId) {
+                lastIdentifiedUserId = userId;
                 socketInstance?.emit('identify', userId);
             }
             socketInstance?.emit('get-online-users');
         });
 
         socketInstance.on('online-users', (users: string[]) => {
-            currentOnlineUsers = Array.isArray(users) ? users : [];
-            onlineSubscribers.forEach((cb) => cb(currentOnlineUsers));
+            const newUsers = Array.isArray(users) ? users : [];
+            const isSame =
+                currentOnlineUsers.length === newUsers.length &&
+                currentOnlineUsers.every((u, i) => u === newUsers[i]);
+            if (!isSame) {
+                currentOnlineUsers = newUsers;
+                onlineSubscribers.forEach((cb) => cb(currentOnlineUsers));
+            }
         });
 
         socketInstance.on('disconnect', (reason) => {
@@ -59,8 +67,9 @@ export const getSocket = (userId?: string): Socket => {
         socketInstance.on('connect_error', (err) => {
             console.warn('[Socket] Connection warning:', err.message);
         });
-    } else if (userId) {
+    } else if (userId && userId !== lastIdentifiedUserId) {
         if (socketInstance.connected) {
+            lastIdentifiedUserId = userId;
             socketInstance.emit('identify', userId);
             socketInstance.emit('get-online-users');
         }
@@ -90,6 +99,7 @@ export const disconnectSocket = (userId?: string) => {
             // ignore
         }
         socketInstance = null;
+        lastIdentifiedUserId = null;
         currentOnlineUsers = [];
         onlineSubscribers.forEach((cb) => cb([]));
     }
@@ -102,15 +112,25 @@ export const useOnlineUsers = (currentUserId?: string) => {
     const [onlineUsers, setOnlineUsers] = useState<string[]>(currentOnlineUsers);
 
     useEffect(() => {
-        const socket = getSocket(currentUserId);
-        setOnlineUsers(currentOnlineUsers);
+        getSocket(currentUserId);
+        
+        setOnlineUsers((prev) => {
+            if (prev.length === currentOnlineUsers.length && prev.every((u, i) => u === currentOnlineUsers[i])) {
+                return prev;
+            }
+            return currentOnlineUsers;
+        });
 
         const subscriber = (users: string[]) => {
-            setOnlineUsers([...users]);
+            setOnlineUsers((prev) => {
+                if (prev.length === users.length && prev.every((u, i) => u === users[i])) {
+                    return prev;
+                }
+                return users;
+            });
         };
 
         onlineSubscribers.add(subscriber);
-        socket.emit('get-online-users');
 
         return () => {
             onlineSubscribers.delete(subscriber);

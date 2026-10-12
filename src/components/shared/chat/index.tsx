@@ -27,6 +27,7 @@ export default function ChatLayout() {
     const [createChatRoom, { isLoading: isCreatingChatRoom }] = useCreateChatRoomMutation();
 
     const chatRooms = data?.data || [];
+    const chatRoomIds = chatRooms.map((r: any) => r._id).join(',');
 
     // Socket listener for new incoming chat rooms
     useEffect(() => {
@@ -51,8 +52,8 @@ export default function ChatLayout() {
         if (queryChatId) {
             const matchedRoom = chatRooms.find((r: any) => String(r._id) === String(queryChatId));
             if (matchedRoom) {
-                setActiveRoom(matchedRoom);
-                setMessageId(matchedRoom._id);
+                setActiveRoom((prev: any) => (prev?._id === matchedRoom._id ? prev : matchedRoom));
+                setMessageId((prev: any) => (prev === matchedRoom._id ? prev : matchedRoom._id));
                 return;
             }
         }
@@ -63,9 +64,11 @@ export default function ChatLayout() {
                 r.participants?.some((p: any) => String(p._id) === String(queryUserId))
             );
             if (matchedRoom) {
-                setActiveRoom(matchedRoom);
-                setMessageId(matchedRoom._id);
-                setSearchParams({ chatId: matchedRoom._id }, { replace: true });
+                setActiveRoom((prev: any) => (prev?._id === matchedRoom._id ? prev : matchedRoom));
+                setMessageId((prev: any) => (prev === matchedRoom._id ? prev : matchedRoom._id));
+                if (queryChatId !== matchedRoom._id) {
+                    setSearchParams({ chatId: matchedRoom._id }, { replace: true });
+                }
                 return;
             }
         }
@@ -73,11 +76,15 @@ export default function ChatLayout() {
         // 3. If on desktop and nothing selected or selection not found, default to first room
         if (lg && (!messageId || !chatRooms.some((r: any) => r._id === messageId))) {
             const defaultRoom = chatRooms[0];
-            setActiveRoom(defaultRoom);
-            setMessageId(defaultRoom._id);
-            setSearchParams({ chatId: defaultRoom._id }, { replace: true });
+            if (defaultRoom) {
+                setActiveRoom((prev: any) => (prev?._id === defaultRoom._id ? prev : defaultRoom));
+                setMessageId((prev: any) => (prev === defaultRoom._id ? prev : defaultRoom._id));
+                if (queryChatId !== defaultRoom._id) {
+                    setSearchParams({ chatId: defaultRoom._id }, { replace: true });
+                }
+            }
         }
-    }, [queryChatId, queryUserId, chatRooms, lg, messageId, setSearchParams]);
+    }, [queryChatId, queryUserId, chatRoomIds, lg]);
 
     const selectRoom = (room: any) => {
         setActiveRoom(room);
